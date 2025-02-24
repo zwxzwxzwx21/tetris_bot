@@ -239,13 +239,40 @@ def drop_piece(piece, board, col):
         row += 1
     place_piece(piece, board, row, col)  
 
+def check_holes(board):
+    #pass
+    #todo, somehow figure out a way to check for holes on sides, because it wont be chceking with current loop and ifs
+    for row in range(20):
+        for col in range(10):
+            if board[row][col] == ' ':  
+                pieces_around = 0
+                available_neighbors = 0
 
+                for x_row in range(-1, 2):
+                    for y_col in range(-1, 2):
+                        if not (x_row == 0 and y_col == 0): 
+                            new_row, new_col = row + x_row, col + y_col
+
+                            # Sprawdzanie granic planszy
+                            if 0 <= new_row < 20 and 0 <= new_col < 10:
+                                available_neighbors += 1
+                                if board[new_row][new_col] != ' ':
+                                    pieces_around += 1
+                if pieces_around == available_neighbors:
+                    print('piece placement makes a hole',row,col)
+
+
+
+def check_cover(board):
+    # this one doesnt check for holes but if anything is above a hole, goes upwards and if there is anything covering then prints it out
+    pass
 if __name__ == "__main__":
     #check_pos()
     for i in range(9):
         board1 = copy.deepcopy(board)
         drop_piece(s_piece_s,board1,col=i)
         print_board(board1)
+        check_holes(board1)
     
     #use_piece, queue = read_queue()
     
