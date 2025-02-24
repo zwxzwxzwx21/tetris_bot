@@ -1,8 +1,31 @@
 import pyautogui
 import time
+import copy
 # board zoom at 95% 
 
-board = [[ '' for _ in range(10)] for _ in range(20)]
+#board = [[ '' for _ in range(10)] for _ in range(20)]
+board = [
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ','x',' ',' '],
+    [' ',' ','x',' ','x',' ',' ','x',' ','x'],
+    ['x','x','x','x','x','x','x','x','x','x'],
+    ]
 ''' pieces '''
 #region
 # f - flat
@@ -192,18 +215,44 @@ def check_pos():
         print(x,y,pyautogui.pixel(x,y)) 
         time.sleep(0.2)
 def make_placements(board,pieces):
+    pass
+
+def can_place(piece,board,row,col):
+    for dy,piece_row in enumerate(piece):
+        for dx, cell in enumerate(piece_row):
+            if cell != ' ':
+                y, x = row + dy, col + dx
+                if y >= len(board) or x < 0 or x >= len(board[0]) or board[y][x] != ' ':
+                    return False
+    return True
+
+
+def place_piece(piece, board, row, col):
+    for dy, piece_row in enumerate(piece):
+        for dx, cell in enumerate(piece_row):
+            if cell != ' ':
+                board[row + dy][col + dx] = cell
+
+def drop_piece(piece, board, col):
+    row = 0
+    while can_place(piece, board, row + 1, col):
+        row += 1
+    place_piece(piece, board, row, col)  
 
 
 if __name__ == "__main__":
     #check_pos()
+    for i in range(9):
+        board1 = copy.deepcopy(board)
+        drop_piece(s_piece_s,board1,col=i)
+        print_board(board1)
     
+    #use_piece, queue = read_queue()
     
-    use_piece, queue = read_queue()
-    
-    print(use_piece)
+    #print(use_piece)
 
-    q_bruteforce = [use_piece] # queue which we will bruteforce on board, used as arg for function so its more flexible, can use 1 to  6 pieces
+    #q_bruteforce = [use_piece] # queue which we will bruteforce on board, used as arg for function so its more flexible, can use 1 to  6 pieces
     
-    make_placements(board,q_bruteforce)
+    #make_placements(board,q_bruteforce)
     #print(board)
     
