@@ -3,7 +3,119 @@ import time
 # board zoom at 95% 
 
 board = [[ '' for _ in range(10)] for _ in range(20)]
+''' pieces '''
+#region
+# f - flat
+# cw - clockwise
+# ccw- counter clockwise
+# 180 - yeha
+# s - side (for pieces like i, s, z)
 
+# O piece
+o_piece = [
+    ['O', 'O'],
+    ['O', 'O']
+]
+# I piece
+i_piece_s = [
+    ['I'],
+    ['I'],
+    ['I'],
+    ['I']
+]
+
+i_piece_f = [
+    ['I', 'I', 'I', 'I']
+]
+# T piece
+t_piece_f = [
+    ['T', 'T', 'T'],
+    [' ', 'T', ' ']
+]
+
+t_piece_180 = [
+    [' ', 'T', ' '],
+    ['T', 'T', 'T']
+]
+
+t_piece_cw = [
+    ['T', ' '],
+    ['T', 'T'],
+    ['T', ' ']
+]
+
+t_piece_ccw = [
+    [' ', 'T'],
+    ['T', 'T'],
+    [' ', 'T']
+]
+# L piece
+l_piece_f = [
+    [' ', ' ', 'L'],
+    ['L', 'L', 'L']
+]
+
+l_piece_180 = [
+    ['L', 'L', 'L'],
+    ['L', ' ', ' ']
+]
+
+l_piece_cw = [
+    ['L', ' '],
+    ['L', ' '],
+    ['L', 'L']
+]
+
+l_piece_ccw = [
+    ['L', 'L'],
+    [' ', 'L'],
+    [' ', 'L']
+]
+# J piece
+l_piece_f = [
+    ['J', ' ', ' '],
+    ['J', 'J', 'J']
+]
+
+l_piece_180 = [
+    ['J', 'J', 'J'],
+    [' ', ' ', 'J']
+]
+
+l_piece_cw = [
+    ['J', 'J'],
+    ['J', ' '],
+    ['J', ' ']
+]
+
+l_piece_ccw = [
+    [' ', 'J'],
+    [' ', 'J'],
+    ['J', 'J']
+]
+# S piece
+s_piece_f = [
+    [' ', 'S', 'S'],
+    ['S', 'S', ' ']
+]
+
+s_piece_s = [
+    ['S', ' '],
+    ['S', 'S'],
+    [' ', 'S']
+]
+# Z piece
+z_piece_f = [
+    ['Z', 'Z', ' '],
+    [' ', 'Z', 'Z']
+]
+
+z_piece_s = [
+    [' ', 'Z'],
+    ['Z', 'Z'],
+    ['Z', ' ']
+]
+#endregion
 '''
 # pieces:
 # j - (25, 131, 191) poss moves: 8+8+9+9 (34)
@@ -14,6 +126,10 @@ board = [[ '' for _ in range(10)] for _ in range(20)]
 # t - (180, 81, 172) same as l/j (34)
 # i - (65, 175, 222) 10+7 (17)'''
 
+def print_board(board):
+    for row in board:
+        print(' '.join(row))
+    print()
     
 def read_queue():
     p1,p2,p3,p4,p5 = '','','','','' # pieces
@@ -76,7 +192,8 @@ def check_pos():
         print(x,y,pyautogui.pixel(x,y)) 
         time.sleep(0.2)
 def make_placements(board,pieces):
-    
+
+
 if __name__ == "__main__":
     #check_pos()
     
