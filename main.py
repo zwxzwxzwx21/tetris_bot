@@ -6,26 +6,26 @@ import copy
 #board = [[ '' for _ in range(10)] for _ in range(20)]
 board = [
     
-    ['x','x','x','x','x','x','x',' ','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
-    ['x','x','x',' ','x','x','x','x','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
-    ['x','x','x','x','x','x','x','x','x',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ','x',' ',' ','x'],
+    ['x',' ',' ','x',' ','x','x',' ',' ','x'],
     ['x','x','x','x','x','x','x','x','x','x'],
-    ['x','x','x','x','x','x','x',' ','x','x'],
-    ['x','x','x','x','x','x','x','x','x','x'],
-    ['x','x','x','x','x','x','x','x','x','x'],
-    ['x','x','x','x','x','x','x','x','x','x'],
-    ['x','x','x','x','x','x','x','x','x','x'],
-    ['x','x','x','x',' ','x',' ','x','x','x'],
-    ['x','x','x','x','x','x','x','x','x','x'],
-    [' ','x','x','x','x','x','x','x','x',' '],
     ]
 ''' pieces '''
 #region
@@ -261,6 +261,8 @@ def check_holes(board):
                                     pieces_around += 1
                 if pieces_around == available_neighbors:
                     print('piece placement makes a hole',row,col)
+                    return True
+    return False
 
 
 
@@ -272,7 +274,8 @@ def check_cover(board):
                 for y in range(row-1,-1,-1):
                     if board[y][col] != ' ':
                         print(f' cover at line {col}, y = {y}, row = {row}')
-                        break
+                        return True
+    return False
 
 def choose_piece():
     import random
@@ -283,51 +286,76 @@ def choose_piece():
     
 def bruteforce_placements(board,piece):
     rotations = {
-        'I': [i_piece_f,i_piece_s],
-        'O': [o_piece],
-        'S': [s_piece_f,s_piece_s],
-        'Z': [z_piece_f,z_piece_s],
-        'L': [l_piece_180,l_piece_ccw,l_piece_cw,l_piece_f],
-        'J': [j_piece_180,j_piece_ccw,j_piece_cw,j_piece_f],
-        'T': [t_piece_180,t_piece_ccw,t_piece_cw,t_piece_f]
+        'I': ['i_piece_f','i_piece_s'],
+        'O': ['o_piece'],
+        'S': ['s_piece_f','s_piece_s'],
+        'Z': ['z_piece_f','z_piece_s'],
+        'L': ['l_piece_180','l_piece_ccw','l_piece_cw','l_piece_f'],
+        'J': ['j_piece_180','j_piece_ccw','j_piece_cw','j_piece_f'],
+        'T': ['t_piece_180','t_piece_ccw','t_piece_cw','t_piece_f']
     }
     # this one is keeping track of colums you move from  0 to X, where x needs to change because some pieces are longer than others
     column_number = {
-        i_piece_f: 6,
-        i_piece_s: 9,
-        o_piece: 8,
-        s_piece_f : 7,
-        s_piece_s : 8,
-        z_piece_f : 7,
-        z_piece_s : 8,
-        l_piece_180 : 7,
-        l_piece_ccw : 8,
-        l_piece_cw : 8,
-        l_piece_f : 7,
-        j_piece_180 : 7,
-        j_piece_ccw : 8,
-        j_piece_cw : 8,
-        j_piece_f : 7,
-        t_piece_180 : 7,
-        t_piece_ccw : 8,
-        t_piece_cw : 8,
-        t_piece_f : 7
+        'i_piece_f': 6,
+        'i_piece_s': 9,
+        'o_piece': 8,
+        's_piece_f' : 7,
+        's_piece_s' : 8,
+        'z_piece_f' : 7,
+        'z_piece_s' : 8,
+        'l_piece_180' : 7,
+        'l_piece_ccw' : 8,
+        'l_piece_cw' : 8,
+        'l_piece_f' : 7,
+        'j_piece_180' : 7,
+        'j_piece_ccw' : 8,
+        'j_piece_cw' : 8,
+        'j_piece_f' : 7,
+        't_piece_180' : 7,
+        't_piece_ccw' : 8,
+        't_piece_cw' : 8,
+        't_piece_f' : 7
+    }
+    str_to_piece =  {
+        'i_piece_f' : i_piece_f,
+        'i_piece_s' : i_piece_s,
+        'o_piece' : o_piece,
+        's_piece_f': s_piece_f,
+        's_piece_s' :s_piece_s,
+        'z_piece_f' :z_piece_f,
+        'z_piece_s' :z_piece_s,
+        'l_piece_180': l_piece_180,
+        'l_piece_ccw' :l_piece_ccw,
+        'l_piece_cw' :l_piece_cw,
+        'l_piece_f':l_piece_f,
+        'j_piece_180': j_piece_180,
+        'j_piece_ccw' :j_piece_ccw,
+        'j_piece_cw' :j_piece_cw,
+        'j_piece_f' :j_piece_f,
+        't_piece_180': t_piece_180,
+        't_piece_ccw': t_piece_ccw,
+        't_piece_cw' :t_piece_cw,
+        't_piece_f': t_piece_f,
     }
     for rotation in rotations[piece]:
-        for xpos in range(column_number[rotation[piece]]):
-            
+        for xpos in range(column_number[rotation]):
+            board_copy = copy.deepcopy(board)
+            drop_piece(str_to_piece[rotation],board_copy,xpos)
+            if check_cover(board_copy) != True and check_holes(board_copy) != True:
+                print_board(board_copy)
 
 
 if __name__ == "__main__":
     #check_pos()
-    for i in range(9):
+    for i in range(1):
         board1 = copy.deepcopy(board)
-        drop_piece(s_piece_s,board1,col=i)
-        print_board(board1)
+        #drop_piece(s_piece_s,board1,col=i)
+        #print_board(board1)
         #check_holes(board1)
         #check_cover(board)
         piece = choose_piece()
         print(f"chosen piece is {piece}")
+        bruteforce_placements(board1,piece)
         
         
         
