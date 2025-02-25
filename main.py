@@ -5,26 +5,27 @@ import copy
 
 #board = [[ '' for _ in range(10)] for _ in range(20)]
 board = [
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ','x',' ',' '],
-    [' ',' ','x',' ','x',' ',' ','x',' ','x'],
+    
+    ['x','x','x','x','x','x','x',' ','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
+    ['x','x','x',' ','x','x','x','x','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
+    ['x','x','x','x','x','x','x','x','x',' '],
     ['x','x','x','x','x','x','x','x','x','x'],
+    ['x','x','x','x','x','x','x',' ','x','x'],
+    ['x','x','x','x','x','x','x','x','x','x'],
+    ['x','x','x','x','x','x','x','x','x','x'],
+    ['x','x','x','x','x','x','x','x','x','x'],
+    ['x','x','x','x','x','x','x','x','x','x'],
+    ['x','x','x','x',' ','x',' ','x','x','x'],
+    ['x','x','x','x','x','x','x','x','x','x'],
+    [' ','x','x','x','x','x','x','x','x',' '],
     ]
 ''' pieces '''
 #region
@@ -95,23 +96,23 @@ l_piece_ccw = [
     [' ', 'L']
 ]
 # J piece
-l_piece_f = [
+j_piece_f = [
     ['J', ' ', ' '],
     ['J', 'J', 'J']
 ]
 
-l_piece_180 = [
+j_piece_180 = [
     ['J', 'J', 'J'],
     [' ', ' ', 'J']
 ]
 
-l_piece_cw = [
+j_piece_cw = [
     ['J', 'J'],
     ['J', ' '],
     ['J', ' ']
 ]
 
-l_piece_ccw = [
+j_piece_ccw = [
     [' ', 'J'],
     [' ', 'J'],
     ['J', 'J']
@@ -206,7 +207,7 @@ def read_queue():
     p_use = pieces[pyautogui.pixel(1258, 192)]
     return p_use, queue
 
-def move_pieves(queue):
+def move_pieces(queue):
     pass 
 # this function will work like this that you pass q as argument and make p2 -> p1, p3 -> p2 etc, can do with p2,p3 = p1,p2
 def check_pos():
@@ -265,15 +266,71 @@ def check_holes(board):
 
 def check_cover(board):
     # this one doesnt check for holes but if anything is above a hole, goes upwards and if there is anything covering then prints it out
-    pass
+    for row in range(20):
+        for col in range(10):
+            if board[row][col] == ' ':
+                for y in range(row-1,-1,-1):
+                    if board[y][col] != ' ':
+                        print(f' cover at line {col}, y = {y}, row = {row}')
+                        break
+
+def choose_piece():
+    import random
+    piece_variant =random.randint(0,6)
+    #temp function because we dont wanna roll pieces, its just good for bruteforcing pieces, for now i wanna have 2 piece placements bruteforced, can do that rather nicely
+    pieces = ['I','O','S','Z','L','J','T']
+    return pieces[piece_variant]
+    
+def bruteforce_placements(board,piece):
+    rotations = {
+        'I': [i_piece_f,i_piece_s],
+        'O': [o_piece],
+        'S': [s_piece_f,s_piece_s],
+        'Z': [z_piece_f,z_piece_s],
+        'L': [l_piece_180,l_piece_ccw,l_piece_cw,l_piece_f],
+        'J': [j_piece_180,j_piece_ccw,j_piece_cw,j_piece_f],
+        'T': [t_piece_180,t_piece_ccw,t_piece_cw,t_piece_f]
+    }
+    # this one is keeping track of colums you move from  0 to X, where x needs to change because some pieces are longer than others
+    column_number = {
+        i_piece_f: 6,
+        i_piece_s: 9,
+        o_piece: 8,
+        s_piece_f : 7,
+        s_piece_s : 8,
+        z_piece_f : 7,
+        z_piece_s : 8,
+        l_piece_180 : 7,
+        l_piece_ccw : 8,
+        l_piece_cw : 8,
+        l_piece_f : 7,
+        j_piece_180 : 7,
+        j_piece_ccw : 8,
+        j_piece_cw : 8,
+        j_piece_f : 7,
+        t_piece_180 : 7,
+        t_piece_ccw : 8,
+        t_piece_cw : 8,
+        t_piece_f : 7
+    }
+    for rotation in rotations[piece]:
+        for xpos in range(column_number[rotation[piece]]):
+            
+
+
 if __name__ == "__main__":
     #check_pos()
     for i in range(9):
         board1 = copy.deepcopy(board)
         drop_piece(s_piece_s,board1,col=i)
         print_board(board1)
-        check_holes(board1)
-    
+        #check_holes(board1)
+        #check_cover(board)
+        piece = choose_piece()
+        print(f"chosen piece is {piece}")
+        
+        
+        
     #use_piece, queue = read_queue()
     
     #print(use_piece)
