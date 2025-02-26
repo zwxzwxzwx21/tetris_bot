@@ -4,7 +4,7 @@ import copy
 # board zoom at 95% 
 
 #board = [[ '' for _ in range(10)] for _ in range(20)]
-board = [
+'''board = [
     
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
@@ -27,7 +27,30 @@ board = [
     ['x',' ',' ','x',' ','x','x',' ',' ','x'],
     ['x','x','x','x','x','x','x','x','x','x'],
     ]
-''' pieces '''
+'''''' pieces '''
+board = [
+    
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+    ['x','x','x','x','x','x','x','x','x','x'],
+    ]
 #region
 # f - flat
 # cw - clockwise
@@ -140,6 +163,28 @@ z_piece_s = [
     ['Z', ' ']
 ]
 #endregion
+sequences = [
+    ["T", "T", "L"],  # TTL
+    ["T", "T", "J"],  # TTJ
+    ["L", "O", "J"],  # LOJ
+    ["J", "O", "L"],  # JOL
+    ["L", "S", "L"],  # LSL
+    ["J", "Z", "J"],   # JZJ
+    ["L", "T", "T"],
+    ["J", "T", "T"],
+    ["L", "S", "L"],
+    ["J", "Z", "J"],
+    ["O", "I", "O"],
+    ["O", "O", "I"],
+    ["I", "O", "O"],
+    ["T", "S", "L"],
+    ["L", "Z", "J"],
+    ["L", "L", "O"],
+    ["J", "J", "O"],
+    ["O", "J", "J"],
+    ["O", "L", "L"],
+]  
+
 '''
 # pieces:
 # j - (25, 131, 191) poss moves: 8+8+9+9 (34)
@@ -260,7 +305,7 @@ def check_holes(board):
                                 if board[new_row][new_col] != ' ':
                                     pieces_around += 1
                 if pieces_around == available_neighbors:
-                    print('piece placement makes a hole',row,col)
+                    #print('piece placement makes a hole',row,col)
                     return True
     return False
 
@@ -273,7 +318,7 @@ def check_cover(board):
             if board[row][col] == ' ':
                 for y in range(row-1,-1,-1):
                     if board[y][col] != ' ':
-                        print(f' cover at line {col}, y = {y}, row = {row}')
+                        #print(f' cover at line {col}, y = {y}, row = {row}')
                         return True
     return False
 
@@ -284,37 +329,37 @@ def choose_piece():
     pieces = ['I','O','S','Z','L','J','T']
     return pieces[piece_variant]
     
-def bruteforce_placements(board,piece):
+def bruteforce_placements(board,pieces,current_piece_index=0):
     rotations = {
         'I': ['i_piece_f','i_piece_s'],
         'O': ['o_piece'],
         'S': ['s_piece_f','s_piece_s'],
         'Z': ['z_piece_f','z_piece_s'],
-        'L': ['l_piece_180','l_piece_ccw','l_piece_cw','l_piece_f'],
-        'J': ['j_piece_180','j_piece_ccw','j_piece_cw','j_piece_f'],
-        'T': ['t_piece_180','t_piece_ccw','t_piece_cw','t_piece_f']
+        'L': ['l_piece_f','l_piece_ccw','l_piece_cw','l_piece_180'],
+        'J': ['j_piece_f','j_piece_ccw','j_piece_cw','j_piece_180'],
+        'T': ['t_piece_f','t_piece_ccw','t_piece_cw','t_piece_180']
     }
     # this one is keeping track of colums you move from  0 to X, where x needs to change because some pieces are longer than others
     column_number = {
-        'i_piece_f': 6,
-        'i_piece_s': 9,
-        'o_piece': 8,
-        's_piece_f' : 7,
-        's_piece_s' : 8,
-        'z_piece_f' : 7,
-        'z_piece_s' : 8,
-        'l_piece_180' : 7,
-        'l_piece_ccw' : 8,
-        'l_piece_cw' : 8,
-        'l_piece_f' : 7,
-        'j_piece_180' : 7,
-        'j_piece_ccw' : 8,
-        'j_piece_cw' : 8,
-        'j_piece_f' : 7,
-        't_piece_180' : 7,
-        't_piece_ccw' : 8,
-        't_piece_cw' : 8,
-        't_piece_f' : 7
+        'i_piece_f': 6+1,
+        'i_piece_s': 9+1,
+        'o_piece': 8+1,
+        's_piece_f' : 7+1,
+        's_piece_s' : 8+1,
+        'z_piece_f' : 7+1,
+        'z_piece_s' : 8+1,
+        'l_piece_180' : 7+1,
+        'l_piece_ccw' : 8+1,
+        'l_piece_cw' : 8+1,
+        'l_piece_f' : 7+1,
+        'j_piece_180' : 7+1,
+        'j_piece_ccw' : 8+1,
+        'j_piece_cw' : 8+1,
+        'j_piece_f' : 7+1,
+        't_piece_180' : 7+1,
+        't_piece_ccw' : 8+1,
+        't_piece_cw' : 8+1,
+        't_piece_f' : 7+1
     }
     str_to_piece =  {
         'i_piece_f' : i_piece_f,
@@ -337,13 +382,81 @@ def bruteforce_placements(board,piece):
         't_piece_cw' :t_piece_cw,
         't_piece_f': t_piece_f,
     }
-    for rotation in rotations[piece]:
+    if current_piece_index >= len(pieces):
+        print("Plansza po ułożeniu wszystkich klocków:")
+        #print_board(board)
+        return
+    
+    # Pobierz aktualny klocek
+    current_piece = pieces[current_piece_index]
+    
+    # Przetwarzaj wszystkie możliwe ułożenia aktualnego klocka
+    for rotation in rotations[current_piece]:
         for xpos in range(column_number[rotation]):
+            # Utwórz kopię planszy
             board_copy = copy.deepcopy(board)
-            drop_piece(str_to_piece[rotation],board_copy,xpos)
+            
+            # Ułóż klocek na kopii planszy
+            drop_piece(str_to_piece[rotation], board_copy, xpos)
+            
+            # Sprawdź, czy ułożenie jest poprawne
             if check_cover(board_copy) != True and check_holes(board_copy) != True:
-                print_board(board_copy)
+                # Rekurencyjnie przetwarzaj następny klocek
+                bruteforce_placements(board_copy, pieces, current_piece_index + 1)
 
+def check_sequence_with_gaps(pieces, sequence):
+    seq_index = 0
+
+    for piece in pieces:
+        
+        if piece == sequence[seq_index]:
+            seq_index += 1 
+            if seq_index == len(sequence):
+                return True
+    return False
+
+def check_sequences_with_gaps(pieces, sequences):
+
+    found_sequences = []
+    
+    for sequence in sequences:
+        if check_sequence_with_gaps(pieces, sequence):
+            found_sequences.append(sequence)
+    
+    return found_sequences
+        
+def compare_to_avg(height_array,average):
+    print(average, "avg height")
+    offset = 0
+    for height in height_array:
+        offset_ = height - average
+        if offset_ < 0:
+            offset_ *= -1
+        offset += offset_
+    print(offset)
+
+def find_box(queue):
+    # this one checks if there is a box pattern possible given a queue
+    box = [[' ' for i in range(3)] for i in range(4)]
+    print(box)
+def check_heights(board):
+    #this function checks how  flat the board is by taking average of every column and comparing it to each column, if its close 
+    # to every single column then stack is clean, otherwise it wont be 
+    
+    minos_array = []
+    for stack in range(10):
+        minos_in_line = 0
+        for y in range(20):
+            
+            if board[y][stack] != ' ':
+                minos_in_line += 1
+        print(minos_in_line, 'minos on line', stack)
+        minos_array.append(minos_in_line)
+    sum_height = 0
+    for height in minos_array:
+        sum_height += height
+    average_height = sum_height/10
+    compare_to_avg(minos_array,average_height)
 
 if __name__ == "__main__":
     #check_pos()
@@ -353,10 +466,15 @@ if __name__ == "__main__":
         #print_board(board1)
         #check_holes(board1)
         #check_cover(board)
-        piece = choose_piece()
-        print(f"chosen piece is {piece}")
-        bruteforce_placements(board1,piece)
+        #piece = choose_piece()
+        piece = ['O','I','T',"O"]
+        #print(f"chosen piece is {piece}")
+        #bruteforce_placements(board1,piece)
+        #check_heights(board)
         
+        found_sequences = check_sequences_with_gaps(piece, sequences)
+        if found_sequences:
+            print(found_sequences[-1])  # !! use that to access first sequence
         
         
     #use_piece, queue = read_queue()
