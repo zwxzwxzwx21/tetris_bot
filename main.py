@@ -1,3 +1,5 @@
+# SO FAR NOT USED AS MY FILE SPLITTING BAD HEHE
+
 import pyautogui
 import time
 import copy
@@ -22,8 +24,8 @@ board = [
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ','x','x','x',' ','x','x'],
+    ['x','x','x','x','x','x','x','x','x','x'],
     ]
 # keep track of dependencies like I,J,L
 # keep track of when a next piece when appear, when you place o piece on empty board, next o piece wont appear in at least 7 pieces!
@@ -34,44 +36,50 @@ board = [
 
 # creating i dependencies is good UNTIL you have i pieces to fill them with, in a run you wont have more than 16-17 I pieces so you need to limit your I piece usage (including dependencies)!
 
-queues = [
-            ['O','J','I','L','S','T'],  # First queue # SEED 1 
-            ['Z','T','O','L','J','S'],  # Second queue
-            ['T','Z','J','J','S','L'],   # Third queue
-            ['I','T','Z','O','I','T'],   # Third queue
-            ['L','O','Z','S','J','J'],   # Third queue
-            ['O','Z','L','I','T','O']   # Third queue
-        ]
-    
+# yeah fuck efficiency for now, i think the best idea, tho extremely inefficient (IT DOESNT MATTER!!):
+# take a piece and before making placement think about other pieces, so if you have a q
+# think how other pieces would behave when you place one piece, if that piece placement would lead to uneven stack, then you need to  abbandon it
+# another good thing would be to keep track of flatness of the board for pieces, if your board is completely flat, you cant place Z/S,
+# if its spikey, you cant place O piece, idk how to do that to, fuck my life.
 
-queue = ['O','J','I','L','S','T','Z','T','O','L','J','S','I','Z','L','I','S','O','I','T','Z','O','I','T','L','O','Z','S','J','J','O','Z','L','I','T','O']
+# ig what you can do is run function that checks if stack is viable to place o piece and z,s piece, instead of checking if its even  or not.
+# height diff checks seems to be good idea as having stack being uneven just makes shit ton of dependencies which clearing up is nightmare
+
+
+queue = ['O','J','I','L','S','T'] # ['O','J','I','L','S','T']  First queue # SEED 1 
+
+    #['O','J','I','L','S','T','Z','T','O','L','J','S','I','Z','L','I','S','O','I','T','Z','O','I','T','L','O','Z','S','J','J','O','Z','L','I','T','O']
+
+#queue = ['O','J','I','L','S','T']
+
 # wow it works nice, now what i need to do is to have counter of I pieces to not overshoot
 
 
 
 import timeit
 import time
-from bruteforcing import bruteforce_placements
+from bruteforcing import find_best_placement
 from utility.print_board import print_board
 
 def measure_execution_time():
     start_time = time.perf_counter()
     
-    if __name__ == "__main__":
-        # Initialize with empty board
-        current_board = copy.deepcopy(board)
-       
-        current_board = bruteforce_placements(current_board, queue, 0)
-        print_board(current_board)
+    # Przekazujemy CAŁĄ kolejkę, nie pojedyncze klocki
+    final_board = find_best_placement(board, queue)  # Start od indeksu 0
     
     end_time = time.perf_counter()
     execution_time = end_time - start_time
     
-    print("\nFinal board state:")
-    print_board(current_board)
-    print(f"\nTotal runtime: {execution_time:.6f} seconds")
+    print("\nfinal board state ")
+    if final_board is not None:
+        pass
+        print_board(final_board)
+    else:
+        print("bruteforced failed to find good placement (rn nothing is good tho as there are no rules)")
+    
+    print(f"\ntotal runtime {execution_time:.6f} seconds")
 
-# Run the modified function
+
 measure_execution_time()
 
 

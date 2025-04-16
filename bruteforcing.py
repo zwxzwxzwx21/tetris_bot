@@ -59,37 +59,51 @@ import time
 
 # Ustawienia
 TIME_LIMIT = 0.1  # 100 ms na planowanie
-UNEVEN_THRESHOLD = 1
+UNEVEN_THRESHOLD = 1.1
 MAX_HEIGHT_DIFF = 11
 
 def find_best_placement(board, queue):
-    """Znajduje najlepsze ułożenie z automatycznym czyszczeniem linii."""
+    """Znajduje najlepsze ułożenie z priorytetem dla Perfect Clear."""
     global start_time
     start_time = time.perf_counter()
     best_board = None
     best_score = float('inf')
     best_move = None
+    perfect_clear_found = False
 
-    def evaluate(board):
+    def evaluate(board, is_potential_pc=False):
         height_diff, heights = height_difference(board)
         uneven = uneven_stack_est(heights)
-        return height_diff * uneven
+        score = height_diff * uneven
+        
+        # Ogromny bonus za Perfect Clear
+        if is_potential_pc:
+            score -= 10000
+        return score
 
     def recursive_search(board, queue, current_piece_index, move_history):
-        nonlocal best_board, best_score, best_move
+        nonlocal best_board, best_score, best_move, perfect_clear_found
 
         if time.perf_counter() - start_time > TIME_LIMIT:
             return
 
         if current_piece_index >= len(queue):
-            # Przed oceną wyczyść pełne linie
-            cleared_board = clear_lines(copy.deepcopy(board))
-            score = evaluate(cleared_board)
-            if score < best_score:
-                best_board = cleared_board
-                best_score = score
+            # Sprawdź czy to Perfect Clear
+            is_pc = check_perfect_clear(board)
+            current_score = evaluate(board, is_pc)
+            
+            if is_pc:  # Znaleziono Perfect Clear
+                if not perfect_clear_found or current_score < best_score:
+                    perfect_clear_found = True
+                    best_board = board
+                    best_score = current_score
+                    best_move = move_history[0]
+            elif not perfect_clear_found and current_score < best_score:
+                best_board = board
+                best_score = current_score
                 best_move = move_history[0]
             return
+            
 
         current_piece = queue[current_piece_index]
         for rotation_name, piece_shape in PIECES[current_piece].items():
@@ -99,7 +113,6 @@ def find_best_placement(board, queue):
                 if new_board is None:
                     continue
 
-                # Sprawdź warunki przed rekurencją
                 height_diff, heights = height_difference(new_board)
                 uneven = uneven_stack_est(heights)
                 if (uneven > UNEVEN_THRESHOLD or 
@@ -117,6 +130,33 @@ def find_best_placement(board, queue):
 
     recursive_search(board, queue, 0, [])
     return best_board, best_move
+
+def check_perfect_clear(board):
+    """Sprawdza czy plansza jest gotowa do Perfect Clear."""
+    # Sprawdź czy wszystkie linie są pełne
+    for row in board:
+        if not all(cell != ' ' for cell in row):
+            return False
+    return True
+
+def check_potential_perfect_clear(board, piece_type, rotation, x):
+    """Sprawdza czy dane ułożenie prowadzi do Perfect Clear."""
+    # Symulacja ułożenia klocka
+    temp_board = copy.deepcopy(board)
+    piece_shape = PIECES[piece_type][rotation]
+    
+    # Znajdź gdzie klocek się zatrzyma
+    y = 0
+    while can_place(piece_shape, temp_board, y + 1, x):
+        y += 1
+    
+    # Umieść klocek
+    place_piece(piece_shape, temp_board, y, x)
+    
+    # Sprawdź Perfect Clear
+    return check_perfect_clear(temp_board)
+
+# W pętli głównej dodaj:
 
 def clear_lines(board):
     """Czyści pełne linie i stosuje grawitację."""
@@ -157,9 +197,12 @@ def apply_gravity(board):
 
 # Przykład użycia
 board = [[' ' for _ in range(10)] for _ in range(20)]
-queue = ['O','J','I','L','S','T']
 
-    #['O','J','I','L','S','T','Z','T','O','L','J','S','I','Z','L','I','S','O','I','T','Z','O','I','T','L','O','Z','S','J','J','O','Z','L','I','T','O']
+from tetrio_parsing.screen_reading import get_next_piece,read_queue
+queue = read_queue()
+queue.append(get_next_piece())
+    #['O','J','I','L','S','T','Z','T','O','L','J','S','I','Z','L','I','S','O','T','Z','J','J','S','L','O','Z','S','J','J','O','Z','L','I','T','O']
+time.sleep(1)
 while True:
     print("\n=== Current Queue ===")
     print(queue)
@@ -180,9 +223,12 @@ while True:
     board = clear_lines(board)
     
     print(f"\nPlaced: {piece_type} at x={x}, rotation={rotation}")
+    move_piece(piece_type,x,rotation)
     print_board(board)
-    
+    time.sleep(0.04)
     # Symulacja nowego klocka
-    new_piece = input("Enter next piece (I, O, L, J, S, Z, T): ").strip().upper()
+    new_piece = get_next_piece()
+    print('NEW PIECE: ', new_piece  )
+    time.sleep(0.04)
     queue.pop(0)
     queue.append(new_piece)

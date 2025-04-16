@@ -19,7 +19,7 @@ def check_holes(board, check_covered=False):
                 for y in range(row-1, -1, -1):
                     if board[y][col] != ' ':
                         return True  # covered
-                return False  # not covered
+                return False  # not  covered
     return False
 
 def compare_to_avg(height_array, average):
@@ -36,7 +36,8 @@ def compare_to_avg(height_array, average):
         offset += abs(height - average)  
     print('Total offset:', offset)
 
-def check_heights(board):
+def check_heights(board): # BAD
+    #BAD
     """
     Checks board flatness by comparing each column's height to the average.
     
@@ -60,18 +61,19 @@ def height_difference(board):
     Calculates the maximum height difference between columns and returns heights.
     
     Args:
-        board (list): 2D list representing the game board (20 rows x 9 columns).
+        board (list): 2D list representing the game board (20 rows x 10 columns).
     
     Returns:
-        tuple: (max_height_diff, height_array), where height_array contains heights of all 9 columns.
+        tuple: (max_height_diff, height_array), where height_array contains heights of all 10 columns.
     """
     height_array = []
-    for stack in range(9):  
-        minos_in_line = 0
-        for y in range(20):
-            if board[y][stack] != ' ':
-                minos_in_line += 1
-        height_array.append(minos_in_line)
+    for col in range(10):  # Tetris ma 10 kolumn (indeksy 0-9)
+        column_height = 0
+        for row in range(20):
+            if board[row][col] != ' ':
+                column_height = 20 - row  # Wysokość liczona od dołu (0 = pusta kolumna)
+                break
+        height_array.append(column_height)
     
     max_diff = max(height_array) - min(height_array)
     return max_diff, height_array
@@ -124,4 +126,39 @@ def uneven_stack_est(height_array):
     uneven_sum = sum(abs(height_array[j] - height_array[j+1]) for j in range(len(height_array) - 1))
     return uneven_sum / (len(height_array) - 1) 
 
+def get_heights(board):
+    heights = []
+    for col in range(len(board[0])):  
+        for row in range(len(board)):  
+            if board[row][col] != ' ':
+                heights.append(len(board) - row - 1) # 0 index  !!!
+                break
+        else:  
+            heights.append(0)
+    return heights
+board = [
+    
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ','x',' ',' ',' ',' '],
+    [' ','x',' ','x','x','x','x',' ','x','x'],
+    ['x','x','x','x',' ',' ',' ','x',' ',' '],
+    ]
 
+a=get_heights(board)
+print(a)
