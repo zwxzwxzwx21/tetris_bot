@@ -153,32 +153,50 @@ def apply_gravity(board):
                 board[row][col] = ' '
 
 board = [[' ' for _ in range(10)] for _ in range(20)]
+from tetrio_parsing.screen_reading import get_next_piece, read_queue
+from GenerateBag import create_bag, add_piece_from_bag
+from BoardRealTimeView import TetrisBoardViewer
+import time
+import threading
 
-from tetrio_parsing.screen_reading import get_next_piece,read_queue
+# Initialize empty board
+board = [[0 for _ in range(10)] for _ in range(20)]
+queue = create_bag()
+bag = create_bag()
 
-queue = ['O','J','I','L','S','T','Z','T','O','L','J','S','I','Z','L','I','S','O','T','Z','J','J','S','L','O','Z','S','J','J','O','Z','L','I','T','O']
+# Create viewer window
+viewer = TetrisBoardViewer(board)
 
-time.sleep(1)
-while True:
-    print("\n=== Current Queue ===")
-    print(queue)
-    
-    best_board, best_move = find_best_placement(board, queue)
-    
-    if not best_board:
-        print("No valid placement found. Game over?")
-        break
-    
-    piece_type, x, rotation = best_move.split('_')
-    x = int(x[1:])
-    piece_shape = PIECES[piece_type][rotation]
-    board = drop_piece(piece_shape, board, x)
-    
-    board = clear_lines(board)
-    
-    print(f"\nPlaced: {piece_type} at x={x}, rotation={rotation}")
-   
-    print_board(board)
-   
-    queue.pop(0)
-  
+def game_loop():
+    while True:
+        global board, queue, bag
+        print("\n=== Current Queue ===")
+        print(queue)
+        
+        best_board, best_move = find_best_placement(board, queue)
+        
+        if not best_board:
+            print("No valid placement found")
+            break
+        
+        piece_type, x, rotation = best_move.split('_')
+        x = int(x[1:])
+        piece_shape = PIECES[piece_type][rotation]
+        new_board = drop_piece(piece_shape, board, x)
+        
+        new_board = clear_lines(new_board)
+       
+        board[:] = new_board  
+        viewer.update_board(board)
+        print(f"\nPlaced: {piece_type} at x={x}, rotation={rotation}")
+       
+        print_board(board)
+        queue, bag = add_piece_from_bag(queue, bag)
+        queue.pop(0)
+        
+
+game_thread = threading.Thread(target=game_loop, daemon=True)
+game_thread.start()
+
+
+viewer.mainloop()
