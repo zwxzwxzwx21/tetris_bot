@@ -4,7 +4,7 @@ TETROMINOES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L']
 
 def create_bag():
     """Create and shuffle a new 7-bag of tetrominoes."""
-    bag = TETROMINOES.copy()  # Lepiej użyć copy() zamiast [:]
+    bag = TETROMINOES.copy()  
     random.shuffle(bag)
     return bag
 

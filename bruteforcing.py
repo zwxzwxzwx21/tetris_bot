@@ -1,6 +1,10 @@
 import copy
 from utility.print_board import print_board
-from utility.pieces import * # importing piece lookuptable
+from utility.pieces import PIECES  # importing piece lookup table
+
+# Ensure PIECES is properly imported or defined
+if not PIECES:
+    raise ImportError("PIECES dictionary could not be imported or is empty.")
 from board_operations.stack_checking import compare_to_avg, check_heights, check_holes, check_i_dep, uneven_stack_est, height_difference,get_heights
 from board_operations.checking_valid_placements import drop_piece,place_piece,can_place
 from tetrio_parsing.movement import move_piece
@@ -17,7 +21,6 @@ import time
 #
 
 
-debug = True
 rotations = {
     'I': ['flat', 'spin'],
     'O': ['flat'],
@@ -55,7 +58,6 @@ column_ranges  = {
         't_cw': 8  ,
         't_flat': 7  
     }
-import time
 
 TIME_LIMIT = 0.1 
 UNEVEN_THRESHOLD = 1.1
@@ -70,14 +72,8 @@ def find_best_placement(board, queue):
     best_move = None
     perfect_clear_found = False
 
-    def evaluate(board, is_potential_pc=False):
-        height_diff, heights = height_difference(board)
-        uneven = uneven_stack_est(heights)
-        score = height_diff * uneven
+    
         
-        if is_potential_pc:
-            score -= 10000
-        return score
 
     def recursive_search(board, queue, current_piece_index, move_history):
         nonlocal best_board, best_score, best_move, perfect_clear_found
@@ -93,6 +89,10 @@ def find_best_placement(board, queue):
             
 
         current_piece = queue[current_piece_index]
+        if current_piece not in PIECES:
+            print(f"Error: Piece '{current_piece}' is not defined in PIECES.")
+            return
+
         for rotation_name, piece_shape in PIECES[current_piece].items():
             max_x = 10 - len(piece_shape[0])
             for x in range(max_x + 1):
@@ -112,7 +112,7 @@ def find_best_placement(board, queue):
                     new_board,
                     queue,
                     current_piece_index + 1,
-                    [*move_history, move] if current_piece_index == 0 else move_history
+                    [*move_history, move]
                 )
 
     recursive_search(board, queue, 0, [])
@@ -120,22 +120,20 @@ def find_best_placement(board, queue):
 
 
 def clear_lines(board):
-    
+    new_board = []
     lines_cleared = 0
-    
-    rows_to_clear = []
-    for row in range(len(board)):
-        if all(cell != ' ' for cell in board[row]):
-            rows_to_clear.append(row)
+
+    for row in board:
+        if all(cell != ' ' for cell in row):
             lines_cleared += 1
-    
-    for row in rows_to_clear:
-        board[row] = [' ' for _ in range(10)]
-    
-    if lines_cleared > 0:
-        apply_gravity(board)
-    
-    return board
+        else:
+            new_board.append(row)
+
+    # Add empty rows at the top for cleared lines
+    for _ in range(lines_cleared):
+        new_board.insert(0, [' ' for _ in range(10)])
+
+    return new_board
 
 def apply_gravity(board):
     
@@ -160,7 +158,7 @@ import time
 import threading
 
 # Initialize empty board
-board = [[0 for _ in range(10)] for _ in range(20)]
+# The board is already initialized earlier, so this line is removed.
 queue = create_bag()
 bag = create_bag()
 
@@ -200,3 +198,5 @@ game_thread.start()
 
 
 viewer.mainloop()
+
+# IMPORTANT BUG GAME SEEMS TO NOT COUNT FIRST PIECE BEING PLACED
