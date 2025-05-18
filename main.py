@@ -1,96 +1,113 @@
-# SO FAR NOT USED AS MY FILE SPLITTING BAD HEHE
-
+# -*- coding: utf-8 -*-
 import pyautogui
-import time
 import copy
-# board zoom at 95% 
-board = [
-    
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ','x','x','x',' ','x','x'],
-    ['x','x','x','x','x','x','x','x','x','x'],
-    ]
-# keep track of dependencies like I,J,L
-# keep track of when a next piece when appear, when you place o piece on empty board, next o piece wont appear in at least 7 pieces!
-# ^ might be stupid, no point really
-# place pieces with advance of one piece, so when you place one piece you want to know immediately when second one will go
-# that lowers the efficiency because you cant change the piece placement if you find a better one, tho i dont think it would be the case as the piece that would have to change inputs is last
-#make possibility to delay box patterns, if you have L piece which you just can really place, just move it to the left and wait for 2 pieces filling the box pattern, can do the same but with 2 T pieces
-
-# creating i dependencies is good UNTIL you have i pieces to fill them with, in a run you wont have more than 16-17 I pieces so you need to limit your I piece usage (including dependencies)!
-
-# yeah fuck efficiency for now, i think the best idea, tho extremely inefficient (IT DOESNT MATTER!!):
-# take a piece and before making placement think about other pieces, so if you have a q
-# think how other pieces would behave when you place one piece, if that piece placement would lead to uneven stack, then you need to  abbandon it
-# another good thing would be to keep track of flatness of the board for pieces, if your board is completely flat, you cant place Z/S,
-# if its spikey, you cant place O piece, idk how to do that to, fuck my life.
-
-# ig what you can do is run function that checks if stack is viable to place o piece and z,s piece, instead of checking if its even  or not.
-# height diff checks seems to be good idea as having stack being uneven just makes shit ton of dependencies which clearing up is nightmare
-
-
-queue = ['O','J','I','L','S','T'] # ['O','J','I','L','S','T']  First queue # SEED 1 
-
-    #['O','J','I','L','S','T','Z','T','O','L','J','S','I','Z','L','I','S','O','I','T','Z','O','I','T','L','O','Z','S','J','J','O','Z','L','I','T','O']
-
-#queue = ['O','J','I','L','S','T']
-
-# wow it works nice, now what i need to do is to have counter of I pieces to not overshoot
-
-
-
-import timeit
 import time
-from bruteforcing import find_best_placement
+import threading
+
 from utility.print_board import print_board
+from utility.pieces import PIECES  # importing piece lookup table
 
-def measure_execution_time():
+from board_operations.stack_checking import compare_to_avg, check_heights, check_holes, check_i_dep, uneven_stack_est, height_difference, get_heights
+from board_operations.checking_valid_placements import drop_piece, place_piece, can_place
+from board_operations.board_operations import clear_lines, apply_gravity
+
+from tetrio_parsing.screen_reading import get_next_piece, read_queue
+from tetrio_parsing.movement import move_piece
+
+from GenerateBag import create_bag, add_piece_from_bag
+
+from BoardRealTimeView import TetrisBoardViewer
+
+# Ensure PIECES is properly imported or defined
+if not PIECES:
+    raise ImportError("PIECES dictionary could not be imported or is empty.")
+
+from bruteforcing import find_best_placement
+
+# Initialize empty board and piece queue/bag
+queue = create_bag()
+bag = create_bag()
+board = [[' ' for _ in range(10)] for _ in range(20)]
+
+# Create the Tetris board viewer window (Pygame)
+viewer = TetrisBoardViewer(board)
+
+# Shared stats object for PPS (Pieces Per Second)
+class GameStats:
+    """
+    Holds statistics for the current game session.
+    Currently only tracks PPS (pieces per second).
+    """
+    def __init__(self):
+        self.pps = 0.0
+
+stats = GameStats()
+
+def game_loop():
+    """
+    Main game loop for the Tetris AI/bot.
+    Continuously finds and places the best move, updates the board and viewer,
+    and tracks performance statistics (PPS).
+    """
+    pieces_placed = 0
     start_time = time.perf_counter()
-    
-    # Przekazujemy CAŁĄ kolejkę, nie pojedyncze klocki
-    final_board = find_best_placement(board, queue)  # Start od indeksu 0
-    
-    end_time = time.perf_counter()
-    execution_time = end_time - start_time
-    
-    print("\nfinal board state ")
-    if final_board is not None:
-        pass
-        print_board(final_board)
-    else:
-        print("bruteforced failed to find good placement (rn nothing is good tho as there are no rules)")
-    
-    print(f"\ntotal runtime {execution_time:.6f} seconds")
+    while True:
+        global board, queue, bag
+        print("\n=== Current Queue ===")
+        print(queue)
+        
+        # Find the best move for the current board and queue
+        best_board, best_move = find_best_placement(board, queue)
+        
+        if not best_board:
+            print("No valid placement found")
+            break
+        
+        # Parse the move string and apply the move
+        piece_type, x, rotation = best_move.split('_')
+        x = int(x[1:])
+        piece_shape = PIECES[piece_type][rotation]
+        new_board = drop_piece(piece_shape, board, x)
+        
+        # Clear lines if needed
+        new_board = clear_lines(new_board)
+       
+        # Update the board and viewer
+        board[:] = new_board  
+        viewer.update_board(board)
+        print(f"\nPlaced: {piece_type} at x={x}, rotation={rotation}")
+       
+        print_board(board)
+        # Add new piece(s) to the queue from the bag and remove the used one
+        queue, bag = add_piece_from_bag(queue, bag)
+        queue.pop(0)
 
+        # PPS calculation (average pieces placed per second)
+        pieces_placed += 1
+        elapsed = time.perf_counter() - start_time
+        if elapsed > 0:
+            stats.pps = pieces_placed / elapsed
+            print(f"PPS (Pieces Per Second): {stats.pps:.2f}")
 
-measure_execution_time()
+# Example: you can now access stats.pps from anywhere, e.g. in your viewer or another thread
 
+# Start the game loop in a separate thread so the viewer remains responsive
+game_thread = threading.Thread(target=game_loop, daemon=True)
+game_thread.start()
 
-#idea:
-#mearuse up how high the stack is on both of the sides and try to match the left side with the side of the boxes on the right
-# another important thing is to have a system that ill judge the flatness of a stack and immediately pic k one which is "good enough"
+# Start the viewer's main loop (blocks until window is closed)
+viewer.mainloop()
 
-# todo:
-# make functionality so you can parse q and play indefinitely 
-# make line clears 
-# scoring system to judge pieces instead of bruteforcing them to save time
-# perfect clear mode/ solver
-# make so it resets when early z/s piece
+# --- 
+# IMPORTANT: 
+# - The game loop will stop if no valid placement is found.
+# - stats.pps can be used in other modules (e.g., for display in the viewer).
+# - This script is intended for AI/bot simulation, debugging, or visualization.
+# - For headless or server-side use, remove or modify the viewer code.
+#
+# TODO:
+# - Add more advanced scoring/evaluation for moves.
+# - Implement perfect clear solver/mode.
+# - Add reset/restart logic for early Z/S pieces or other "unlucky" starts.
+# - Improve stack flatness/height evaluation for better AI performance.
 
