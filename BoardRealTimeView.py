@@ -38,9 +38,17 @@ class TetrisBoardViewer:
             'L': (255, 165, 0),    # orange
             ' ': (0, 0, 0)         # black (empty cell)
         }
-        self.cell_size = 30  # Size of each cell in pixels
-        # Set up the Pygame window: 10 columns x 30px, 20 rows x 30px
-        self.screen = pygame.display.set_mode((10 * self.cell_size, 20 * self.cell_size))
+        self.cell_size = 30
+        
+        # Each section (left panel, board, right panel) has the same width
+        self.board_width = 10 * self.cell_size  # Width of actual Tetris board (10 cells)
+        self.side_panel_width = self.board_width  # Same width as the board
+        
+        # Total window width is now 3x the board width (left panel + board + right panel)
+        window_width = self.board_width + 2 * self.side_panel_width
+        window_height = 20 * self.cell_size
+        
+        self.screen = pygame.display.set_mode((window_width, window_height))
         pygame.display.set_caption("Tetris Board Viewer")
         self.clock = pygame.time.Clock()
         self.draw_board()  # Draw the initial board
@@ -48,21 +56,31 @@ class TetrisBoardViewer:
     def draw_board(self):
         """
         Draws the current board state to the Pygame window.
-        Each cell is drawn as a colored rectangle.
+        Board is in the middle with equal space on both sides.
         """
         self.screen.fill((0, 0, 0))  # Fill background with black
+        
+        # Draw the Tetris board, positioned in the middle
         for y in range(20):
             for x in range(10):
                 value = self.board[y, x]
                 color = self.colors.get(value, (200, 200, 200))  # Default to gray if unknown
                 rect = pygame.Rect(
-                    x * self.cell_size,
+                    self.side_panel_width + (x * self.cell_size),  # Shift by left panel width
                     y * self.cell_size,
                     self.cell_size,
                     self.cell_size
                 )
                 pygame.draw.rect(self.screen, color, rect)  # Draw filled cell
                 pygame.draw.rect(self.screen, (50, 50, 50), rect, 1)  # Draw cell border
+        
+        # Draw subtle borders to show the three sections
+        pygame.draw.rect(self.screen, (40, 40, 40),
+                       pygame.Rect(0, 0, self.side_panel_width, 20 * self.cell_size), 1)
+        pygame.draw.rect(self.screen, (40, 40, 40),
+                       pygame.Rect(self.side_panel_width + self.board_width, 0, 
+                                  self.side_panel_width, 20 * self.cell_size), 1)
+                         
         pygame.display.flip()  # Update the display
 
     def update_board(self, new_board):

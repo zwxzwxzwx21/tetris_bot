@@ -62,7 +62,7 @@ def game_loop():
         if not best_board:
             print("No valid placement found")
             break
-        
+         
         # Parse the move string and apply the move
         piece_type, x, rotation = best_move.split('_')
         x = int(x[1:])

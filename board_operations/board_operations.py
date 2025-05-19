@@ -1,5 +1,7 @@
 # all the functions that directly manipulate the board 
 
+# this file deserve a namechange
+
 # ---
 # This module contains functions for direct manipulation of the Tetris board.
 # Use these functions to clear lines, apply gravity, and perform other board-level operations.
