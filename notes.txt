@@ -23,6 +23,11 @@ left and right garbage and just make the bot try clearing as much combo as possi
 upon pressing the start button that would appear in the middle of the screen, all options (those on the right,which are listed above)
 change to queue, while left side had things like APM, PPS, APP, and maybe other debug informations
 
+approaching APM and combo table:
+i think the best idea would be to simply create some testcases (can finally use that stupid test folder ive created) as in:
+use combo downstackpractice and just copy some maps from there (its a website to practice tetris downstack duh)
+and then just give it to the bot to find either pc (as that is the gamemode in that webside) or jsut highest apm in one combo, for example:
+give it a task to find the most amountn of attack within 5 pieces and see what happens, if it wont find a solution then expand the search and just fuck around really lol
 
 DOWNSIDES:
 very inefficient as most of the times the board we go on will be correct for first pieces but then it will be better to redo calculations
