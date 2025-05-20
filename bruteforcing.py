@@ -50,7 +50,7 @@ column_ranges  = {
     't_flat': 7  
 }
 
-TIME_LIMIT = 2  # Maximum time (in seconds) allowed for the search
+TIME_LIMIT = 3  # Maximum time (in seconds) allowed for the search
 UNEVEN_THRESHOLD = 1.1  # Prune stacks that are too uneven
 MAX_HEIGHT_DIFF = 11    # Prune stacks that are too tall
 

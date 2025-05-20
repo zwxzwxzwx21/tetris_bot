@@ -11,7 +11,6 @@ focusing on first 6 elements we have ['O','J','I','L','S','T']
 now what we need to do is try to create a board that will follor the RULES (more about them later) which will make a good stack. bruteforcing should take a board that yealds one of the better scores,
 (score being graded based on the rules) and place first piece, then after placing a piece we redo calculations, with new piece,
 
-
 3. with new window that shows how algorythm work i would like to add some things that may improve the clarity of how things work:
 - have a small game window like, 360x640 for example, you have some modes on the left like:
      - "random" - which  just places pieces and clears lines, singles,doubles whatever currect algorythm has to offer

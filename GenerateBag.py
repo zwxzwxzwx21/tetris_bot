@@ -2,7 +2,7 @@ import random
 
 TETROMINOES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L']
 
-def create_bag(bag_size=15, no_s_z_first_piece=True):
+def create_bag(bag_size=7, no_s_z_first_piece=True):
     """
     Create and shuffle a new bag of tetrominoes of given size.
     If no_s_z_first_piece is True, ensures the first piece is not S or Z.

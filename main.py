@@ -37,11 +37,29 @@ class GameStats:
     """
     def __init__(self):
         self.pps = 0.0
+        # attacks
+        self.single = 0
+        self.double = 0
+        self.triple = 0
+        self.tetris = 0
 
 stats = GameStats()
 
 # Create the Tetris board viewer window (Pygame)
 viewer = TetrisBoardViewer(board,stats)
+def count_lines_clear(lines_cleared):
+    if lines_cleared == 1:
+        stats.single += 1
+        print("Single cleared") 
+    elif lines_cleared == 2:    
+        stats.double += 1
+        print("Double cleared")
+    elif lines_cleared == 3:    
+        stats.triple += 1
+        print("Triple cleared")
+    elif lines_cleared == 4:
+        stats.tetris += 1
+        print("Tetris cleared") 
 
 def game_loop():
     """
@@ -70,8 +88,9 @@ def game_loop():
         new_board = drop_piece(piece_shape, board, x)
         
         # Clear lines if needed
-        new_board = clear_lines(new_board)
-       
+        new_board,lines_cleared = clear_lines(new_board)
+        print(f"Lines cleared: {lines_cleared}")
+        count_lines_clear(lines_cleared)
         # Update the board and viewer
         board[:] = new_board  
         viewer.update_board(board)

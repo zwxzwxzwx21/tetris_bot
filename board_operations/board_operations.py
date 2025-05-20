@@ -32,7 +32,7 @@ def clear_lines(board):
     for _ in range(lines_cleared):
         new_board.insert(0, [' ' for _ in range(10)])
 
-    return new_board
+    return new_board,lines_cleared
 
 def apply_gravity(board):
     """

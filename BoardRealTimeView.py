@@ -74,6 +74,7 @@ class TetrisBoardViewer:
         Board is in the middle with equal space on both sides.
         """
         self.screen.fill((0, 0, 0))  # Fill background with black
+        
         pps_text = f"PPS: {self.stats.pps:.2f}"
         pps_surface = self.font.render(pps_text, True, (255, 255, 255))
         ppr_rect = pps_surface.get_rect(topleft=(10,10))
@@ -86,6 +87,26 @@ class TetrisBoardViewer:
         timer_rect = timer_surface.get_rect(topleft=(10,self.cell_size*10 - 10))
         self.screen.blit(timer_surface, timer_rect)  # Draw the timer in the bottom left corner
 
+        # easy clears counts (singles, doubles, triples, tetrises)
+        single_line_clears_text = f"Singles: {self.stats.single}"
+        single_line_clears_surface = self.font.render(single_line_clears_text, True, (255, 255, 255))
+        single_line_clears_rect = single_line_clears_surface.get_rect(topleft=(10,self.cell_size*3 - 10))
+        self.screen.blit(single_line_clears_surface, single_line_clears_rect)  # Draw the text in the top right corner
+
+        double_line_clears_text = f"Doubles: {self.stats.double}"
+        double_line_clears_surface = self.font.render(double_line_clears_text, True, (255, 255, 255))
+        double_line_clears_rect = double_line_clears_surface.get_rect(topleft=(10,self.cell_size*4 - 10))
+        self.screen.blit(double_line_clears_surface, double_line_clears_rect)  # Draw the text in the top right corner
+        
+        triple_line_clears_text = f"Triples: {self.stats.triple}"
+        triple_line_clears_surface = self.font.render(triple_line_clears_text, True, (255, 255, 255))
+        triple_line_clears_rect = triple_line_clears_surface.get_rect(topleft=(10,self.cell_size*5 - 10))
+        self.screen.blit(triple_line_clears_surface, triple_line_clears_rect)  # Draw the text in the top right corner
+        
+        tetris_line_clears_text = f"Tetrises: {self.stats.tetris}"
+        tetris_line_clears_surface = self.font.render(tetris_line_clears_text, True, (255, 255, 255))
+        tetris_line_clears_rect = tetris_line_clears_surface.get_rect(topleft=(10,self.cell_size*6 - 10))
+        self.screen.blit(tetris_line_clears_surface, tetris_line_clears_rect)  # Draw the text in the top right corner
         # Draw the Tetris board, positioned in the middle
         for y in range(20):
             for x in range(10):
