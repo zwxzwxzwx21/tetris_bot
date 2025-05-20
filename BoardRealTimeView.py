@@ -1,6 +1,7 @@
 import pygame
 import numpy as np
 
+
 class TetrisBoardViewer:
     """
     A simple Pygame-based viewer for displaying a Tetris board in real time.
@@ -18,7 +19,7 @@ class TetrisBoardViewer:
         - Call mainloop() to keep the window open (blocks until closed).
     """
 
-    def __init__(self, board):
+    def __init__(self, board,stats_obj):
         """
         Initializes the viewer window and sets up colors and board state.
 
@@ -26,7 +27,11 @@ class TetrisBoardViewer:
             board (list of lists): The initial 20x10 Tetris board (list of lists or numpy array).
         """
         pygame.init()
+        pygame.font.init()
+        self.font = pygame.font.SysFont('Arial', 10)
         self.board = np.array(board)  # Store the board as a numpy array for easy access
+        self.stats = stats_obj
+        self.start_time = pygame.time.get_ticks()  # Initialize the timer
         # Define colors for each piece type (RGB tuples)
         self.colors = {
             'T': (128, 0, 128),    # purple
@@ -51,6 +56,16 @@ class TetrisBoardViewer:
         self.screen = pygame.display.set_mode((window_width, window_height))
         pygame.display.set_caption("Tetris Board Viewer")
         self.clock = pygame.time.Clock()
+
+        try:
+            self.font = pygame.font.SysFont('Arial',30)
+        except pygame.error:
+            print("Font not found, using default font.")
+            self.font = pygame.font.Font(None, 10)
+
+        # test timer
+        self.timer = pygame.time.get_ticks()
+
         self.draw_board()  # Draw the initial board
 
     def draw_board(self):
@@ -59,7 +74,18 @@ class TetrisBoardViewer:
         Board is in the middle with equal space on both sides.
         """
         self.screen.fill((0, 0, 0))  # Fill background with black
-        
+        pps_text = f"PPS: {self.stats.pps:.2f}"
+        pps_surface = self.font.render(pps_text, True, (255, 255, 255))
+        ppr_rect = pps_surface.get_rect(topleft=(10,10))
+        self.screen.blit(pps_surface, ppr_rect)  # Draw the text in the top left corner
+
+        # Time elapsed since start (small issue that its updated every hard drop, not every frame)
+        elapsed_time = (pygame.time.get_ticks() - self.start_time) / 1000.0
+        timer_text = f"Time: {elapsed_time:.2f}s"
+        timer_surface = self.font.render(timer_text, True, (255, 255, 255))
+        timer_rect = timer_surface.get_rect(topleft=(10,self.cell_size*10 - 10))
+        self.screen.blit(timer_surface, timer_rect)  # Draw the timer in the bottom left corner
+
         # Draw the Tetris board, positioned in the middle
         for y in range(20):
             for x in range(10):

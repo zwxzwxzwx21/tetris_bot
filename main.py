@@ -29,9 +29,6 @@ queue = create_bag()
 bag = create_bag()
 board = [[' ' for _ in range(10)] for _ in range(20)]
 
-# Create the Tetris board viewer window (Pygame)
-viewer = TetrisBoardViewer(board)
-
 # Shared stats object for PPS (Pieces Per Second)
 class GameStats:
     """
@@ -42,6 +39,9 @@ class GameStats:
         self.pps = 0.0
 
 stats = GameStats()
+
+# Create the Tetris board viewer window (Pygame)
+viewer = TetrisBoardViewer(board,stats)
 
 def game_loop():
     """
