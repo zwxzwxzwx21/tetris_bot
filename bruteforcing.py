@@ -1,19 +1,16 @@
 import copy
-from utility.print_board import print_board
+import time 
+
 from utility.pieces import PIECES  # importing piece lookup table
+from board_operations.stack_checking import check_holes, uneven_stack_est, height_difference
+from board_operations.checking_valid_placements import drop_piece 
 
 # Ensure PIECES is properly imported or defined
 if not PIECES:
     raise ImportError("PIECES dictionary could not be imported or is empty.")
 
-from board_operations.stack_checking import compare_to_avg, check_heights, check_holes, check_i_dep, uneven_stack_est, height_difference, get_heights
-from board_operations.checking_valid_placements import drop_piece, place_piece, can_place
-from tetrio_parsing.movement import move_piece
-from board_operations.board_operations import clear_lines, apply_gravity
-import time 
-
 # --- 
-# This module contains the core brute-force search logic for Tetris AI.
+# This module contains the core brute-force search logic for Tetris.
 # It evaluates all possible placements for a given queue of pieces and returns the best move.
 # The search uses branch and bound to prune unpromising branches and is limited by a time threshold.
 # ---
@@ -28,41 +25,9 @@ rotations = {
     'T': ['flat', '180', 'cw', 'ccw']
 }
 
-column_ranges  = {
-    'i_flat': 6,
-    'i_spin': 9,
-    'o_flat': 8,
-    's_flat': 7,
-    's_spin': 8,
-    'z_flat': 7,
-    'z_spin': 8,
-    'l_180': 7,
-    'l_ccw': 8,
-    'l_cw': 8,
-    'l_flat': 7,
-    'j_180': 7,
-    'j_ccw': 8,
-    'j_cw': 8,
-    'j_flat': 7,
-    't_180': 7,
-    't_ccw': 8,
-    't_cw': 8,
-    't_flat': 7  
-}
-
 TIME_LIMIT = 3  # Maximum time (in seconds) allowed for the search
 UNEVEN_THRESHOLD = 1.1  # Prune stacks that are too uneven
-MAX_HEIGHT_DIFF = 11    # Prune stacks that are too tall
-
-def evaluate_board(board):
-    """
-    Evaluates the board state using a simple heuristic:
-    score = (number of holes) * 10 + (height difference)
-    Lower scores are better.
-    """
-    holes = check_holes(board)
-    height_diff, _ = height_difference(board)
-    return holes * 10 + height_diff
+MAX_HEIGHT_DIFF = 8    # Prune stacks that are too tall
 
 def find_best_placement(board, queue):
     """
@@ -73,48 +38,82 @@ def find_best_placement(board, queue):
     start_time = time.perf_counter()
     best_board = None
     best_move = None
-    best_score = float('inf')
 
     def recursive_search(board, queue, current_piece_index, move_history):
-        nonlocal best_board, best_move, best_score
+        nonlocal best_board, best_move
 
-        # Stop searching if time limit exceeded
+        t_rec_start = time.perf_counter()
+
+        # --- TIME LIMIT ---
+        t0 = time.perf_counter()
         if time.perf_counter() - start_time > TIME_LIMIT:
+            t1 = time.perf_counter()
+            ms = (t1 - t0) * 1000
+            if ms > 50:
+                print(f"TIME_LIMIT check: {ms:.2f} ms")
             return
 
-        # Evaluate current board and prune if not better than best found so far
-        score = evaluate_board(board)
-        if score >= best_score:
-            return  # Branch and Bound: prune this branch
-
-        # If all pieces in the queue have been placed, update the best result
+        # --- END CONDITION ---
+        t0 = time.perf_counter()
         if current_piece_index >= len(queue):
             best_board = board
-            best_move = move_history[0]
-            best_score = score
+            best_move = move_history[0] 
+            t1 = time.perf_counter()
+            ms = (t1 - t0) * 1000
+            if ms > 50:
+                print(f"END CONDITION: {ms:.2f} ms")
             return
 
+        # --- PIECE LOOKUP ---
+        t0 = time.perf_counter()
         current_piece = queue[current_piece_index]
         if current_piece not in PIECES:
             print(f"Error: Piece '{current_piece}' is not defined in PIECES.")
             return
+        t1 = time.perf_counter()
+        ms = (t1 - t0) * 1000
+        if ms > 50:
+            print(f"PIECE LOOKUP: {ms:.2f} ms")
 
-        # Try all rotations and horizontal positions for the current piece
+        # --- ROTATIONS & POSITIONS ---
         for rotation_name, piece_shape in PIECES[current_piece].items():
+            t_rot_start = time.perf_counter()
             max_x = 10 - len(piece_shape[0])
             for x in range(max_x + 1):
+                # --- DROP PIECE ---
+                t0 = time.perf_counter()
                 new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
+                t1 = time.perf_counter()
+                ms = (t1 - t0) * 1000
+                if ms > 50:
+                    print(f"drop_piece: {ms:.2f} ms (piece {current_piece}, rot {rotation_name}, x {x})")
                 if new_board is None:
                     continue
 
-                # Prune placements that are too uneven, too tall, or have holes
+                # --- HEIGHT & UNEVEN CHECK ---
+                t0 = time.perf_counter()
                 height_diff, heights = height_difference(new_board)
                 uneven = uneven_stack_est(heights)
+                t1 = time.perf_counter()
+                ms = (t1 - t0) * 1000
+                if ms > 50:
+                    print(f"height/uneven check: {ms:.2f} ms")
+
+                # --- HOLES CHECK ---
+                t0 = time.perf_counter()
+                holes = check_holes(new_board)
+                t1 = time.perf_counter()
+                ms = (t1 - t0) * 1000
+                if ms > 50:
+                    print(f"check_holes: {ms:.2f} ms")
+
                 if (uneven > UNEVEN_THRESHOLD or 
                     height_diff > MAX_HEIGHT_DIFF or 
-                    check_holes(new_board)):
+                    holes):
                     continue
 
+                # --- RECURSIVE CALL ---
+                t0 = time.perf_counter()
                 move = f"{current_piece}_x{x}_{rotation_name}"
                 recursive_search(
                     new_board,
@@ -122,6 +121,20 @@ def find_best_placement(board, queue):
                     current_piece_index + 1,
                     [*move_history, move]
                 )
+                t1 = time.perf_counter()
+                ms = (t1 - t0) * 1000
+                if ms > 50:
+                    print(f"recursive_search call: {ms:.2f} ms")
+
+            t_rot_end = time.perf_counter()
+            ms_rot = (t_rot_end - t_rot_start) * 1000
+            if ms_rot > 50:
+                print(f"rotation loop (piece {current_piece}, rot {rotation_name}): {ms_rot:.2f} ms")
+
+        t_rec_end = time.perf_counter()
+        ms_rec = (t_rec_end - t_rec_start) * 1000
+        if ms_rec > 50:
+            print(f"recursive_search total: {ms_rec:.2f} ms (piece {current_piece}, idx {current_piece_index})")
 
     # Start the recursive search from the current board and queue
     recursive_search(board, queue, 0, [])

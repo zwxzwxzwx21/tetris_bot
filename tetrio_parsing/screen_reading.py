@@ -1,7 +1,9 @@
-import pyautogui
+# this function is entirely for tetrio screen reading which will become
+# complretely redundant once i got the access to API
+# hence why i am commenting it out 
+'''import pyautogui
 from math import sqrt
 
-# Słownik kolorów z dokładnymi wartościami RGB
 PIECE_COLORS = {
     "I": [(65, 175, 222), (63, 221, 255)],
     "O": [(247, 211, 62), (255, 255, 59)],
@@ -21,7 +23,7 @@ def color_distance(c1, c2):
 def find_closest_piece(pixel, xpos, ypos, failed_atts):
     print('finding for color pixel: ', pixel, " xpos: ", xpos, " ypos: ", ypos)
     
-    if not pixel:  # Jeśli pixel() zwróci None
+    if not pixel:  
         return "?"
     
     closest_piece = "?"
@@ -38,7 +40,7 @@ def find_closest_piece(pixel, xpos, ypos, failed_atts):
     
     if closest_piece == 'A':
         failed_atts += 1
-        if failed_atts >= 10:  # Zabezpieczenie przed nieskończoną rekurencją
+        if failed_atts >= 10:  
             print("Too many failed attempts, returning '?'")
             return "?"
         import time
@@ -49,7 +51,6 @@ def find_closest_piece(pixel, xpos, ypos, failed_atts):
     return closest_piece
 
 def read_queue():
-    """Czyta kolejkę z ekranu z tolerancją kolorów"""
     y_positions = [384, 517, 645, 778, 906]
     queue = []
     
@@ -75,4 +76,4 @@ def get_next_piece():
 if __name__ == "__main__":
     queue = read_queue()
     queue.append(get_next_piece())
-    print("Aktualna kolejka:", queue)
+    print("Aktualna kolejka:", queue)'''

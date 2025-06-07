@@ -1,4 +1,5 @@
-import keyboard
+# exact same as screen_reading, useless, thus commented out
+'''import keyboard
 import time
 import pyautogui
  
@@ -997,3 +998,4 @@ def rotate(rot):
         keyboard.press_and_release('v')
     if rot == '180' or rot == 'x':
         keyboard.press_and_release('x')
+'''

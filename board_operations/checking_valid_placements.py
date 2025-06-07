@@ -18,10 +18,10 @@ def find_drop_height(board, xpos):
         - Use to determine where a piece will land before placing it.
         - Useful for AI evaluation and move simulation.
     """
-    for y in range(len(board)-1, -1, -1):
-        if board[y][xpos] != ' ':
-            return y + 1  # Returns the first empty space above the highest block
-    return 0
+    for y in range(len(board)):  
+        if board[y][xpos] != ' ':  
+            return y - 1  
+    return len(board) - 1 # retuns last index of board, being 19 normally 
 
 def can_place(piece, board, row, col):
     """

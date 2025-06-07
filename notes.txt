@@ -1,17 +1,7 @@
-how things might work ideas:
+deleting notes as now its mostly a todo, i will focus on how bot works when i will get things mentioned below ready (the "gamemodes"), until that, it doesnt 
+fucking matter whether i get the idea or not as i dont evne have the tools to work with really 
 
-1. first we read up the queue that is in tetrio, that will give up 6 pieces, 
-putting that in a loop, which can use  6 pieces as an argument, then whenever we make a piece placement, we move the first piece out and read another piece from the queue, so we are always working with 6 pieces
-
-
-2. the way bruteforcer can work is not so straightforward, idea looks like this:
-assuming that we have 6 pieces, lets take a queue of seed 1 for example, which looks like this "['O','J','I','L','S','T','Z','T','O','L','J','S','I','Z','L','I','S','O','I','T','Z','O','I','T','L','O','Z','S','J','J','O','Z','L','I','T','O']"
-focusing on first 6 elements we have ['O','J','I','L','S','T']
-
-now what we need to do is try to create a board that will follor the RULES (more about them later) which will make a good stack. bruteforcing should take a board that yealds one of the better scores,
-(score being graded based on the rules) and place first piece, then after placing a piece we redo calculations, with new piece,
-
-3. with new window that shows how algorythm work i would like to add some things that may improve the clarity of how things work:
+1. with new window that shows how algorythm work i would like to add some things that may improve the clarity of how things work:
 - have a small game window like, 360x640 for example, you have some modes on the left like:
      - "random" - which  just places pieces and clears lines, singles,doubles whatever currect algorythm has to offer
      - "spins" - disables or enables usage of spins
@@ -20,85 +10,35 @@ now what we need to do is try to create a board that will follor the RULES (more
 - can add custom test modes like "4 wide" when the bot upstacks and tries to 20 combo down, or just something like, you have unlimited
 left and right garbage and just make the bot try clearing as much combo as possible (preferably indefinitely) - REQUIRES SPINS
 
+
+
 upon pressing the start button that would appear in the middle of the screen, all options (those on the right,which are listed above)
 change to queue, while left side had things like APM, PPS, APP, and maybe other debug informations
 
 approaching APM and combo table:
 i think the best idea would be to simply create some testcases (can finally use that stupid test folder ive created) as in:
-use combo downstackpractice and just copy some maps from there (its a website to practice tetris downstack duh)
+use combo downstackpractice and just copy some maps from there (its a website to practice tetris downstack)
 and then just give it to the bot to find either pc (as that is the gamemode in that webside) or jsut highest apm in one combo, for example:
 give it a task to find the most amountn of attack within 5 pieces and see what happens, if it wont find a solution then expand the search and just fuck around really lol
 
-DOWNSIDES:
-very inefficient as most of the times the board we go on will be correct for first pieces but then it will be better to redo calculations
-possible solution is to place pieces with pairs, that will also make the problem with finesse errors be less visible, but who really cares for now.
-some placements can seem to be good but then be questionable, like algorythm can find o piece middle as good, because there will be pieces around it preventing it to be spikey, but then it will abbandon it or just 
-the fact that the o piece is here would make things hard to stack around, tho that MAY NOT be an issue, at least shouldnt be if rules would be good 
-
-assuming we managed to calculate everything already, we need to have a rule system,  sometihng like:
-(100 - punishment) where we only consider stacks that are for example >90 and then abbandon those lower 
-
-RULES
-this is by far the most important thing, here are some rules i can think of that we need to make count for the bot
-
-- dependencies
-as bad as they are, they can be affordable. if we have some random stack when I piece is upcoming, making I dependency will be good as we will fill up the i dependency on those better boards, adn those worse will 
-not pass the scoring, that way we take dependencies which we can and not make fuckery off the stack
-
--- dependencies II
-keeping the stack too clean might result in S/Z pieces not being able to be placed, same in reverse, too spiky and o pieces cant be placed, so we need to look ahead to keep unevenness above 0 and below some treshhold 
-
-- unevenness - this one should work on something like this: compare column 1 to 2, 2 to 3, 3 to 4 and sum differences (abs of them)
-what it achieves is:
-if we have stack
- X X X X X
-XXXXXXXXXX
-and
-     XXXXX
-XXXXXXXXXX
-comparing to average is bad as both of those stacks will give the same result, while comparing column by column will give a very different result
-making up some random folmula like:
-unevenness = ( abs(col1-col2) + abs(col2-col3) + ... + abs(col9-col10) ) / 10 <- number of cols 
-first one gives 1 while second 0.1
-
-- height diff
-im unsure about that one as technically unevenness takes care of that but having some measurement that blocks possibility to place shit ton of blocks on the left without giving a fuck about right one might be good?
-its just, unevenness exists, so i think combining those two will be good tho, idk
-
-- hole checker
-as funny as name is, hole checker is very important as it checks holes, more importantly, it makes sure that no stack with holes will exist, tho it works rather extremely as it removes any possibility of holes or covers
-(which can be good while for example downstacking or doing something as crucial as overhangs, but its 40l bot so idk)
-
-- holds?
-i dont wanna use holds as its a wasted input and more calculations to do, without hold things should work the same 99% of the time if not more 
-
-CHASING PERFECTION
-
-this part is whatever really as i dont think i can even reach it so ill briefly mention:
-
-PC END
-lowkey no idea how to do it, seems stupid, fuck it just be lucky
-
-EVALUATING OPTIMIZATIONS
-first make it work lol
+#removing the rules as they were solely focusing on 40l mode which francly idgaf anymore, well i do but not as much anymore
 
 # board zoom at 95% 
 
 # keep track of dependencies like I,J,L
+
 # keep track of when a next piece when appear, when you place o piece on empty board, next o piece wont appear in at least 7 pieces!
-# ^ might be stupid, no point really
-# place pieces with advance of one piece, so when you place one piece you want to know immediately when second one will go
-# that lowers the efficiency because you cant change the piece placement if you find a better one, tho i dont think it would be the case as the piece that would have to change inputs is last
-#make possibility to delay box patterns, if you have L piece which you just can really place, just move it to the left and wait for 2 pieces filling the box pattern, can do the same but with 2 T pieces
+# holds can kinda screw with that one but it can be nice to estimate whether you can make an I depencency or no, like for example, you have I piece dep, and youre
+# very high in a stack, should you clear I dep or take a quad to ds (assuming one is possible), if next i piece is shortly after, it doesnt really matter, (tho ds better unless you can combo into it)
+# if it isnt, ds immediately (ds- downstack)
 
-# creating i dependencies is good UNTIL you have i pieces to fill them with, in a run you wont have more than 16-17 I pieces so you need to limit your I piece usage (including dependencies)!
 
-# yeah fuck efficiency for now, i think the best idea, tho extremely inefficient (IT DOESNT MATTER!!):
-# take a piece and before making placement think about other pieces, so if you have a q
-# think how other pieces would behave when you place one piece, if that piece placement would lead to uneven stack, then you need to  abbandon it
-# another good thing would be to keep track of flatness of the board for pieces, if your board is completely flat, you cant place Z/S,
-# if its spikey, you cant place O piece, idk how to do that to, fuck my life.
+TODO type shit:
+maybe split the BoardRealTimeView.py a bit so its not that clumped up, i think even when we move to TETR.IO it still could matter to have better view on what
+is actually happening in console vs in game, but yeah its not also that this function will have literally everything, its just display and some options, can be
+left in one file imo (unless someone smarter thinks otherwise)
 
-# ig what you can do is run function that checks if stack is viable to place o piece and z,s piece, instead of checking if its even  or not.
-# height diff checks seems to be good idea as having stack being uneven just makes shit ton of dependencies which clearing up is nightmare
+make the timer run form pressing start ai rather than from running main.py
 
+make testcases and check how and why height_difference works, and if it is as efficient as it claims to be,
+check exactly heights of each column and if second if statement even makes sense (as in print values n such) 

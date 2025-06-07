@@ -1,120 +1,161 @@
 # -*- coding: utf-8 -*-
-import pyautogui
+# if someone is reading that, i may or may not have used some AI help for comments and such to make code more readable
+# got an issue with that? better not or i will cry.
+
 import copy
 import time
 import threading
 
 from utility.print_board import print_board
-from utility.pieces import PIECES  # importing piece lookup table
+from utility.pieces import PIECES
 
-from board_operations.stack_checking import compare_to_avg, check_heights, check_holes, check_i_dep, uneven_stack_est, height_difference, get_heights
-from board_operations.checking_valid_placements import drop_piece, place_piece, can_place
-from board_operations.board_operations import clear_lines, apply_gravity
+from board_operations.checking_valid_placements import drop_piece
+from board_operations.board_operations import clear_lines
 
-from tetrio_parsing.screen_reading import get_next_piece, read_queue
-from tetrio_parsing.movement import move_piece
-
-from GenerateBag import create_bag, add_piece_from_bag
+from GenerateBag import add_piece_from_bag 
 
 from BoardRealTimeView import TetrisBoardViewer
+from bruteforcing import find_best_placement
 
-# Ensure PIECES is properly imported or defined
 if not PIECES:
     raise ImportError("PIECES dictionary could not be imported or is empty.")
 
-from bruteforcing import find_best_placement
-
-# Initialize empty board and piece queue/bag
-queue = create_bag()
-bag = create_bag()
 board = [[' ' for _ in range(10)] for _ in range(20)]
+queue = []  
+bag = []   
 
-# Shared stats object for PPS (Pieces Per Second)
+start_signal = [False]
+game_over_signal = [False]
+no_s_z_first_piece_signal = [False] 
+
+DESIRED_QUEUE_PREVIEW_LENGTH = 5
+
 class GameStats:
-    """
-    Holds statistics for the current game session.
-    Currently only tracks PPS (pieces per second).
-    """
     def __init__(self):
+        self.burst = [] # stores 10 times piece was placed, then max-min
         self.pps = 0.0
-        # attacks
         self.single = 0
         self.double = 0
         self.triple = 0
         self.tetris = 0
-
 stats = GameStats()
 
-# Create the Tetris board viewer window (Pygame)
-viewer = TetrisBoardViewer(board,stats)
-def count_lines_clear(lines_cleared):
-    if lines_cleared == 1:
+def count_lines_clear(lines_cleared_count):
+    if lines_cleared_count == 1:
         stats.single += 1
         print("Single cleared") 
-    elif lines_cleared == 2:    
+    elif lines_cleared_count == 2:    
         stats.double += 1
         print("Double cleared")
-    elif lines_cleared == 3:    
+    elif lines_cleared_count == 3:    
         stats.triple += 1
         print("Triple cleared")
-    elif lines_cleared == 4:
+    elif lines_cleared_count == 4:
         stats.tetris += 1
         print("Tetris cleared") 
 
 def game_loop():
-    """
-    Main game loop for the Tetris AI/bot.
-    Continuously finds and places the best move, updates the board and viewer,
-    and tracks performance statistics (PPS).
-    """
+    global board, queue, bag, stats, viewer, game_over_signal, no_s_z_first_piece_signal 
+   
+    print("Game loop thread started, waiting for start signal...")
+    while not start_signal[0]: 
+        time.sleep(0.1)
+        if game_over_signal[0]: 
+            print("Game loop terminated before start by external signal.")
+            return 
+        
     pieces_placed = 0
-    start_time = time.perf_counter()
-    while True:
-        global board, queue, bag
-        print("\n=== Current Queue ===")
-        print(queue)
-        
-        # Find the best move for the current board and queue
-        best_board, best_move = find_best_placement(board, queue)
-        
-        if not best_board:
-            print("No valid placement found")
-            break
-         
-        # Parse the move string and apply the move
-        piece_type, x, rotation = best_move.split('_')
-        x = int(x[1:])
-        piece_shape = PIECES[piece_type][rotation]
-        new_board = drop_piece(piece_shape, board, x)
-        
-        # Clear lines if needed
-        new_board,lines_cleared = clear_lines(new_board)
-        print(f"Lines cleared: {lines_cleared}")
-        count_lines_clear(lines_cleared)
-        # Update the board and viewer
-        board[:] = new_board  
-        viewer.update_board(board)
-        print(f"\nPlaced: {piece_type} at x={x}, rotation={rotation}")
-       
-        print_board(board)
-        # Add new piece(s) to the queue from the bag and remove the used one
-        queue, bag = add_piece_from_bag(queue, bag)
-        queue.pop(0)
+    actual_game_start_time = time.perf_counter()
 
-        # PPS calculation (average pieces placed per second)
-        pieces_placed += 1
-        elapsed = time.perf_counter() - start_time
-        if elapsed > 0:
-            stats.pps = pieces_placed / elapsed
-            print(f"PPS (Pieces Per Second): {stats.pps:.2f}")
+    try:
+        if not queue:
+            print("Initial queue fill...")
+            num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(queue)
+            if num_to_add > 0:
+                queue, bag = add_piece_from_bag(
+                    queue, 
+                    bag, 
+                    num_pieces=num_to_add, 
+                    no_s_z_first_piece=no_s_z_first_piece_signal[0]
+                )
+            if len(queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
+                print("Failed to fill initial queue sufficiently. Game Over.")
+                return 
 
-# Example: you can now access stats.pps from anywhere, e.g. in your viewer or another thread
+        while True:
+            if game_over_signal[0]: 
+                print("Game loop terminating due to game_over_signal.")
+                break
+            
+            print("\n=== Current Queue ===")
+            print(queue[:DESIRED_QUEUE_PREVIEW_LENGTH]) 
+            
+            best_board_after_search, best_move_str = find_best_placement(board, queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
+            
+            if not best_board_after_search: 
+                print("No valid placement found by bruteforcer. Ending game.")
+                break
+            
+            piece_type_placed = queue[0] 
 
-# Start the game loop in a separate thread so the viewer remains responsive
+            piece_type, x_str, rotation = best_move_str.split('_') 
+            x = int(x_str[1:]) 
+            
+            piece_shape = PIECES[piece_type_placed][rotation] 
+            
+            board_after_drop = drop_piece(piece_shape, copy.deepcopy(board), x)
+            if board_after_drop is None:
+                print(f"Error: drop_piece failed for supposedly valid move: {best_move_str} with piece {piece_type_placed}")
+                print("Game Over - Cannot drop piece.")
+                break
+        
+            board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
+            print(f"Lines cleared: {lines_cleared_count}")
+            count_lines_clear(lines_cleared_count)
+
+            board[:] = board_after_clear
+            if viewer: viewer.update_board(board)
+            
+            print(f"\nPlaced: {piece_type_placed} via move {best_move_str}")
+            print_board(board)
+            
+            if queue: 
+                queue.pop(0) # Remove the used piece
+            else: # should never happen
+                print("error: Tried to pop from empty queue after placement.")
+                break
+
+            # Add one new piece to the queue
+            queue, bag = add_piece_from_bag(
+                queue, 
+                bag, 
+                num_pieces=1, 
+                no_s_z_first_piece=no_s_z_first_piece_signal[0]
+            )
+
+            pieces_placed += 1
+            elapsed = time.perf_counter() - actual_game_start_time
+            if len(stats.burst) < 10:
+                stats.burst.append(elapsed)
+            else:
+                stats.burst.pop(0)
+                stats.burst.append(elapsed)
+            print(stats.burst)
+            if elapsed > 0:
+                stats.pps = pieces_placed / elapsed
+                stats.burst_pps = (len(stats.burst) - 1) / (max(stats.burst) - min(stats.burst)) if len(stats.burst) > 9 else 0
+                print(f"PPS (Pieces Per Second): {stats.pps:.2f} burst: {stats.burst_pps/10}")
+
+    finally:
+        print("Game loop finished.")
+        game_over_signal[0] = True
+
+viewer = TetrisBoardViewer(board, stats, start_signal, queue, game_over_signal, no_s_z_first_piece_signal)
+
+# start the game loop in a separate thread so the viewer remains responsive
 game_thread = threading.Thread(target=game_loop, daemon=True)
 game_thread.start()
 
-# Start the viewer's main loop (blocks until window is closed)
 viewer.mainloop()
 
 # --- 

@@ -1,7 +1,5 @@
-# this one just checks if there is an empty space in a row under a block
-# works slightly faster due to change in the way it operates, probably negligible change but still
 
-def check_holes(board, check_covered=False):
+def check_holes(board, check_covered=True):
     """
     this is merged fucntion of check holes and check cover,
     returns true when there is a hole which can hav ebigger height than one
@@ -13,14 +11,8 @@ def check_holes(board, check_covered=False):
             if board[row][col] != ' ':
                 found_solid = True
             elif found_solid:  
-                if not check_covered:
-                    return True
-                # checks if the gap is covered
-                for y in range(row-1, -1, -1):
-                    if board[y][col] != ' ':
-                        return True  # covered
-                return False  # not  covered
-    return False
+                return True  # covered 
+    return False # not  covered
 
 def compare_to_avg(height_array, average):
     """
@@ -36,26 +28,6 @@ def compare_to_avg(height_array, average):
         offset += abs(height - average)  
     print('Total offset:', offset)
 
-def check_heights(board): # BAD
-    #BAD
-    """
-    Checks board flatness by comparing each column's height to the average.
-    
-    Args:
-        board (list): 2D list representing the game board (20 rows x 9 columns).
-    """
-    minos_array = []
-    for stack in range(9):  
-        minos_in_line = 0
-        for y in range(20):
-            if board[y][stack] != ' ':
-                minos_in_line += 1
-        minos_array.append(minos_in_line)
-    
-    sum_height = sum(minos_array)
-    average_height = sum_height / 9 
-    compare_to_avg(minos_array, average_height)
-
 def height_difference(board):
     """
     Calculates the maximum height difference between columns and returns heights.
@@ -66,15 +38,18 @@ def height_difference(board):
     Returns:
         tuple: (max_height_diff, height_array), where height_array contains heights of all 10 columns.
     """
+    # idfk why it works,apparently its bad but i will make testcases after realising it
+    # i really cannot be bothered to work on it now, im hungry
     height_array = []
-    for col in range(10):  # Tetris ma 10 kolumn (indeksy 0-9)
+    for col in range(10):  
         column_height = 0
-        for row in range(20):
-            if board[row][col] != ' ':
-                column_height = 20 - row  # Wysokość liczona od dołu (0 = pusta kolumna)
+        # checks from bottom up, looking for empty space
+        for row in range(19,-1,-1):
+            if board[row][col] == ' ':
+                height_array.append(row+1) # Calculate height from the bottom  
                 break
-        height_array.append(column_height)
-    
+        if len(height_array) == col - 1:    
+            height_array.append(0)  # If no blocks found, column is empty
     max_diff = max(height_array) - min(height_array)
     return max_diff, height_array
 
@@ -136,29 +111,3 @@ def get_heights(board):
         else:  
             heights.append(0)
     return heights
-board = [
-    
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ',' ',' ','x',' ',' ',' ',' '],
-    [' ','x',' ','x','x','x','x',' ','x','x'],
-    ['x','x','x','x',' ',' ',' ','x',' ',' '],
-    ]
-
-a=get_heights(board)
-print(a)

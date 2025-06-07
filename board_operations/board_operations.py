@@ -17,7 +17,6 @@ def clear_lines(board):
         new_board (list of lists): The board after clearing lines.
     Usage:
         - Call after placing a piece to remove completed lines.
-        - Use in the main game loop or AI logic.
     """
     new_board = []
     lines_cleared = 0
@@ -28,33 +27,13 @@ def clear_lines(board):
         else:
             new_board.append(row)
 
-    # Add empty rows at the top for cleared lines
+    # adds empty rows at the top for cleared lines
     for _ in range(lines_cleared):
         new_board.insert(0, [' ' for _ in range(10)])
+    # doesn't have to return lines_cleared, it does so to count quads and other clears
+    return new_board, lines_cleared
 
-    return new_board,lines_cleared
 
-def apply_gravity(board):
-    """
-    Applies gravity to the board, causing blocks to fall down into empty spaces.
-    Args:
-        board (list of lists): The current board state.
-    Modifies:
-        board (in-place): The board is updated so that all blocks fall to the lowest possible position.
-    Usage:
-        - Call after clearing lines or when simulating gravity.
-        - Use in the main game loop or AI logic.
-    """
-    for col in range(10):
-        blocks = []
-        for row in range(len(board)):
-            if board[row][col] != ' ':
-                blocks.append(board[row][col])
-        for row in range(len(board)-1, -1, -1):
-            if blocks:
-                board[row][col] = blocks.pop()
-            else:
-                board[row][col] = ' '
 
 # ---
 # How and when to use:
