@@ -6,6 +6,8 @@ def find_box_in_queue(queue, boxes=sequences):
     """
     Finds the first box from boxes that appears in queue (in order, not necessarily consecutive).
     Returns (remaining_queue, box_queue) if found, else (queue, []).
+    # i have a feeling this can be done more efficiently, however we are not gonna
+    # use this one besides 40l so i dont care that much 
     """
     for box in boxes:
         box_indices = []
@@ -23,10 +25,3 @@ def find_box_in_queue(queue, boxes=sequences):
             remaining_queue = [queue[i] for i in range(len(queue)) if i not in box_indices]
             return remaining_queue, box_queue
     return queue, []
-
-# Example usage:
-if __name__ == "__main__":
-    queue = ['z', 'i', 'o', 'l', 'o', 't']
-    remaining, box = find_box_in_queue(queue)
-    print("Remaining:", remaining)
-    print("Box:", box)
