@@ -5,14 +5,43 @@ def check_holes(board, check_covered=True):
     returns true when there is a hole which can hav ebigger height than one
     untested, better change that soon!
     """
+    # explanation with example:
+    # region
+    # number of blocks that are covering x number of holes, eg.
+    # x - full; o - empty
+    # xxo
+    # xxo
+    # oxx
+    # xxo
+    # xxo
+    # returns 2 for first column and 1 for second one, in a case like:
+    # xxo
+    # xxo
+    # oxx
+    # xxo
+    # xxx
+    # xxo
+    # it would return 2 for first column, 1 for one hole in column 3 and 1 for another hole
+    #endregion
+    sum,count = 0,0
+    test_mode = True
     for col in range(10):
         found_solid = False
         for row in range(20):
             if board[row][col] != ' ':
                 found_solid = True
-            elif found_solid:  
-                return True  # covered 
-    return False # not  covered
+            if found_solid:
+                if board[row][col] != ' ':
+                    count += 1
+                if board[row][col] == ' ' and board[row-1][col] != ' ': 
+                    sum += count
+                    if test_mode:
+                        print(f"Found hole in column {col} at row {row}, sum: {sum} count: {count}")
+                        print()
+                    
+                if row == 19: 
+                    count = 0
+    return sum 
 
 def compare_to_avg(height_array, average):
     """

@@ -156,7 +156,7 @@ viewer = TetrisBoardViewer(board, stats, start_signal, queue, game_over_signal, 
 game_thread = threading.Thread(target=game_loop, daemon=True)
 game_thread.start()
 
-viewer.mainloop()
+viewer.mainloop(GUI_mode=False)
 
 # --- 
 # IMPORTANT: 
