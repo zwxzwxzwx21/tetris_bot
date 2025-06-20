@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from board_operations.stack_checking import check_holes
 from utility.print_board import print_board 
-
+# test push 
 
 '''
 generates a board with 3 bottom rows being randomly filled with "X"
