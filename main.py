@@ -38,9 +38,16 @@ class GameStats:
         self.double = 0
         self.triple = 0
         self.tetris = 0
+        self.combo = 0
 stats = GameStats()
 
 def count_lines_clear(lines_cleared_count):
+
+    if lines_cleared_count > 1:
+        stats.combo += 1
+    else:
+        stats.combo = 0
+        
     if lines_cleared_count == 1:
         stats.single += 1
         print("Single cleared") 
@@ -112,7 +119,7 @@ def game_loop():
             board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
             print(f"Lines cleared: {lines_cleared_count}")
             count_lines_clear(lines_cleared_count)
-
+            
             board[:] = board_after_clear
             if viewer: viewer.update_board(board)
             

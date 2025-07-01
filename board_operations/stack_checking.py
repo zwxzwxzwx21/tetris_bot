@@ -24,7 +24,7 @@ def check_holes(board, check_covered=True):
     # it would return 2 for first column, 1 for one hole in column 3 and 1 for another hole
     #endregion
     sum,count = 0,0
-    test_mode = True
+    test_mode = False  # Set to True to enable debug output
     for col in range(10):
         found_solid = False
         for row in range(20):
@@ -38,7 +38,6 @@ def check_holes(board, check_covered=True):
                     if test_mode:
                         print(f"Found hole in column {col} at row {row}, sum: {sum} count: {count}")
                         print()
-                    
                 if row == 19: 
                     count = 0
     return sum 

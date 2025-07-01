@@ -3,6 +3,7 @@ import time
 
 from utility.print_board import board as board_ # yeah i know its stupid that its in print_board.py i dun care
 
+#from tetrio_parsing import check_lines_clear 
 from utility.pieces import PIECES  # importing piece lookup table
 from board_operations.stack_checking import check_holes, uneven_stack_est, height_difference
 from board_operations.checking_valid_placements import drop_piece 
@@ -70,6 +71,7 @@ def find_best_placement(board, queue):
             for x in range(max_x + 1):
                 # --- DROP PIECE ---
                 new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
+                
                 MOVES_DONE += 1
                 if new_board is None:
                     continue
@@ -123,9 +125,9 @@ def find_best_placement(board, queue):
 # - You can tune the evaluation function and pruning thresholds for different play styles or AI goals.
 # ---
 
-a,b =find_best_placement(board_, ['O','I','S'])  
+'''a,b =find_best_placement(board_, ['O','I','S'])  
 for row in a:
     print(' '.join(row))
 print("Best move:", b)
 print("Moves done:", MOVES_DONE)
-print("Moves removed:", MOVES_REMOVED)
+print("Moves removed:", MOVES_REMOVED)'''

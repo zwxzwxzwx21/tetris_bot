@@ -1,3 +1,8 @@
+'''def check_lines_clear(board):
+    for row in board:
+        if all(cell != ' ' for cell in row):
+            return True
+    return False'''
 
 ATTACK_TABLE = {
     "single": [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3],
@@ -20,6 +25,7 @@ def attack_simplified(clear, combo):
     atk = 0
     
     if clear == "perfect clear":
+        # that wont work really, make sth like, check if board is empty, if it is, add 10 attack
         return PERFECT_CLEAR_BONUS
 
     if combo >= len(ATTACK_TABLE["single"]): 
