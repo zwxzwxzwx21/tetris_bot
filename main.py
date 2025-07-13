@@ -2,6 +2,7 @@
 # if someone is reading that, i may or may not have used some AI help for comments and such to make code more readable
 # got an issue with that? better not or i will cry.
 
+from tetrio_parsing.calculate_attack import count_lines_clear 
 import copy
 import time
 import threading
@@ -23,7 +24,7 @@ if not PIECES:
 board = [[' ' for _ in range(10)] for _ in range(20)]
 queue = []  
 bag = []   
-
+combo = 0  
 start_signal = [False]
 game_over_signal = [False]
 no_s_z_first_piece_signal = [False] 
@@ -41,28 +42,8 @@ class GameStats:
         self.combo = 0
 stats = GameStats()
 
-def count_lines_clear(lines_cleared_count):
-
-    if lines_cleared_count > 1:
-        stats.combo += 1
-    else:
-        stats.combo = 0
-        
-    if lines_cleared_count == 1:
-        stats.single += 1
-        print("Single cleared") 
-    elif lines_cleared_count == 2:    
-        stats.double += 1
-        print("Double cleared")
-    elif lines_cleared_count == 3:    
-        stats.triple += 1
-        print("Triple cleared")
-    elif lines_cleared_count == 4:
-        stats.tetris += 1
-        print("Tetris cleared") 
-
 def game_loop():
-    global board, queue, bag, stats, viewer, game_over_signal, no_s_z_first_piece_signal 
+    global board, queue, bag, stats, viewer, game_over_signal, no_s_z_first_piece_signal, combo
    
     print("Game loop thread started, waiting for start signal...")
     while not start_signal[0]: 
@@ -97,7 +78,7 @@ def game_loop():
             print("\n=== Current Queue ===")
             print(queue[:DESIRED_QUEUE_PREVIEW_LENGTH]) 
             
-            best_board_after_search, best_move_str = find_best_placement(board, queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
+            best_board_after_search, best_move_str = find_best_placement(board, queue[:DESIRED_QUEUE_PREVIEW_LENGTH],combo)
             
             if not best_board_after_search: 
                 print("No valid placement found by bruteforcer. Ending game.")
@@ -118,7 +99,7 @@ def game_loop():
         
             board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
             print(f"Lines cleared: {lines_cleared_count}")
-            count_lines_clear(lines_cleared_count)
+            count_lines_clear(lines_cleared_count,combo)
             
             board[:] = board_after_clear
             if viewer: viewer.update_board(board)

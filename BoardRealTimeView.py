@@ -215,6 +215,8 @@ class TetrisBoardViewer:
                 f"Doubles: {self.stats.double}",
                 f"Triples: {self.stats.triple}",
                 f"Tetrises: {self.stats.tetris}"
+                f"combo: {self.stats.combo}"
+                f"attack: {self.stats.attack if hasattr(self.stats, 'attack') else 0}"
             ]
             for text_content in stats_texts:
                 stat_surface = self.font.render(text_content, True, (255, 255, 255))
