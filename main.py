@@ -21,14 +21,6 @@ from bruteforcing import find_best_placement
 if not PIECES:
     raise ImportError("PIECES dictionary could not be imported or is empty.")
 
-board = [[' ' for _ in range(10)] for _ in range(20)]
-queue = []  
-bag = []   
-combo = 0  
-start_signal = [False]
-game_over_signal = [False]
-no_s_z_first_piece_signal = [False] 
-
 DESIRED_QUEUE_PREVIEW_LENGTH = 5
 
 class GameStats:
@@ -42,106 +34,119 @@ class GameStats:
         self.combo = 0
 stats = GameStats()
 
-def game_loop():
-    global board, queue, bag, stats, viewer, game_over_signal, no_s_z_first_piece_signal, combo
-   
-    print("Game loop thread started, waiting for start signal...")
-    while not start_signal[0]: 
-        time.sleep(0.1)
-        if game_over_signal[0]: 
-            print("Game loop terminated before start by external signal.")
-            return 
-        
-    pieces_placed = 0
-    actual_game_start_time = time.perf_counter()
+class TetrisGame:
+    def __init__(self):
+        self.board = [[' ' for _ in range(10)] for _ in range(20)]
+        self.queue = []  
+        self.bag = []   
+        self.combo = 0  
+        self.start_signal = [False]
+        self.game_over_signal = [False]
+        self.no_s_z_first_piece_signal = [False] 
+        self.stats = GameStats()
+    def start_game(self):
+        print("Starting Tetris game...")
+        self.viewer = TetrisBoardViewer(self.board, self.stats, self.start_signal, self.queue, self.game_over_signal, self.no_s_z_first_piece_signal)
 
-    try:
-        if not queue:
-            print("Initial queue fill...")
-            num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(queue)
-            if num_to_add > 0:
-                queue, bag = add_piece_from_bag(
-                    queue, 
-                    bag, 
-                    num_pieces=num_to_add, 
-                    no_s_z_first_piece=no_s_z_first_piece_signal[0]
-                )
-            if len(queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
-                print("Failed to fill initial queue sufficiently. Game Over.")
+    def game_loop(self,viewer):
+        
+        print("Game loop thread started, waiting for start signal...")
+        while not self.start_signal[0]: 
+            time.sleep(0.1)
+            if self.game_over_signal[0]: 
+                print("Game loop terminated before start by external signal.")
                 return 
+            
+        pieces_placed = 0
+        actual_game_start_time = time.perf_counter()
 
-        while True:
-            if game_over_signal[0]: 
-                print("Game loop terminating due to game_over_signal.")
-                break
-            
-            print("\n=== Current Queue ===")
-            print(queue[:DESIRED_QUEUE_PREVIEW_LENGTH]) 
-            
-            best_board_after_search, best_move_str = find_best_placement(board, queue[:DESIRED_QUEUE_PREVIEW_LENGTH],combo)
-            
-            if not best_board_after_search: 
-                print("No valid placement found by bruteforcer. Ending game.")
-                break
-            
-            piece_type_placed = queue[0] 
+        try:
+            if not self.queue:
+                print("Initial queue fill...")
+                num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(self.queue)
+                if num_to_add > 0:
+                    self.queue, self.bag = add_piece_from_bag(
+                        self.queue, 
+                        self.bag, 
+                        num_pieces=num_to_add, 
+                        no_s_z_first_piece=self.no_s_z_first_piece_signal[0]
+                    )
+                if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
+                    print("Failed to fill initial queue sufficiently. Game Over.")
+                    return 
 
-            piece_type, x_str, rotation = best_move_str.split('_') 
-            x = int(x_str[1:]) 
-            
-            piece_shape = PIECES[piece_type_placed][rotation] 
-            
-            board_after_drop = drop_piece(piece_shape, copy.deepcopy(board), x)
-            if board_after_drop is None:
-                print(f"Error: drop_piece failed for supposedly valid move: {best_move_str} with piece {piece_type_placed}")
-                print("Game Over - Cannot drop piece.")
-                break
-        
-            board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
-            print(f"Lines cleared: {lines_cleared_count}")
-            count_lines_clear(lines_cleared_count,combo)
-            
-            board[:] = board_after_clear
-            if viewer: viewer.update_board(board)
-            
-            print(f"\nPlaced: {piece_type_placed} via move {best_move_str}")
-            print_board(board)
-            
-            if queue: 
-                queue.pop(0) # Remove the used piece
-            else: # should never happen
-                print("error: Tried to pop from empty queue after placement.")
-                break
+            while True:
+                if self.game_over_signal[0]: 
+                    print("Game loop terminating due to game_over_signal.")
+                    break
+                
+                print("\n=== Current Queue ===")
+                print(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH]) 
+                
+                best_board_after_search, best_move_str = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
+                
+                if not best_board_after_search: 
+                    print("No valid placement found by bruteforcer. Ending game.")
+                    break
+                
+                piece_type_placed = self.queue[0] 
 
-            # Add one new piece to the queue
-            queue, bag = add_piece_from_bag(
-                queue, 
-                bag, 
-                num_pieces=1, 
-                no_s_z_first_piece=no_s_z_first_piece_signal[0]
-            )
+                piece_type, x_str, rotation = best_move_str.split('_') 
+                x = int(x_str[1:]) 
+                
+                piece_shape = PIECES[piece_type_placed][rotation] 
+                
+                board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
+                if board_after_drop is None:
+                    print(f"Error: drop_piece failed for supposedly valid move: {best_move_str} with piece {piece_type_placed}")
+                    print("Game Over - Cannot drop piece.")
+                    break
+            
+                board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
+                print(f"Lines cleared: {lines_cleared_count}")
+                count_lines_clear(lines_cleared_count,self.combo)
+                
+                self.board[:] = board_after_clear
+                if viewer: viewer.update_board(self.board)
+                
+                print(f"\nPlaced: {piece_type_placed} via move {best_move_str}")
+                print_board(self.board)
+                
+                if self.queue: 
+                    self.queue.pop(0) # Remove the used piece
+                else: # should never happen
+                    print("error: Tried to pop from empty queue after placement.")
+                    break
 
-            pieces_placed += 1
-            elapsed = time.perf_counter() - actual_game_start_time
-            if len(stats.burst) < 10:
-                stats.burst.append(elapsed)
-            else:
-                stats.burst.pop(0)
-                stats.burst.append(elapsed)
-            print(stats.burst)
-            if elapsed > 0:
-                stats.pps = pieces_placed / elapsed
-                stats.burst_pps = (len(stats.burst) - 1) / (max(stats.burst) - min(stats.burst)) if len(stats.burst) > 9 else 0
-                print(f"PPS (Pieces Per Second): {stats.pps:.2f} burst: {stats.burst_pps/10}")
+                # Add one new piece to the queue
+                self.queue, self.bag = add_piece_from_bag(
+                    self.queue, 
+                    self.bag, 
+                    num_pieces=1, 
+                    no_s_z_first_piece=self.no_s_z_first_piece_signal[0]
+                )
 
-    finally:
-        print("Game loop finished.")
-        game_over_signal[0] = True
+                pieces_placed += 1
+                elapsed = time.perf_counter() - actual_game_start_time
+                if len(stats.burst) < 10:
+                    stats.burst.append(elapsed)
+                else:
+                    stats.burst.pop(0)
+                    stats.burst.append(elapsed)
+                print(stats.burst)
+                if elapsed > 0:
+                    stats.pps = pieces_placed / elapsed
+                    stats.burst_pps = (len(stats.burst) - 1) / (max(stats.burst) - min(stats.burst)) if len(stats.burst) > 9 else 0
+                    print(f"PPS (Pieces Per Second): {stats.pps:.2f} burst: {stats.burst_pps/10}")
 
-viewer = TetrisBoardViewer(board, stats, start_signal, queue, game_over_signal, no_s_z_first_piece_signal)
+        finally:
+            print("Game loop finished.")
+            self.game_over_signal[0] = True
+game = TetrisGame()
+viewer = TetrisBoardViewer(game.board, stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal)
 
 # start the game loop in a separate thread so the viewer remains responsive
-game_thread = threading.Thread(target=game_loop, daemon=True)
+game_thread = threading.Thread(target=lambda: game.game_loop(viewer), daemon=True)
 game_thread.start()
 
 viewer.mainloop(GUI_mode=False)
