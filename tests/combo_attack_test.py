@@ -1,9 +1,9 @@
 import sys
 import os
-from tetrio_parsing.calculate_attack import ATTACK_TABLE, ATTACK_TABLE_MAX_COMBO
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from tetrio_parsing.calculate_attack import ATTACK_TABLE, ATTACK_TABLE_MAX_COMBO
 
-board= [
+'''board= [
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
@@ -26,7 +26,29 @@ board= [
     ['x','x','x','x','x','x','x','x','x',' '],
     ]
 
-queue = ['T','S','O','L','Z','J','I'] # no need to use hold
-
+queue = ['T','S','O','L','Z','J','I'] # no need to use hold'''
+board= [
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ','x','x','x','x','x','x','x','x','x'],
+    [' ','x','x','x','x','x','x','x','x','x'],
+    [' ','x','x','x','x','x','x','x','x','x'],
+    [' ','x','x','x','x','x','x','x','x','x'],
+    ]
+queue = ["I"]
 from bruteforcing import find_best_placement
-find_best_placement(board, queue)
+find_best_placement(board, queue,0)

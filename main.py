@@ -25,14 +25,15 @@ DESIRED_QUEUE_PREVIEW_LENGTH = 5
 
 class GameStats:
     def __init__(self):
-        self.burst = [] # stores 10 times piece was placed, then max-min
+        self.burst = [] #(PPS) stores 10 times piece was placed, then max-min
         self.pps = 0.0
         self.single = 0
         self.double = 0
         self.triple = 0
         self.tetris = 0
         self.combo = 0
-stats = GameStats()
+        self.burst_attack = 0 # unused, stil; thinking about it
+
 
 class TetrisGame:
     def __init__(self):
@@ -44,6 +45,7 @@ class TetrisGame:
         self.game_over_signal = [False]
         self.no_s_z_first_piece_signal = [False] 
         self.stats = GameStats()
+
     def start_game(self):
         print("Starting Tetris game...")
         self.viewer = TetrisBoardViewer(self.board, self.stats, self.start_signal, self.queue, self.game_over_signal, self.no_s_z_first_piece_signal)
@@ -104,8 +106,18 @@ class TetrisGame:
             
                 board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
                 print(f"Lines cleared: {lines_cleared_count}")
-                count_lines_clear(lines_cleared_count,self.combo)
-                
+                attack, self.combo = count_lines_clear(lines_cleared_count,self.combo)
+                self.stats.combo = self.combo
+
+                if lines_cleared_count == 1:
+                    self.stats.single += 1
+                elif lines_cleared_count == 2:
+                    self.stats.double += 1
+                elif lines_cleared_count == 3:
+                    self.stats.triple += 1
+                elif lines_cleared_count == 4:
+                    self.stats.tetris += 1
+
                 self.board[:] = board_after_clear
                 if viewer: viewer.update_board(self.board)
                 
@@ -128,22 +140,22 @@ class TetrisGame:
 
                 pieces_placed += 1
                 elapsed = time.perf_counter() - actual_game_start_time
-                if len(stats.burst) < 10:
-                    stats.burst.append(elapsed)
+                if len(self.stats.burst) < 10:
+                    self.stats.burst.append(elapsed)
                 else:
-                    stats.burst.pop(0)
-                    stats.burst.append(elapsed)
-                print(stats.burst)
+                    self.stats.burst.pop(0)
+                    self.stats.burst.append(elapsed)
+                print(self.stats.burst)
                 if elapsed > 0:
-                    stats.pps = pieces_placed / elapsed
-                    stats.burst_pps = (len(stats.burst) - 1) / (max(stats.burst) - min(stats.burst)) if len(stats.burst) > 9 else 0
-                    print(f"PPS (Pieces Per Second): {stats.pps:.2f} burst: {stats.burst_pps/10}")
-
+                    self.stats.pps = pieces_placed / elapsed
+                    self.stats.burst_pps = (len(self.stats.burst) - 1) / (max(self.stats.burst) - min(self.stats.burst)) if len(self.stats.burst) > 9 else 0
+                    print(f"PPS (Pieces Per Second): {self.stats.pps:.2f} burst: {self.stats.burst_pps/10}")
+        
         finally:
             print("Game loop finished.")
             self.game_over_signal[0] = True
 game = TetrisGame()
-viewer = TetrisBoardViewer(game.board, stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal)
+viewer = TetrisBoardViewer(game.board, game.stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal)
 
 # start the game loop in a separate thread so the viewer remains responsive
 game_thread = threading.Thread(target=lambda: game.game_loop(viewer), daemon=True)
@@ -154,13 +166,13 @@ viewer.mainloop(GUI_mode=False)
 # --- 
 # IMPORTANT: 
 # - The game loop will stop if no valid placement is found.
-# - stats.pps can be used in other modules (e.g., for display in the viewer).
-# - This script is intended for AI/bot simulation, debugging, or visualization.
-# - For headless or server-side use, remove or modify the viewer code.
+# - stats.pps can be used in other modules (for display in the viewer).
 #
 # TODO:
 # - Add more advanced scoring/evaluation for moves.
 # - Implement perfect clear solver/mode.
 # - Add reset/restart logic for early Z/S pieces or other "unlucky" starts.
 # - Improve stack flatness/height evaluation for better AI performance.
-
+# - improve the code working in a way that its usable on console, i look at it like this
+# just make it work normally but do sth like, if there is a line clear,make it pink in console (assuming everything else is colored)
+# and then next move just removes that line

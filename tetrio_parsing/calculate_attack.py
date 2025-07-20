@@ -38,12 +38,20 @@ def attack_simplified(clear, combo):
     return atk
 
 
-def count_lines_clear(lines_cleared_count,combo):
-    if lines_cleared_count > 0:
-        combo += 1
-    else:
-        combo = 0
+def count_lines_clear(lines_cleared_count,combo,board):
+    
+    
     attack = 0
+    perfect_clear = True
+    for row in board:
+        if all(cell == ' ' for cell in row):
+            perfect_clear = False
+            break
+
+    if perfect_clear:
+        print("Perfect clear!")
+        attack += PERFECT_CLEAR_BONUS
+        
     if combo < 20:
         if lines_cleared_count == 1:
             attack += ATTACK_TABLE["single"][combo]
@@ -70,4 +78,10 @@ def count_lines_clear(lines_cleared_count,combo):
         elif lines_cleared_count == 4:
             attack += ATTACK_TABLE_MAX_COMBO["tetris"]
             print("Tetris cleared") 
+    if lines_cleared_count > 0:
+        combo += 1
+    else:
+        combo = 0        
+    print(f"Attack: {attack}, Combo: {combo}")
+    
     return attack, combo
