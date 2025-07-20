@@ -18,35 +18,18 @@ ATTACK_TABLE_MAX_COMBO = { # for combo above 19
     "tetris": 24
 }
 
-PERFECT_CLEAR_BONUS = 10
-
-def attack_simplified(clear, combo):
-    
-    atk = 0
-    
-    if clear == "perfect clear":
-        # that wont work really, make sth like, check if board is empty, if it is, add 10 attack
-        return PERFECT_CLEAR_BONUS
-
-    if combo >= len(ATTACK_TABLE["single"]): 
-        atk = ATTACK_TABLE_MAX_COMBO.get(clear, 0)
-    else:
-        attack_list = ATTACK_TABLE.get(clear, [])
-        if attack_list: 
-            atk = attack_list[combo]
-
-    return atk
+PERFECT_CLEAR_BONUS = 5 # unsure if pc gives btb or no, idk if that matters even cuz api
 
 
 def count_lines_clear(lines_cleared_count,combo,board):
     
-    
     attack = 0
     perfect_clear = True
     for row in board:
-        if all(cell == ' ' for cell in row):
-            perfect_clear = False
-            break
+        for cell in row:
+            if cell != ' ':
+                perfect_clear = False
+                break
 
     if perfect_clear:
         print("Perfect clear!")
