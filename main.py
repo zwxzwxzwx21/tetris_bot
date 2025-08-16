@@ -13,6 +13,8 @@ import time
 import argparse # testing it
 import threading
 
+from tests.combo_attack_test import custom_board # probably stupid way to do that, idk better yet
+
 from utility.print_board import print_board
 from utility.pieces import PIECES
 
@@ -52,6 +54,8 @@ class TetrisGame:
         self.no_s_z_first_piece_signal = [False] 
         self.custom_bag = [False]
         self.stats = GameStats()
+        self.slow_mode = [False]
+        self.custom_board = [False]  
 
     def game_loop(self,viewer):
         
@@ -162,7 +166,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument(
         "--rule",
-        choices=["40l","custom_bag","nosz","none", "custom_map"], 
+        choices=["40l","custom_bag","nosz","none", "custom_board", "slow"], 
         nargs = "+",
         default=[],
         help = "unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world"
@@ -181,7 +185,13 @@ if __name__ == "__main__":
     if game.custom_bag[0]:
         game.bag = create_bag(custom_bag=True)
         print(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
-    
+        time.sleep(3)
+    game.custom_board[0] = "custom_board" in args.rule
+    if game.custom_board[0]:
+        game.board = custom_board
+        print_board(game.board)
+        time.sleep(5)
+    game.slow_mode[0] = "slow" in args.rule
     game.game_loop(None)
 
 # IMPORTANT:

@@ -28,7 +28,7 @@ from tetrio_parsing.calculate_attack import ATTACK_TABLE, ATTACK_TABLE_MAX_COMBO
 
 queue = ['T','S','O','L','Z','J','I'] # no need to use hold'''
 # 3 combo into pc
-board= [
+custom_board= [
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
@@ -52,6 +52,6 @@ board= [
     ]
 queue = ["I","J","O","I"]
 from bruteforcing import find_best_placement
-best_board, best_move, total_attack = find_best_placement(board, queue, 0)
+best_board, best_move, total_attack = find_best_placement(custom_board, queue, 0)
 print(f"best move {best_move}")
 print(f"total attack after sequence: {total_attack}")
