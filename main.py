@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # if someone is reading that, i may or may not have used some AI help for comments and such to make code more readable
+# half of them i didnt even read but i dont remove them because fucking higlighting puts them there as it feels and it was usefull
+# once!! so i wil lleave them, so like whateverr sorry algosith dont bother with them
 # got an issue with that? better not or i will cry.
 
 from tetrio_parsing.calculate_attack import count_lines_clear 
@@ -15,7 +17,7 @@ from board_operations.board_operations import clear_lines
 
 from GenerateBag import add_piece_from_bag 
 
-from BoardRealTimeView import TetrisBoardViewer
+#from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
 
 if not PIECES:
@@ -46,17 +48,13 @@ class TetrisGame:
         self.no_s_z_first_piece_signal = [False] 
         self.stats = GameStats()
 
-    def start_game(self):
-        print("Starting Tetris game...")
-        self.viewer = TetrisBoardViewer(self.board, self.stats, self.start_signal, self.queue, self.game_over_signal, self.no_s_z_first_piece_signal)
-
     def game_loop(self,viewer):
         
-        print("Game loop thread started, waiting for start signal...")
+        print("game loop thread started, waiting for start signal")
         while not self.start_signal[0]: 
             time.sleep(0.1)
             if self.game_over_signal[0]: 
-                print("Game loop terminated before start by external signal.")
+                print("game loop terminated before start")
                 return 
             
         pieces_placed = 0
@@ -64,7 +62,7 @@ class TetrisGame:
 
         try:
             if not self.queue:
-                print("Initial queue fill...")
+                print("queue fill")
                 num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(self.queue)
                 if num_to_add > 0:
                     self.queue, self.bag = add_piece_from_bag(
@@ -74,12 +72,12 @@ class TetrisGame:
                         no_s_z_first_piece=self.no_s_z_first_piece_signal[0]
                     )
                 if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
-                    print("Failed to fill initial queue sufficiently. Game Over.")
+                    print("failed to fill queue")
                     return 
 
             while True:
                 if self.game_over_signal[0]: 
-                    print("Game loop terminating due to game_over_signal.")
+                    print("game loop finished by game_over_signal")
                     break
                 
                 print("\n=== Current Queue ===")
@@ -88,7 +86,7 @@ class TetrisGame:
                 best_board_after_search, best_move_str = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
                 
                 if not best_board_after_search: 
-                    print("No valid placement found by bruteforcer. Ending game.")
+                    print("no valid placement")
                     break
                 
                 piece_type_placed = self.queue[0] 
@@ -100,13 +98,13 @@ class TetrisGame:
                 
                 board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
                 if board_after_drop is None:
-                    print(f"Error: drop_piece failed for supposedly valid move: {best_move_str} with piece {piece_type_placed}")
-                    print("Game Over - Cannot drop piece.")
+                    print(f"error: drop_piece failed for valid move: {best_move_str} with piece {piece_type_placed}")
+                    print("cannot drop piece")
                     break
             
                 board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
-                print(f"Lines cleared: {lines_cleared_count}")
-                attack, self.combo = count_lines_clear(lines_cleared_count,self.combo)
+                print(f"lines cleared: {lines_cleared_count}")
+                attack, self.combo = count_lines_clear(lines_cleared_count,self.combo,board_after_clear)
                 self.stats.combo = self.combo
 
                 if lines_cleared_count == 1:
@@ -121,16 +119,16 @@ class TetrisGame:
                 self.board[:] = board_after_clear
                 if viewer: viewer.update_board(self.board)
                 
-                print(f"\nPlaced: {piece_type_placed} via move {best_move_str}")
+                print(f"\nplaced: {piece_type_placed} by move {best_move_str}")
                 print_board(self.board)
                 
                 if self.queue: 
-                    self.queue.pop(0) # Remove the used piece
+                    self.queue.pop(0) # remove the used piece
                 else: # should never happen
-                    print("error: Tried to pop from empty queue after placement.")
+                    print("error: tried to pop from empty queue after placement")
                     break
 
-                # Add one new piece to the queue
+                # add one new piece to the queue
                 self.queue, self.bag = add_piece_from_bag(
                     self.queue, 
                     self.bag, 
@@ -149,30 +147,29 @@ class TetrisGame:
                 if elapsed > 0:
                     self.stats.pps = pieces_placed / elapsed
                     self.stats.burst_pps = (len(self.stats.burst) - 1) / (max(self.stats.burst) - min(self.stats.burst)) if len(self.stats.burst) > 9 else 0
-                    print(f"PPS (Pieces Per Second): {self.stats.pps:.2f} burst: {self.stats.burst_pps/10}")
+                    print(f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps/10}")
         
         finally:
-            print("Game loop finished.")
+            print("game loop finished")
             self.game_over_signal[0] = True
-game = TetrisGame()
-viewer = TetrisBoardViewer(game.board, game.stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal)
 
-# start the game loop in a separate thread so the viewer remains responsive
-game_thread = threading.Thread(target=lambda: game.game_loop(viewer), daemon=True)
-game_thread.start()
+if __name__ == "__main__":
+    game = TetrisGame()
+    game.start_signal[0] = True  # automatically start the game
+    
+    #game.viewer = TetrisBoardViewer(game.board, game.stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal)
 
-viewer.mainloop(GUI_mode=False)
+    game.game_loop(None)
 
-# --- 
-# IMPORTANT: 
-# - The game loop will stop if no valid placement is found.
+# IMPORTANT:
+# - the game loop will stop if no valid placement is found
 # - stats.pps can be used in other modules (for display in the viewer).
 #
 # TODO:
-# - Add more advanced scoring/evaluation for moves.
-# - Implement perfect clear solver/mode.
-# - Add reset/restart logic for early Z/S pieces or other "unlucky" starts.
-# - Improve stack flatness/height evaluation for better AI performance.
+# - add more advanced scoring/evaluation for moves.
+# - implement perfect clear solver/mode.
+# - add reset/restart logic for early Z/S pieces or other "unlucky" starts.
+# - improve stack flatness/height evaluation for better bot performance.
 # - improve the code working in a way that its usable on console, i look at it like this
 # just make it work normally but do sth like, if there is a line clear,make it pink in console (assuming everything else is colored)
 # and then next move just removes that line

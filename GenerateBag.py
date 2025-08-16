@@ -2,15 +2,14 @@ import random
 
 TETROMINOES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L']
 
-def create_bag(bag_size=7, no_s_z_first_piece=False): # Default for flag is False
+def create_bag(bag_size=7, no_s_z_first_piece=False):
     """
-    Create and shuffle a new bag of tetrominoes of a given size.
+    Create and shuffle a new bag of tetrominoes of a given size
     If no_s_z_first_piece (checkbox flag) is True, attempts to avoid:
     1. S/Z as the first piece.
     2. O as the first piece, followed by S/Z as the second.
     """
-    # Create and shuffle the bag
-    if bag_size == 7: # Standard 7-bag (one of each piece)
+    if bag_size == 7: 
         bag = list(TETROMINOES)
         random.shuffle(bag)
     else: # For other bag sizes, fill by extending and truncating
@@ -32,7 +31,7 @@ def create_bag(bag_size=7, no_s_z_first_piece=False): # Default for flag is Fals
             # Try to swap bag[0] with a non-S/Z piece from the rest of the bag
             for i in range(1, len(bag)):
                 if bag[i] not in ('S', 'Z'):
-                    bag[0], bag[i] = bag[i], bag[0] # Perform swap
+                    bag[0], bag[i] = bag[i], bag[0] 
                     print(f"Avoidance Rule 1: Initial S/Z '{original_bag_for_logging[0]}' at start. Swapped with '{bag[0]}'.")
                     print(f"   Original Bag: {original_bag_for_logging}")
                     print(f"   New Bag:      {bag}")
@@ -66,8 +65,6 @@ def create_bag(bag_size=7, no_s_z_first_piece=False): # Default for flag is Fals
             if not swapped_rule2:
                 print(f"Avoidance Rule 2: 'O {problematic_second_piece}' sequence, no non-S/Z piece from bag[2:] to swap. Bag remains: {bag}")
         
-        # No need for the old "Bag after reversing" print.
-        # The specific prints above will indicate if changes were made.
 
     return bag
 
@@ -78,19 +75,19 @@ def add_piece_from_bag(queue, bag, no_s_z_first_piece, min_bag_size=4, bag_size=
     Returns the updated queue and bag.
     """
 
-    # Condition to refill: if bag doesn't have enough for current request + maintaining min_bag_size buffer
+    # condition to refill: if bag doesn't have enough for current request + maintaining min_bag_size buffer
     # alternatively: if current bag < (num_pieces + min_bag_size)
-    while len(bag) < num_pieces + min_bag_size: # Ensure enough for current request and buffer
+    while len(bag) < num_pieces + min_bag_size: 
         new_bag_pieces = create_bag(bag_size=bag_size, no_s_z_first_piece=no_s_z_first_piece)
-        if not new_bag_pieces: # Safety break if create_bag returns empty
+        if not new_bag_pieces: 
             break
         bag.extend(new_bag_pieces)
         
     pieces_added_this_call = 0
     for _ in range(num_pieces):
-        if not bag: # Cannot pop from an empty bag
+        if not bag: 
             break
-        piece = bag.pop(0) # Pop from the front (FIFO for bag into queue)
+        piece = bag.pop(0)
         queue.append(piece)
         pieces_added_this_call += 1
         

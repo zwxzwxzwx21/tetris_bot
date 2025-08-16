@@ -59,7 +59,7 @@ def drop_piece(piece, board, col):
         - Used by the brute-forcer and AI to simulate moves.
         - Call to get the resulting board after a drop.
     """
-    board_copy = [row.copy() for row in board]  # Deep copy
+    board_copy = [row.copy() for row in board]  # deep copy
     row = 0
     while can_place(piece, board_copy, row + 1, col):
         row += 1

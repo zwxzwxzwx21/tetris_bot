@@ -30,8 +30,8 @@ rotations = {
 MOVES_DONE = 0
 MOVES_REMOVED = 0  
 TIME_LIMIT = 999  # Maximum time (in seconds) allowed for the search
-UNEVEN_THRESHOLD = 1.4  # Prune stacks that are too uneven
-MAX_HEIGHT_DIFF = 8 # Prune stacks that are too tall
+UNEVEN_THRESHOLD = 1.1  # Prune stacks that are too uneven
+MAX_HEIGHT_DIFF = 6 # Prune stacks that are too tall
 
 def find_best_placement(board, queue, combo):
     """
@@ -40,15 +40,16 @@ def find_best_placement(board, queue, combo):
     Returns the resulting board and the move string for the first move in the best sequence.
     """
     start_time = time.perf_counter()
+    best_attack = 0
     best_board = None
     best_move = None
     attack = 0
     def recursive_search(board, queue, current_piece_index, move_history, combo, attack):
         print(current_piece_index,queue )
-        nonlocal best_board, best_move
+        nonlocal best_board, best_move, best_attack
         global MOVES_DONE, MOVES_REMOVED
         t_rec_start = time.perf_counter()
-        print('test')
+        #print('test')
         # --- TIME LIMIT ---
         # this one seems pointless really
         if time.perf_counter() - start_time > TIME_LIMIT:
@@ -58,6 +59,7 @@ def find_best_placement(board, queue, combo):
         if current_piece_index >= len(queue):
             best_board = board
             best_move = move_history[0] 
+            best_attack = attack
             return
 
         # --- PIECE LOOKUP ---
@@ -74,7 +76,7 @@ def find_best_placement(board, queue, combo):
                 # --- DROP PIECE ---
                 new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
                 board_after_clear,cleared_lines = clear_lines(new_board)
-                print_board(board_after_clear)
+                #print_board(board_after_clear)
                 
                 attack,combo = count_lines_clear(cleared_lines,combo,board_after_clear)
                 #print(f"attack: {attack}\ncombo: {combo}" )
@@ -90,8 +92,8 @@ def find_best_placement(board, queue, combo):
                 holes = check_holes(board_after_clear)
 
                 if (uneven > UNEVEN_THRESHOLD or 
-                    height_diff > MAX_HEIGHT_DIFF):
-                    MOVES_REMOVED += 1
+                    height_diff > MAX_HEIGHT_DIFF or check_holes(board_after_clear) > 0):
+                    MOVES_REMOVED += 1 
                     continue
 
                 # --- RECURSIVE CALL ---
@@ -125,7 +127,7 @@ def find_best_placement(board, queue, combo):
 
     # Start the recursive search from the current board and queue
     recursive_search(board, queue, 0, [], combo, attack)
-    return best_board, best_move
+    return best_board, best_move, best_attack
 
 # ---
 # How and when to use:

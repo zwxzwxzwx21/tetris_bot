@@ -1,4 +1,4 @@
-import pygame
+'''import pygame
 import numpy as np
 from utility.pieces import PIECES
 import time
@@ -229,11 +229,13 @@ class TetrisBoardViewer:
             print("Game Statistics:")
             print(f"PPS: {self.stats.pps:.3f} burst: {(len(self.stats.burst) - 1) / (max(self.stats.burst) - min(self.stats.burst)) if len(self.stats.burst) > 9 else 0:.3f}")
             elapsed_ui_time_seconds = (pygame.time.get_ticks() - self.ui_start_time) / 1000.0
-            print(f"UI Time: {elapsed_ui_time_seconds:.3f}s")
-            print(f"Singles: {self.stats.single}")
-            print(f"Doubles: {self.stats.double}")
-            print(f"Triples: {self.stats.triple}")
-            print(f"Tetrises: {self.stats.tetris}")
+            #print(f"UI Time: {elapsed_ui_time_seconds:.3f}s")
+            #print(f"Singles: {self.stats.single}")
+            #print(f"Doubles: {self.stats.double}")
+            #print(f"Triples: {self.stats.triple}")
+            #print(f"Tetrises: {self.stats.tetris}")
+            #print(f"combo: {self.stats.combo}")
+            #print(f"attack (burst): {self.stats.attack}")
     def draw_queue_display(self,GUI_mode):
         if self.GUI_mode:
             # --- Draw Queue Display (Right Panel) ---
@@ -469,4 +471,4 @@ class TetrisBoardViewer:
             if not self.start_signal[0]:
                 self.start_signal[0] = True
 
-            
+            '''

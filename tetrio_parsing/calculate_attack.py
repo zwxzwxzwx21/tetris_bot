@@ -60,6 +60,6 @@ def count_lines_clear(lines_cleared_count,combo,board):
         combo += 1
     else:
         combo = 0        
-    print(f"Attack: {attack}, Combo: {combo}")
+    #print(f"Attack: {attack}, Combo: {combo}")
     
     return attack, combo
