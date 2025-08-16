@@ -4,9 +4,13 @@
 # once!! so i wil lleave them, so like whateverr sorry algosith dont bother with them
 # got an issue with that? better not or i will cry.
 
+# to test the argparse better, try running it in console using:
+# python .\main.py --rule, rules will be listed lower, as they are wip
 from tetrio_parsing.calculate_attack import count_lines_clear 
+from GenerateBag import create_bag
 import copy
 import time
+import argparse # testing it
 import threading
 
 from utility.print_board import print_board
@@ -46,6 +50,7 @@ class TetrisGame:
         self.start_signal = [False]
         self.game_over_signal = [False]
         self.no_s_z_first_piece_signal = [False] 
+        self.custom_bag = [False]
         self.stats = GameStats()
 
     def game_loop(self,viewer):
@@ -153,12 +158,30 @@ class TetrisGame:
             print("game loop finished")
             self.game_over_signal[0] = True
 
-if __name__ == "__main__":
-    game = TetrisGame()
-    game.start_signal[0] = True  # automatically start the game
-    
-    #game.viewer = TetrisBoardViewer(game.board, game.stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal)
+def parse_args():
+    parser = argparse.ArgumentParser(description="Test arguments/rules")
+    parser.add_argument(
+        "--rule",
+        choices=["40l","custom_bag","nosz","none", "custom_map"], 
+        nargs = "+",
+        default=[],
+        help = "unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world"
+    )
+    return parser.parse_args()
 
+if __name__ == "__main__":
+    args = parse_args()
+    game = TetrisGame()
+    
+    game.start_signal[0] = True
+    
+    game.no_s_z_first_piece_signal[0] = "nosz" in args.rule 
+    
+    game.custom_bag[0] = "custom_bag" in args.rule
+    if game.custom_bag[0]:
+        game.bag = create_bag(custom_bag=True)
+        print(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
+    
     game.game_loop(None)
 
 # IMPORTANT:

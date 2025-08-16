@@ -2,13 +2,17 @@ import random
 
 TETROMINOES = ['I', 'O', 'T', 'S', 'Z', 'J', 'L']
 
-def create_bag(bag_size=7, no_s_z_first_piece=False):
+def create_bag(bag_size=7, no_s_z_first_piece=False, custom_bag=False):
     """
     Create and shuffle a new bag of tetrominoes of a given size
     If no_s_z_first_piece (checkbox flag) is True, attempts to avoid:
     1. S/Z as the first piece.
     2. O as the first piece, followed by S/Z as the second.
     """
+
+    if custom_bag:
+        return ['I', 'O', 'T', 'S', 'Z', 'J', 'L'] # edit as needed, idk how it would work with smaller, bigger bags
+
     if bag_size == 7: 
         bag = list(TETROMINOES)
         random.shuffle(bag)
