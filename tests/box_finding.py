@@ -4,11 +4,11 @@ from utility.boxes import sequences  # Assume BOXES is a list of lists, e.g. [['
 
 def find_box_in_queue(queue, boxes=sequences):
     """
-    Finds the first box from boxes that appears in queue (in order, not necessarily consecutive).
-    Returns (remaining_queue, box_queue) if found, else (queue, []).
+    Finds the first box from boxes that appears in queue
     # i have a feeling this can be done more efficiently, however we are not gonna
     # use this one besides 40l so i dont care that much 
     """
+    # i dont feel like using that at all tbh, makes no sense to me why making a bot just for 40l at all leaving cuz why not
     for box in boxes:
         box_indices = []
         q_idx = 0

@@ -3,3 +3,4 @@ so this is basically a combine funtion that prints all important info i want to 
 such as: heuristic estimations, future branch and bound estimations, and whatever else i might need
 
 """
+#wher functio?

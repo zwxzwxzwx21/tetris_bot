@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # if someone is reading that, i may or may not have used some AI help for comments and such to make code more readable
 # half of them i didnt even read but i dont remove them because fucking higlighting puts them there as it feels and it was usefull
+# ^ update i have cleared some useless things up, yeah you can mby look them up in previous commits but what for
+# those dont even have any working code so i wouldnt bother
 # once!! so i wil lleave them, so like whateverr sorry algosith dont bother with them
 # got an issue with that? better not or i will cry.
 
@@ -23,7 +25,6 @@ from board_operations.board_operations import clear_lines
 
 from GenerateBag import add_piece_from_bag 
 
-#from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
 
 if not PIECES:
@@ -58,12 +59,11 @@ class TetrisGame:
         self.custom_board = [False]  
 
     def game_loop(self,viewer):
-        
-        print("game loop thread started, waiting for start signal")
+        # todo: this has to go, left from boardvierer, was really usefull but now its annoying
+        # i will change it i swear, just give me second :3
         while not self.start_signal[0]: 
             time.sleep(0.1)
             if self.game_over_signal[0]: 
-                print("game loop terminated before start")
                 return 
             
         pieces_placed = 0
@@ -80,19 +80,22 @@ class TetrisGame:
                         num_pieces=num_to_add, 
                         no_s_z_first_piece=self.no_s_z_first_piece_signal[0]
                     )
+                # algo youre may be reading this, those are kind of things ive asked
+                # like obv it wasnt my idea, i saw that and was just, fuck it we ball
                 if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
                     print("failed to fill queue")
                     return 
 
             while True:
                 if self.game_over_signal[0]: 
+                    # leftover from board viewer, useless
                     print("game loop finished by game_over_signal")
                     break
                 
                 print("\n=== Current Queue ===")
                 print(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH]) 
                 
-                best_board_after_search, best_move_str = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
+                best_board_after_search, best_move_str, combo = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
                 
                 if not best_board_after_search: 
                     print("no valid placement")
@@ -104,8 +107,13 @@ class TetrisGame:
                 x = int(x_str[1:]) 
                 
                 piece_shape = PIECES[piece_type_placed][rotation] 
-                
+                if self.slow_mode[0]:
+                    input(f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...")
+                  
                 board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
+                # its never none, usually its just first rotation and leftmost X, i think it would be good to change it 
+                # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
+                # tho im not so sure, leaving it here just because of that
                 if board_after_drop is None:
                     print(f"error: drop_piece failed for valid move: {best_move_str} with piece {piece_type_placed}")
                     print("cannot drop piece")
@@ -146,6 +154,8 @@ class TetrisGame:
                 )
 
                 pieces_placed += 1
+                # i think after removing board viewer it doesnt work, but i also dont print it at all so that is something i will do later
+                # im making those comments and changes cuz i wanna public code soon and then i will be so much more motivated to work on it lmao
                 elapsed = time.perf_counter() - actual_game_start_time
                 if len(self.stats.burst) < 10:
                     self.stats.burst.append(elapsed)
@@ -161,7 +171,7 @@ class TetrisGame:
         finally:
             print("game loop finished")
             self.game_over_signal[0] = True
-
+# this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument(
@@ -185,7 +195,7 @@ if __name__ == "__main__":
     if game.custom_bag[0]:
         game.bag = create_bag(custom_bag=True)
         print(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
-        time.sleep(3)
+        time.sleep(3) # added for testing, same with lower one, can be removed later (even should be)
     game.custom_board[0] = "custom_board" in args.rule
     if game.custom_board[0]:
         game.board = custom_board

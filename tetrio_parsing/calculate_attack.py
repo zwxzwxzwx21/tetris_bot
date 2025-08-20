@@ -1,9 +1,3 @@
-'''def check_lines_clear(board):
-    for row in board:
-        if all(cell != ' ' for cell in row):
-            return True
-    return False'''
-
 ATTACK_TABLE = {
     "single": [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3],
     "double": [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
@@ -27,39 +21,38 @@ def count_lines_clear(lines_cleared_count,combo,board):
     perfect_clear = all(all(cell == ' ' for cell in row) for row in board)
 
     if perfect_clear:
-        print("Perfect clear!")
+        print("perfect clear")
         attack += PERFECT_CLEAR_BONUS
         
     if combo < 20:
         if lines_cleared_count == 1:
             attack += ATTACK_TABLE["single"][combo]
-            print("Single cleared") 
+            print("single cleared") 
         elif lines_cleared_count == 2:    
             attack += ATTACK_TABLE["double"][combo]
-            print("Double cleared")
+            print("double cleared")
         elif lines_cleared_count == 3:    
             attack += ATTACK_TABLE["triple"][combo]
-            print("Triple cleared")
+            print("triple cleared")
         elif lines_cleared_count == 4:
             attack += ATTACK_TABLE["tetris"][combo]
-            print("Tetris cleared") 
+            print("tetris cleared") 
     else:
         if lines_cleared_count == 1:
             attack += ATTACK_TABLE_MAX_COMBO["single"]
             print("Single cleared") 
         elif lines_cleared_count == 2:    
             attack += ATTACK_TABLE_MAX_COMBO["double"]
-            print("Double cleared")
+            print("double cleared")
         elif lines_cleared_count == 3:    
             attack += ATTACK_TABLE_MAX_COMBO["triple"]
-            print("Triple cleared")
+            print("triple cleared")
         elif lines_cleared_count == 4:
             attack += ATTACK_TABLE_MAX_COMBO["tetris"]
-            print("Tetris cleared") 
+            print("tetris cleared")
     if lines_cleared_count > 0:
         combo += 1
     else:
         combo = 0        
-    #print(f"Attack: {attack}, Combo: {combo}")
     
     return attack, combo
