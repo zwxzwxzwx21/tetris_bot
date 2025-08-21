@@ -16,8 +16,13 @@ import argparse # testing it
 import threading
 import logging 
 
-logging.basicConfig(format='%(levelname)s: %(filename)s:%(lineno)d in %(funcName)s - %(message)s',level=logging.DEBUG)
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler) # resets logger cuz when you set it once, you cant change it 
 
+logging.basicConfig(
+    format='%(levelname)s | %(filename)s -> %(lineno)d in %(funcName)s: %(message)s',
+    level=logging.DEBUG
+)
 from tests.combo_attack_test import custom_board # probably stupid way to do that, idk better yet
 
 from utility.print_board import print_board

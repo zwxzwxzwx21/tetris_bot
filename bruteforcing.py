@@ -2,7 +2,6 @@ import copy
 import time 
 import logging
 
-
 from utility.print_board import board as board_ # yeah i know its stupid that its in print_board.py i dun care
 from utility.print_board import print_board  # Importing print_board for debugging output
 from tetrio_parsing.calculate_attack import count_lines_clear 
