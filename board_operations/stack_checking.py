@@ -1,3 +1,6 @@
+import logging
+
+logging.basicConfig(format='%(levelname)s: %(filename)s: %(lineno)d: %(message)s', level=logging.DEBUG)
 
 def check_holes(board, check_covered=True):
     """
@@ -36,8 +39,7 @@ def check_holes(board, check_covered=True):
                 if board[row][col] == ' ' and board[row-1][col] != ' ': 
                     sum += count
                     if test_mode:
-                        print(f"Found hole in column {col} at row {row}, sum: {sum} count: {count}")
-                        print()
+                        logging.debug(f"Found hole in column {col} at row {row}, sum: {sum} count: {count} \n" )
                 if row == 19: 
                     count = 0
     return sum 

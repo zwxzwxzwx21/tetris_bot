@@ -14,6 +14,9 @@ import copy
 import time
 import argparse # testing it
 import threading
+import logging 
+
+logging.basicConfig(format='%(levelname)s: %(filename)s:%(lineno)d in %(funcName)s - %(message)s',level=logging.DEBUG)
 
 from tests.combo_attack_test import custom_board # probably stupid way to do that, idk better yet
 
@@ -71,7 +74,7 @@ class TetrisGame:
 
         try:
             if not self.queue:
-                print("queue fill")
+                logging.debug("queue fill")
                 num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(self.queue)
                 if num_to_add > 0:
                     self.queue, self.bag = add_piece_from_bag(
@@ -83,22 +86,22 @@ class TetrisGame:
                 # algo youre may be reading this, those are kind of things ive asked
                 # like obv it wasnt my idea, i saw that and was just, fuck it we ball
                 if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
-                    print("failed to fill queue")
+                    logging.debug("failed to fill queue")
                     return 
 
             while True:
                 if self.game_over_signal[0]: 
                     # leftover from board viewer, useless
-                    print("game loop finished by game_over_signal")
+                    logging.debug("game loop finished by game_over_signal")
                     break
-                
-                print("\n=== Current Queue ===")
-                print(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH]) 
-                
+
+                logging.debug("\n=== Current Queue ===")
+                logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
+
                 best_board_after_search, best_move_str, combo = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
                 
                 if not best_board_after_search: 
-                    print("no valid placement")
+                    logging.debug("no valid placement")
                     break
                 
                 piece_type_placed = self.queue[0] 
@@ -115,12 +118,12 @@ class TetrisGame:
                 # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
                 # tho im not so sure, leaving it here just because of that
                 if board_after_drop is None:
-                    print(f"error: drop_piece failed for valid move: {best_move_str} with piece {piece_type_placed}")
-                    print("cannot drop piece")
+                    logging.debug(f"error: drop_piece failed for valid move: {best_move_str} with piece {piece_type_placed}")
+                    logging.debug("cannot drop piece")
                     break
             
                 board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
-                print(f"lines cleared: {lines_cleared_count}")
+                logging.debug(f"lines cleared: {lines_cleared_count}")
                 attack, self.combo = count_lines_clear(lines_cleared_count,self.combo,board_after_clear)
                 self.stats.combo = self.combo
 
@@ -136,13 +139,13 @@ class TetrisGame:
                 self.board[:] = board_after_clear
                 if viewer: viewer.update_board(self.board)
                 
-                print(f"\nplaced: {piece_type_placed} by move {best_move_str}")
+                logging.debug(f"\nplaced: {piece_type_placed} by move {best_move_str}")
                 print_board(self.board)
                 
                 if self.queue: 
                     self.queue.pop(0) # remove the used piece
                 else: # should never happen
-                    print("error: tried to pop from empty queue after placement")
+                    logging.debug("error: tried to pop from empty queue after placement")
                     break
 
                 # add one new piece to the queue
@@ -162,14 +165,14 @@ class TetrisGame:
                 else:
                     self.stats.burst.pop(0)
                     self.stats.burst.append(elapsed)
-                print(self.stats.burst)
+                logging.debug(self.stats.burst)
                 if elapsed > 0:
                     self.stats.pps = pieces_placed / elapsed
                     self.stats.burst_pps = (len(self.stats.burst) - 1) / (max(self.stats.burst) - min(self.stats.burst)) if len(self.stats.burst) > 9 else 0
-                    print(f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps/10}")
+                    logging.debug(f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps/10}")
         
         finally:
-            print("game loop finished")
+            logging.debug("game loop finished")
             self.game_over_signal[0] = True
 # this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
@@ -194,13 +197,13 @@ if __name__ == "__main__":
     game.custom_bag[0] = "custom_bag" in args.rule
     if game.custom_bag[0]:
         game.bag = create_bag(custom_bag=True)
-        print(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
+        logging.debug(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
         time.sleep(3) # added for testing, same with lower one, can be removed later (even should be)
     game.custom_board[0] = "custom_board" in args.rule
     if game.custom_board[0]:
         game.board = custom_board
-        print_board(game.board)
-        time.sleep(5)
+        #logging.debug(game.board)
+        #time.sleep(5)
     game.slow_mode[0] = "slow" in args.rule
     game.game_loop(None)
 

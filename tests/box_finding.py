@@ -1,5 +1,3 @@
-# box_finding.py
-
 from utility.boxes import sequences  # Assume BOXES is a list of lists, e.g. [['i', 'o', 'o'], ...]
 
 def find_box_in_queue(queue, boxes=sequences):

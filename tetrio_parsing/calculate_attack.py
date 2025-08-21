@@ -1,3 +1,6 @@
+import logging
+logging.basicConfig(format='%(filename)s: %(message)s', level=logging.DEBUG)
+
 ATTACK_TABLE = {
     "single": [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3],
     "double": [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
@@ -21,35 +24,35 @@ def count_lines_clear(lines_cleared_count,combo,board):
     perfect_clear = all(all(cell == ' ' for cell in row) for row in board)
 
     if perfect_clear:
-        print("perfect clear")
+        logging.debug("perfect clear")
         attack += PERFECT_CLEAR_BONUS
         
     if combo < 20:
         if lines_cleared_count == 1:
             attack += ATTACK_TABLE["single"][combo]
-            print("single cleared") 
+            logging.debug("single cleared") 
         elif lines_cleared_count == 2:    
             attack += ATTACK_TABLE["double"][combo]
-            print("double cleared")
+            logging.debug("double cleared")
         elif lines_cleared_count == 3:    
             attack += ATTACK_TABLE["triple"][combo]
-            print("triple cleared")
+            logging.debug("triple cleared")
         elif lines_cleared_count == 4:
             attack += ATTACK_TABLE["tetris"][combo]
-            print("tetris cleared") 
+            logging.debug("tetris cleared") 
     else:
         if lines_cleared_count == 1:
             attack += ATTACK_TABLE_MAX_COMBO["single"]
-            print("Single cleared") 
+            logging.debug("Single cleared") 
         elif lines_cleared_count == 2:    
             attack += ATTACK_TABLE_MAX_COMBO["double"]
-            print("double cleared")
+            logging.debug("double cleared")
         elif lines_cleared_count == 3:    
             attack += ATTACK_TABLE_MAX_COMBO["triple"]
-            print("triple cleared")
+            logging.debug("triple cleared")
         elif lines_cleared_count == 4:
             attack += ATTACK_TABLE_MAX_COMBO["tetris"]
-            print("tetris cleared")
+            logging.debug("tetris cleared")
     if lines_cleared_count > 0:
         combo += 1
     else:

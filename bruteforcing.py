@@ -1,5 +1,7 @@
 import copy
 import time 
+import logging
+
 
 from utility.print_board import board as board_ # yeah i know its stupid that its in print_board.py i dun care
 from utility.print_board import print_board  # Importing print_board for debugging output
@@ -11,7 +13,7 @@ from board_operations.board_operations import clear_lines
 # Ensure PIECES is properly imported or defined
 if not PIECES:
     raise ImportError("PIECES dictionary could not be imported or is empty.")
-DEBUG = False
+DEBUG = True
 
 rotations = {
     'I': ['flat', 'spin'],
@@ -35,9 +37,9 @@ def find_best_placement(board, queue, combo):
     best_move = None
     attack = 0
     def recursive_search(board, queue, current_piece_index, move_history, combo, attack):
-        print(current_piece_index,queue )
+        logging.debug(f"current_piece_index: {current_piece_index}, queue: {queue}")
         nonlocal best_board, best_move, best_attack
-        global MOVES_DONE, MOVES_REMOVED\
+        global MOVES_DONE, MOVES_REMOVED
 
         # --- END CONDITION ---
         if current_piece_index >= len(queue):
@@ -51,7 +53,7 @@ def find_best_placement(board, queue, combo):
         #another of those that never will happen but why no
         if current_piece not in PIECES:
             if DEBUG:
-                print(f"Error: Piece '{current_piece}' is not defined in PIECES.")
+                logging.debug(f"Error: Piece '{current_piece}' is not defined in PIECES.")
             return
 
         # --- ROTATIONS & POSITIONS ---
@@ -61,10 +63,8 @@ def find_best_placement(board, queue, combo):
                 # --- DROP PIECE ---
                 new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
                 board_after_clear,cleared_lines = clear_lines(new_board)
-                #print_board(board_after_clear)
                 
                 attack,combo = count_lines_clear(cleared_lines,combo,board_after_clear)
-                #print(f"attack: {attack}\ncombo: {combo}" )
                 MOVES_DONE += 1
                 if new_board is None:
                     continue
@@ -83,8 +83,6 @@ def find_best_placement(board, queue, combo):
 
                 # --- RECURSIVE CALL ---
                 move = f"{current_piece}_x{x}_{rotation_name}"
-                
-                #print_board(board_after_clear)  # Debugging output
                 
                 recursive_search(
                     board_after_clear,
