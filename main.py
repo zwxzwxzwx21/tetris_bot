@@ -115,10 +115,13 @@ class TetrisGame:
                 x = int(x_str[1:]) 
                 
                 piece_shape = PIECES[piece_type_placed][rotation] 
+                
+                board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
+                print_board(board_after_drop)  # print the board after dropping the piece
                 if self.slow_mode[0]:
                     input(f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...")
                   
-                board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
+                
                 # its never none, usually its just first rotation and leftmost X, i think it would be good to change it 
                 # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
                 # tho im not so sure, leaving it here just because of that
@@ -219,7 +222,6 @@ if __name__ == "__main__":
 # TODO:
 # - add more advanced scoring/evaluation for moves.
 # - implement perfect clear solver/mode.
-# - add reset/restart logic for early Z/S pieces or other "unlucky" starts.
 # - improve stack flatness/height evaluation for better bot performance.
 # - improve the code working in a way that its usable on console, i look at it like this
 # just make it work normally but do sth like, if there is a line clear,make it pink in console (assuming everything else is colored)
