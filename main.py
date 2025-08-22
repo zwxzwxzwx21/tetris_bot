@@ -115,10 +115,11 @@ class TetrisGame:
                 x = int(x_str[1:]) 
                 
                 piece_shape = PIECES[piece_type_placed][rotation] 
-                
+
                 board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
-                print_board(board_after_drop)  # print the board after dropping the piece
+                
                 if self.slow_mode[0]:
+                    print_board(board_after_drop)  # print the board after dropping the piece
                     input(f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...")
                   
                 
