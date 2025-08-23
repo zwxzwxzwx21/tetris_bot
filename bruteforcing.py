@@ -41,10 +41,11 @@ def find_best_placement(board, queue, combo):
         global MOVES_DONE, MOVES_REMOVED
 
         # --- END CONDITION ---
+        if best_attack < attack:
+            best_attack = attack
         if current_piece_index >= len(queue):
             best_board = board
-            best_move = move_history[0] 
-            best_attack = attack
+            best_move = move_history[0]
             return
 
         # --- PIECE LOOKUP ---
@@ -62,7 +63,8 @@ def find_best_placement(board, queue, combo):
                 # --- DROP PIECE ---
                 new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
                 board_after_clear,cleared_lines = clear_lines(new_board)
-                
+                #print_board(board_after_clear)
+
                 attack,combo = count_lines_clear(cleared_lines,combo,board_after_clear)
                 MOVES_DONE += 1
                 if new_board is None:
