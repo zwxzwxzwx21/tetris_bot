@@ -1,10 +1,4 @@
-DONT READ MOST OF THAT COULD BE OUTDATED AF
-
-
-deleting notes as now its mostly a todo, i will focus on how bot works when i will get things mentioned below ready (the "gamemodes"), until that, it doesnt 
-fucking matter whether i get the idea or not as i dont evne have the tools to work with really 
-
-1. with new window that shows how algorythm work i would like to add some things that may improve the clarity of how things work:
+with new window that shows how algorythm work i would like to add some things that may improve the clarity of how things work:
 - have a small game window like, 360x640 for example, you have some modes on the left like:
      - "random" - which  just places pieces and clears lines, singles,doubles whatever currect algorythm has to offer
      - "spins" - disables or enables usage of spins
@@ -13,35 +7,23 @@ fucking matter whether i get the idea or not as i dont evne have the tools to wo
 - can add custom test modes like "4 wide" when the bot upstacks and tries to 20 combo down, or just something like, you have unlimited
 left and right garbage and just make the bot try clearing as much combo as possible (preferably indefinitely) - REQUIRES SPINS
 
-
-
-upon pressing the start button that would appear in the middle of the screen, all options (those on the right,which are listed above)
-change to queue, while left side had things like APM, PPS, APP, and maybe other debug informations
-
 approaching APM and combo table:
 i think the best idea would be to simply create some testcases (can finally use that stupid test folder ive created) as in:
 use combo downstackpractice and just copy some maps from there (its a website to practice tetris downstack)
 and then just give it to the bot to find either pc (as that is the gamemode in that webside) or jsut highest apm in one combo, for example:
 give it a task to find the most amountn of attack within 5 pieces and see what happens, if it wont find a solution then expand the search and just fuck around really lol
 
-#removing the rules as they were solely focusing on 40l mode which francly idgaf anymore, well i do but not as much anymore
-
-# board zoom at 95% 
-
-# keep track of dependencies like I,J,L
-
-# keep track of when a next piece when appear, when you place o piece on empty board, next o piece wont appear in at least 7 pieces!
-# holds can kinda screw with that one but it can be nice to estimate whether you can make an I depencency or no, like for example, you have I piece dep, and youre
-# very high in a stack, should you clear I dep or take a quad to ds (assuming one is possible), if next i piece is shortly after, it doesnt really matter, (tho ds better unless you can combo into it)
-# if it isnt, ds immediately (ds- downstack)
-
+# keep track of when a next piece when appear, when you place o piece on empty board, next o piece wont appear in at least 7 pieces 
+^ this idea seems to be more suitable for AI not a bot, however i feel like in very late stage of developemnt, it could be implemented like, you dont upstack when i piece is deep into queue or whatever, but with depth bigger than one bag, seems useless (ie. wont really make the bot play better i think)
 
 TODO type shit:
+
+(those below actually more important)
+- one thing in the code i noticed, bruteforcing o piece (unsure about other pieces)
+starts with index ['O_x0_flat'] while next one is ['O_x2_flat'], check combo_attack_test.py to see board state, it could be issue because parsing movements can be fucked if x value (which is the number in name) seems off fsr
+
+
 maybe split the BoardRealTimeView.py a bit so its not that clumped up, i think even when we move to TETR.IO it still could matter to have better view on what
 is actually happening in console vs in game, but yeah its not also that this function will have literally everything, its just display and some options, can be
 left in one file imo (unless someone smarter thinks otherwise)
 
-make the timer run form pressing start ai rather than from running main.py
-
-make testcases and check how and why height_difference works, and if it is as efficient as it claims to be,
-check exactly heights of each column and if second if statement even makes sense (as in print values n such) 

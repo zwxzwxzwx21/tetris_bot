@@ -78,3 +78,5 @@ from bruteforcing import find_best_placement
 best_board, best_move, total_attack = find_best_placement(custom_board, queue, 0)
 print(f"best move {best_move}")
 print(f"total attack after sequence: {total_attack}")
+
+

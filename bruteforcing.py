@@ -35,17 +35,23 @@ def find_best_placement(board, queue, combo):
     best_board = None
     best_move = None
     attack = 0
+    attack_move_array = [None,0] # test array that connects move with attack, idk if tuple would be better, i think its not mutable
+
     def recursive_search(board, queue, current_piece_index, move_history, combo, attack):
         logging.debug(f"current_piece_index: {current_piece_index}, queue: {queue}")
         nonlocal best_board, best_move, best_attack
         global MOVES_DONE, MOVES_REMOVED
-
+        
         # --- END CONDITION ---
         if best_attack < attack:
             best_attack = attack
+            attack_move_array[1] = attack
+            attack_move_array[0] = move_history[0]
+        logging.debug(move_history)
+        logging.debug(attack_move_array)
         if current_piece_index >= len(queue):
             best_board = board
-            best_move = move_history[0]
+            best_move = attack_move_array[0]
             return
 
         # --- PIECE LOOKUP ---
