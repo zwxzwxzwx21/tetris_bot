@@ -18,10 +18,12 @@ give it a task to find the most amountn of attack within 5 pieces and see what h
 
 TODO type shit:
 
+fix the attack so it displays correctl, calculations are good, addition isnt
+
 (those below actually more important)
 - one thing in the code i noticed, bruteforcing o piece (unsure about other pieces)
 starts with index ['O_x0_flat'] while next one is ['O_x2_flat'], check combo_attack_test.py to see board state, it could be issue because parsing movements can be fucked if x value (which is the number in name) seems off fsr
-
+^seems to not be an issue always fsr, no clue why
 
 maybe split the BoardRealTimeView.py a bit so its not that clumped up, i think even when we move to TETR.IO it still could matter to have better view on what
 is actually happening in console vs in game, but yeah its not also that this function will have literally everything, its just display and some options, can be
