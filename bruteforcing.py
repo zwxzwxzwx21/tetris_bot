@@ -32,14 +32,13 @@ MAX_HEIGHT_DIFF = 6 # Prune stacks that are too tall
 def find_best_placement(board, queue, combo):
     
     best_attack = 0
-    best_board = None
     best_move = None
     attack = 0
-    attack_move_array = [None,0] # test array that connects move with attack, idk if tuple would be better, i think its not mutable
+    attack_move_array = [[],0] # test array that connects move with attack, idk if tuple would be better, i think its not mutable
 
     def recursive_search(board, queue, current_piece_index, move_history, combo, attack):
         logging.debug(f"current_piece_index: {current_piece_index}, queue: {queue}")
-        nonlocal best_board, best_move, best_attack
+        nonlocal best_move, best_attack
         global MOVES_DONE, MOVES_REMOVED
         
         # --- END CONDITION ---
@@ -50,7 +49,6 @@ def find_best_placement(board, queue, combo):
         logging.debug(move_history)
         logging.debug(attack_move_array)
         if current_piece_index >= len(queue):
-            best_board = board
             best_move = attack_move_array[0]
             return
 
@@ -101,4 +99,4 @@ def find_best_placement(board, queue, combo):
                 )
             
     recursive_search(board, queue, 0, [], combo, attack)
-    return best_board, best_move, best_attack
+    return best_move, best_attack
