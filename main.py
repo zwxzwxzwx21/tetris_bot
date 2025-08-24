@@ -103,18 +103,14 @@ class TetrisGame:
                 logging.debug("\n=== Current Queue ===")
                 logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
-                move_history, best_attack = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
-
-                if not move_history: 
-                    logging.debug("no valid placement")
-                    break
+                move_history, best_move_str, = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
                 
                 piece_type_placed = [0] 
                 first_move = move_history[0]
-                piece_type, x_str, rotation = first_move.split('_') 
-                x = int(x_str[1:]) 
-                piece_type_placed  =self.queue[0]
-                piece_shape = PIECES[piece_type_placed][rotation] 
+                piece_type, x_str, rotation = first_move.split('_')
+                x = int(x_str[1:])
+                piece_type_placed = self.queue[0]
+                piece_shape = PIECES[piece_type_placed][rotation]
 
                 board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
                 
