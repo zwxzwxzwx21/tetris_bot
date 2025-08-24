@@ -103,7 +103,7 @@ class TetrisGame:
                 logging.debug("\n=== Current Queue ===")
                 logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
-                best_board_after_search, best_move_str, combo = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
+                best_board_after_search, best_move_str = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
                 
                 if not best_board_after_search: 
                     logging.debug("no valid placement")
