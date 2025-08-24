@@ -19,7 +19,7 @@ PERFECT_CLEAR_BONUS = 5 # unsure if pc gives btb or no, idk if that matters even
 
 
 def count_lines_clear(lines_cleared_count,combo,board):
-    
+    #logging.debug(f"lines cleared count: {lines_cleared_count}, combo: {combo}")
     attack = 0
     perfect_clear = all(all(cell == ' ' for cell in row) for row in board)
 

@@ -18,7 +18,8 @@ give it a task to find the most amountn of attack within 5 pieces and see what h
 
 TODO type shit:
 
-fix the attack so it displays correctl, calculations are good, addition isnt
+1. fix the attack so it displays correctl, calculations are good, addition isnt
+-seems to work fine now, but combo isnt included so that is another issue where attacks arent amplified by combo
 
 (those below actually more important)
 - one thing in the code i noticed, bruteforcing o piece (unsure about other pieces)
