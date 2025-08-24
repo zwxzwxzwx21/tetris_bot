@@ -30,29 +30,29 @@ def count_lines_clear(lines_cleared_count,combo,board):
     if combo < 20:
         if lines_cleared_count == 1:
             attack += ATTACK_TABLE["single"][combo]
-            logging.debug("single cleared") 
+            logging.debug("single cleared, with combo {}. Attack for this clear is {}".format(combo, ATTACK_TABLE["single"][combo]))
         elif lines_cleared_count == 2:    
             attack += ATTACK_TABLE["double"][combo]
-            logging.debug("double cleared")
+            logging.debug("double cleared, with combo {}. Attack for this clear is {}".format(combo, ATTACK_TABLE["double"][combo]))
         elif lines_cleared_count == 3:    
             attack += ATTACK_TABLE["triple"][combo]
-            logging.debug("triple cleared")
+            logging.debug("triple cleared, with combo {}. Attack for this clear is {}".format(combo, ATTACK_TABLE["triple"][combo]))
         elif lines_cleared_count == 4:
             attack += ATTACK_TABLE["tetris"][combo]
-            logging.debug("tetris cleared") 
-    else:
+            logging.debug("tetris cleared, with combo {}. Attack for this clear is {}".format(combo, ATTACK_TABLE["tetris"][combo]))
+    else: # its copy pasted code, can be hardcoded but also can just be removed, its extremely rare to get above 19 combo so idk
         if lines_cleared_count == 1:
             attack += ATTACK_TABLE_MAX_COMBO["single"]
-            logging.debug("Single cleared") 
+            logging.debug("Single cleared, with combo {}. Attack for this clear is {}".format(combo, ATTACK_TABLE_MAX_COMBO["single"]))
         elif lines_cleared_count == 2:    
             attack += ATTACK_TABLE_MAX_COMBO["double"]
-            logging.debug("double cleared")
+            logging.debug("double cleared, with combo {}. Attack for this clear is {}".format(combo, ATTACK_TABLE_MAX_COMBO["double"]))
         elif lines_cleared_count == 3:    
             attack += ATTACK_TABLE_MAX_COMBO["triple"]
-            logging.debug("triple cleared")
+            logging.debug("triple cleared, with combo {}. Attack for this clear is {}".format(combo, ATTACK_TABLE_MAX_COMBO["triple"]))
         elif lines_cleared_count == 4:
             attack += ATTACK_TABLE_MAX_COMBO["tetris"]
-            logging.debug("tetris cleared")
+            logging.debug("tetris cleared, with combo {}. Attack for this clear is {}".format(combo, ATTACK_TABLE_MAX_COMBO["tetris"]))
     if lines_cleared_count > 0:
         combo += 1
     else:

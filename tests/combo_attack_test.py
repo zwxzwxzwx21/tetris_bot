@@ -68,12 +68,12 @@ custom_board= [
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '], 
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],  
-    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    ['x',' ',' ',' ',' ','x','x','x','x','x'],  
-    [' ',' ','x','x','x','x','x','x','x','x'],
-    [' ',' ','x','x','x','x','x','x','x','x'],
+    ['x',' ',' ',' ',' ','x','x','x','x','x'],
+    ['x',' ',' ',' ','x','x','x','x','x','x'],  
+    ['x',' ',' ',' ','x','x','x','x','x','x'],
+    ['x',' ',' ','x','x','x','x','x','x','x'],
     ]
-queue = ['I','O']
+queue = ['J','O','I']
 from bruteforcing import find_best_placement
 best_move, total_attack = find_best_placement(custom_board, queue, 0)
 print(f"best move {best_move}")
