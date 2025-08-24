@@ -20,6 +20,7 @@ TODO type shit:
 
 1. fix the attack so it displays correctl, calculations are good, addition isnt
 -seems to work fine now, but combo isnt included so that is another issue where attacks arent amplified by combo
+- now the issue seems to be that combo is off by one due to tetrio being fucking stupid (and i use that term because one of tetrio admins called that thing fucking stupid) that calculating combo starts with 0, attack seems to be okay, im just not sure if its off or no, because testcases that would demostrate combo better just fail (bot finds wrong moves as good, but its not combo issue)
 
 (those below actually more important)
 - one thing in the code i noticed, bruteforcing o piece (unsure about other pieces)
