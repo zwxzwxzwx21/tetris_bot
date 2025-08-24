@@ -103,17 +103,17 @@ class TetrisGame:
                 logging.debug("\n=== Current Queue ===")
                 logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
-                best_board_after_search, best_move_str = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
-                
-                if not best_board_after_search: 
+                move_history, best_attack = find_best_placement(self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],self.combo)
+
+                if not move_history: 
                     logging.debug("no valid placement")
                     break
                 
-                piece_type_placed = self.queue[0] 
-
-                piece_type, x_str, rotation = best_move_str.split('_') 
+                piece_type_placed = [0] 
+                first_move = move_history[0]
+                piece_type, x_str, rotation = first_move.split('_') 
                 x = int(x_str[1:]) 
-                
+                piece_type_placed  =self.queue[0]
                 piece_shape = PIECES[piece_type_placed][rotation] 
 
                 board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
@@ -127,7 +127,7 @@ class TetrisGame:
                 # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
                 # tho im not so sure, leaving it here just because of that
                 if board_after_drop is None:
-                    logging.debug(f"error: drop_piece failed for valid move: {best_move_str} with piece {piece_type_placed}")
+                    #logging.debug(f"error: drop_piece failed for valid move: {best_move_str} with piece {piece_type_placed}")
                     logging.debug("cannot drop piece")
                     break
             
@@ -148,7 +148,7 @@ class TetrisGame:
                 self.board[:] = board_after_clear
                 if viewer: viewer.update_board(self.board)
                 
-                logging.debug(f"\nplaced: {piece_type_placed} by move {best_move_str}")
+                #logging.debug(f"\nplaced: {piece_type_placed} by move {best_move_str}")
                 print_board(self.board)
                 
                 if self.queue: 

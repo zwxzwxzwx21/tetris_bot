@@ -76,8 +76,8 @@ custom_board= [
 queue = ['I','I','L']
 #next testcase i wanna try is PC end with 2  o pieces, so it should be 2 double clears into p
 from bruteforcing import find_best_placement
-best_move, total_attack = find_best_placement(custom_board, queue, 0)
-print(f"best move {best_move}")
-print(f"total attack after sequence: {total_attack}")
+#best_move, total_attack = find_best_placement(custom_board, queue, 0)
+#print(f"best move {best_move}")
+#print(f"total attack after sequence: {total_attack}")
 
 

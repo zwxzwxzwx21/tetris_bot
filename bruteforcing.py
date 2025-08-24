@@ -31,27 +31,22 @@ MAX_HEIGHT_DIFF = 6 # Prune stacks that are too tall
 
 def find_best_placement(board, queue, combo):
     
-    best_attack = 0
-    best_move = None
+    best_attack = -1
+    best_move = []
     attack = 0
-    attack_move_array = [[],0,0] # test array that connects move with attack, idk if tuple would be better, i think its not mutable
-    #move, attack, combo
     def recursive_search(board, queue, current_piece_index, move_history, combo, attack):
-        logging.debug(f"current_piece_index: {current_piece_index}, queue: {queue}")
+        #logging.debug(f"current_piece_index: {current_piece_index}, queue: {queue}")
         nonlocal best_move, best_attack
         global MOVES_DONE, MOVES_REMOVED
         
+        
         # --- END CONDITION ---
-        if best_attack < attack:
-            best_attack = attack
-            attack_move_array[1] = attack
-            attack_move_array[0] = move_history
-        logging.debug(move_history)
-        logging.debug(attack_move_array)
         if current_piece_index >= len(queue):
-            best_move = attack_move_array[0]
+            if best_attack < attack:
+                best_attack = attack
+                best_move = move_history
+                logging.debug(move_history)
             return
-
         # --- PIECE LOOKUP ---
         current_piece = queue[current_piece_index]
         #another of those that never will happen but why no
@@ -69,8 +64,8 @@ def find_best_placement(board, queue, combo):
                 board_after_clear,cleared_lines = clear_lines(new_board)
                 #print_board(board_after_clear)
 
-                attack_for_clear,attack_move_array[2] = count_lines_clear(cleared_lines,combo,board_after_clear)
-                attack += attack_for_clear
+                attack_for_clear,new_combo = count_lines_clear(cleared_lines,combo,board_after_clear)
+                new_attack = attack_for_clear + attack
                 MOVES_DONE += 1
                 if new_board is None:
                     continue
@@ -95,8 +90,8 @@ def find_best_placement(board, queue, combo):
                     queue,
                     current_piece_index + 1,
                     [*move_history, move],
-                    attack_move_array[2],
-                    attack
+                    new_combo,
+                    new_attack
                 )
             
     recursive_search(board, queue, 0, [], combo, attack)

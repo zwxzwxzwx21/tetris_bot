@@ -25,22 +25,31 @@ def create_bag(bag_size=7, no_s_z_first_piece=False, custom_bag=False):
         bag = bag[:bag_size]
 
     if no_s_z_first_piece and bag: 
+        original_bag_for_logging = list(bag)
+        made_a_change_this_call = False
 
         # --- rule 1 avoid s/z as the first piece ---
         if bag[0] in ('S', 'Z'):
+            swapped_rule1 = False
             # try to swap bag[0] with a non s z piece from the rest of the bag
             for i in range(1, len(bag)):
                 if bag[i] not in ('S', 'Z'):
                     bag[0], bag[i] = bag[i], bag[0]
+                    swapped_rule1 = True
+                    made_a_change_this_call = True
                     break
 
         # --- rule 2 avoid 'O' first, then s/z second ---
         # this check is performed after rule 1 might have altered bagp[0]
         if len(bag) > 1 and bag[0] == 'O' and bag[1] in ('S', 'Z'):
+            problematic_second_piece = bag[1]
+            swapped_rule2 = False
             # Try to swap bag[1] (the s/z piece) with a non-s/z piece from bag[2:]
             for i in range(2, len(bag)):
                 if bag[i] not in ('S', 'Z'):
                     bag[1], bag[i] = bag[i], bag[1]
+                    swapped_rule2 = True
+                    made_a_change_this_call = True 
                     break
 
     return bag
