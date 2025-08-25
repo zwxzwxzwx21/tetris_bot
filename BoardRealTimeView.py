@@ -117,4 +117,4 @@ class TetrisBoardViewer:
                 self._draw()
             self.clock.tick(FPS)
         pygame.quit()   
-        
+        # buttons dont appear anymore (somehow?) and also i wanna make so you have button that just acts as pressing enter in slow mode
