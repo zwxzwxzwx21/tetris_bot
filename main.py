@@ -28,6 +28,8 @@ from tests.combo_attack_test import custom_board # probably stupid way to do tha
 from utility.print_board import print_board
 from utility.pieces import PIECES
 
+from BoardRealTimeView import TetrisBoardViewer
+
 from board_operations.checking_valid_placements import drop_piece
 from board_operations.board_operations import clear_lines
 
@@ -65,7 +67,7 @@ class TetrisGame:
         self.stats = GameStats()
         self.slow_mode = [False]
         self.custom_board = [False]  
-
+        self.gui_mode = [False]
     def game_loop(self,viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
         # i will change it i swear, just give me second :3
@@ -184,7 +186,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument(
         "--rule",
-        choices=["40l","custom_bag","nosz","none", "custom_board", "slow"], 
+        choices=["40l","custom_bag","nosz","none", "custom_board", "slow", "gui"], 
         nargs = "+",
         default=[],
         help = "unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world"
@@ -210,7 +212,18 @@ if __name__ == "__main__":
         #logging.debug(game.board)
         #time.sleep(5)
     game.slow_mode[0] = "slow" in args.rule
-    game.game_loop(None)
+
+    game.gui_mode[0] = "gui" in args.rule
+    
+    use_gui = "gui" in args.rule
+    if use_gui:
+        viewer = TetrisBoardViewer(game.board, game.stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal)
+        t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
+        t.start()
+        viewer.mainloop()
+    else:
+        game.start_signal[0] = True
+        game.game_loop(None)
 
 # IMPORTANT:
 # - the game loop will stop if no valid placement is found
