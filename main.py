@@ -114,6 +114,9 @@ class TetrisGame:
                 piece_type_placed = self.queue[0]
                 piece_shape = PIECES[piece_type_placed][rotation]
 
+                if viewer:
+                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
+
                 board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
                 
                 if self.slow_mode[0]:
@@ -144,7 +147,9 @@ class TetrisGame:
                     self.stats.tetris += 1
 
                 self.board[:] = board_after_clear
-                if viewer: viewer.update_board(self.board)
+                if viewer:
+                    viewer.clear_preview()          
+                    viewer.update_board(self.board)
                 
                 #logging.debug(f"\nplaced: {piece_type_placed} by move {best_move_str}")
                 print_board(self.board)

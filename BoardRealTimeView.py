@@ -7,10 +7,10 @@ BOARD_HEIGHT = 20
 SIDE_WIDTH = 170
 FPS = 30
 
-COLOR_BG = (0, 0, 0)
-COLOR_PANEL = (28, 28, 36)
-COLOR_GRID = (42, 42, 54)
-COLOR_TEXT = (220, 220, 230)
+COLOR_BG     = (0, 0, 0)
+COLOR_PANEL  = (28, 28, 36)
+COLOR_GRID   = (42, 42, 54)
+COLOR_TEXT   = (220, 220, 230)
 COLOR_BUTTON = (30, 140, 40)
 
 PIECE_COLORS = {
@@ -41,12 +41,37 @@ class TetrisBoardViewer:
         self.running = True
         self.draw = True
         self.start_button = True
-        button_width, button_height = 120, 40
-        self.button = pygame.Rect((BOARD_WIDTH * CELL_SIZE + (SIDE_WIDTH - button_width)//2,BOARD_HEIGHT * CELL_SIZE//2 - button_height//2), (button_width, button_height))
-
+        self.preview = None
+        self.button = pygame.Rect(BOARD_WIDTH * CELL_SIZE + (SIDE_WIDTH - 120)//2,BOARD_HEIGHT * CELL_SIZE // 2 - 20,120, 40)
+    
     def update_board(self, new_board):
         self.board = np.array(new_board)
         self.draw = True
+
+    def set_preview(self, piece, shape, xpos, board_array):
+        height = len(shape); width = len(shape[0])
+        def occupied(cell):
+            return cell not in (' ', 0)
+        def collides(ypos):
+            for h in range(height):
+                for w in range(width):
+                    if occupied(shape[h][w]):
+                        yyy = ypos + h
+                        xxx = xpos + w
+                        if yyy >= BOARD_HEIGHT: return True
+                        if board_array[yyy][xxx] != ' ' and board_array[yyy][xxx] != 0:
+                            return True
+            return False
+        y = 0
+        while not collides(y+1):
+            y += 1
+        self.preview = (piece, shape, xpos, y)
+        self.draw = True
+
+    def clear_preview(self):
+        if self.preview:
+            self.preview = None
+            self.draw = True
 
     def _draw_board(self):
         for y in range(BOARD_HEIGHT):
@@ -57,6 +82,18 @@ class TetrisBoardViewer:
                 yy = y * CELL_SIZE
                 pygame.draw.rect(self.surface, color, (xx, yy, CELL_SIZE, CELL_SIZE))
                 pygame.draw.rect(self.surface, COLOR_GRID, (xx, yy, CELL_SIZE, CELL_SIZE), 1)
+        if self.preview:
+            piece, shape, xpos, ypos = self.preview
+            base = PIECE_COLORS.get(piece, (180,180,180))
+            duszek = tuple(wawa//2 for wawa in base)
+            height = len(shape); width = len(shape[0])
+            for h in range(height):
+                for w in range(width):
+                    if shape[h][w] not in (' ', 0):
+                        xx = (xpos + w) * CELL_SIZE
+                        yy = (ypos + h) * CELL_SIZE
+                        pygame.draw.rect(self.surface, duszek, (xx, yy, CELL_SIZE, CELL_SIZE))
+                        pygame.draw.rect(self.surface, base,  (xx, yy, CELL_SIZE, CELL_SIZE), 1)
 
     def _draw_panel(self):
         xpos = BOARD_WIDTH * CELL_SIZE
@@ -64,8 +101,8 @@ class TetrisBoardViewer:
         y = 8
         def line(txt):
             nonlocal y
-            surf = self.font.render(txt, True, COLOR_TEXT)
-            self.surface.blit(surf, (xpos + 8, y))
+            bleh = self.font.render(txt, True, COLOR_TEXT)
+            self.surface.blit(bleh, (xpos + 8, y))
             y += 18
 
         queue_ = list(self.queue)[:5]
@@ -84,10 +121,9 @@ class TetrisBoardViewer:
         if self.start_button and not self.start_signal[0]:
             mouse = pygame.mouse.get_pos()
             collide_point = self.button.collidepoint(mouse)
-            pygame.draw.rect(self.surface, COLOR_BUTTON if collide_point else COLOR_BUTTON,                            self.button, border_radius=6)
-            txt = self.font.render("start", True, COLOR_BUTTON)
+            pygame.draw.rect(self.surface, COLOR_BUTTON if collide_point else COLOR_BUTTON, self.button, border_radius=6)
+            txt = self.font.render("start", True, (255,255,255))
             self.surface.blit(txt, txt.get_rect(center=self.button.center))
-        # game crashes before that is initialized it seems?
         if self.game_over_signal[0]:
             overlay = pygame.Surface(self.surface.get_size(), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 140))
@@ -107,11 +143,6 @@ class TetrisBoardViewer:
                 if event.type == pygame.QUIT:
                     self.running = False
                     self.game_over_signal[0] = True
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    if (self.start_button and not self.start_signal[0] and self.button.collidepoint(event.pos)):
-                        self.start_signal[0] = True
-                        self.start_button = False
-                        self.draw = True
             if self.draw:
                 self.draw = False
                 self._draw()
