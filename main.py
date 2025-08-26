@@ -185,8 +185,8 @@ class TetrisGame:
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument(
-        "--rule",
-        choices=["40l","custom_bag","nosz","none", "custom_board", "slow", "gui"], 
+        "--rules",
+        choices=["custom_bag","nosz", "custom_board", "slow", "gui"], 
         nargs = "+",
         default=[],
         help = "unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world"
@@ -199,23 +199,23 @@ if __name__ == "__main__":
     
     game.start_signal[0] = True
     
-    game.no_s_z_first_piece_signal[0] = "nosz" in args.rule 
+    game.no_s_z_first_piece_signal[0] = "nosz" in args.rules
     
-    game.custom_bag[0] = "custom_bag" in args.rule
+    game.custom_bag[0] = "custom_bag" in args.rules
     if game.custom_bag[0]:
         game.bag = create_bag(custom_bag=True)
         logging.debug(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
         time.sleep(3) # added for testing, same with lower one, can be removed later (even should be)
-    game.custom_board[0] = "custom_board" in args.rule
+    game.custom_board[0] = "custom_board" in args.rules
     if game.custom_board[0]:
         game.board = custom_board
         #logging.debug(game.board)
         #time.sleep(5)
-    game.slow_mode[0] = "slow" in args.rule
+    game.slow_mode[0] = "slow" in args.rules
 
-    game.gui_mode[0] = "gui" in args.rule
+    game.gui_mode[0] = "gui" in args.rules
     
-    use_gui = "gui" in args.rule
+    use_gui = "gui" in args.rules
     if use_gui:
         viewer = TetrisBoardViewer(game.board, game.stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal)
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
