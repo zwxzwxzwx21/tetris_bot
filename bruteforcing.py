@@ -78,7 +78,7 @@ def find_best_placement(board, queue, combo):
                 holes = check_holes(board_after_clear)
 
                 if (uneven > UNEVEN_THRESHOLD or 
-                    height_diff > MAX_HEIGHT_DIFF or check_holes(board_after_clear) > 0):
+                    height_diff > MAX_HEIGHT_DIFF or check_holes(board_after_clear) > 1):
                     MOVES_REMOVED += 1 
                     continue
 
