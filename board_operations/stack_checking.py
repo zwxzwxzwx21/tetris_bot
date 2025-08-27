@@ -28,7 +28,6 @@ def height_difference(board):
     # i really cannot be bothered to work on it now, im hungry
     height_array = []
     for col in range(10):
-        column_height = 0
         # checks from bottom up, looking for empty space
         for row in range(19, -1, -1):
             if board[row][col] == " ":

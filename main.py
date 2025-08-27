@@ -235,13 +235,11 @@ if __name__ == "__main__":
         game.bag = create_bag(custom_bag=True)
         logging.debug(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
         time.sleep(
-            3
-        )  # added for testing, same with lower one, can be removed later (even should be)
+            1
+        )  
     game.custom_board[0] = "custom_board" in args.rules
     if game.custom_board[0]:
         game.board = custom_board
-        # logging.debug(game.board)
-        # time.sleep(5)
     game.slow_mode[0] = "slow" in args.rules
 
     game.gui_mode[0] = "gui" in args.rules
