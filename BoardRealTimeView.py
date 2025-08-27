@@ -25,26 +25,22 @@ PIECE_COLORS = {
 }
 
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, start_signal, queue,game_over_signal, no_s_z_first_piece_signal,slow_mode):
+    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal,slow_mode):
         pygame.init()
         self.surface = pygame.display.set_mode((BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE))
         pygame.display.set_caption("tewi bot :3")
         self.font = pygame.font.SysFont("orbitron", 16)
-        self.font2 = pygame.font.SysFont("orbitron", 36)
         self.clock = pygame.time.Clock()
         self.board = np.array(board_)
         self.stats = stats
-        self.start_signal = start_signal
         self.queue = queue
-        self.game_over_signal = game_over_signal
         self.no_s_z_first_piece_signal = no_s_z_first_piece_signal
         self.slow_mode = slow_mode
         self.running = True
         self.draw = True
         self.start_button = True
         self.preview = None
-        self.button = pygame.Rect(BOARD_WIDTH * CELL_SIZE + (SIDE_WIDTH - 120)//2,BOARD_HEIGHT * CELL_SIZE // 2 - 20,120, 40)
-    
+        
     def update_board(self, new_board):
         self.board = np.array(new_board)
         self.draw = True
@@ -83,6 +79,7 @@ class TetrisBoardViewer:
                 yy = y * CELL_SIZE
                 pygame.draw.rect(self.surface, color, (xx, yy, CELL_SIZE, CELL_SIZE))
                 pygame.draw.rect(self.surface, COLOR_GRID, (xx, yy, CELL_SIZE, CELL_SIZE), 1)
+        
         if self.preview:
             piece, shape, xpos, ypos = self.preview
             base = PIECE_COLORS.get(piece, (180,180,180))
@@ -128,19 +125,6 @@ class TetrisBoardViewer:
         line(f"nosz: {self.no_s_z_first_piece_signal[0]}")
         line(f"slow mode: {self.slow_mode[0]}")
 
-        if self.start_button and not self.start_signal[0]:
-            mouse = pygame.mouse.get_pos()
-            collide_point = self.button.collidepoint(mouse)
-            pygame.draw.rect(self.surface, COLOR_BUTTON if collide_point else COLOR_BUTTON, self.button, border_radius=6)
-            txt = self.font.render("start", True, (255,255,255))
-            self.surface.blit(txt, txt.get_rect(center=self.button.center))
-        if self.game_over_signal[0]:
-            overlay = pygame.Surface(self.surface.get_size(), pygame.SRCALPHA)
-            overlay.fill((0, 0, 0, 140))
-            self.surface.blit(overlay, (0, 0))
-            go = self.font2.render("gg looost", True, (255, 70, 90))
-            self.surface.blit(go, go.get_rect(center=(BOARD_WIDTH * CELL_SIZE // 2,BOARD_HEIGHT * CELL_SIZE // 2)))
-
     def _draw(self):
         self.surface.fill(COLOR_BG)
         self._draw_board()
@@ -148,11 +132,10 @@ class TetrisBoardViewer:
         pygame.display.flip()
 
     def mainloop(self):
-        while self.running and not self.game_over_signal[0]:
+        while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                    self.game_over_signal[0] = True
             if self.draw:
                 self.draw = False
                 self._draw()
