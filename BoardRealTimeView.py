@@ -29,8 +29,8 @@ class TetrisBoardViewer:
         pygame.init()
         self.surface = pygame.display.set_mode((BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE))
         pygame.display.set_caption("tewi bot :3")
-        self.font = pygame.font.SysFont("consolas", 16)
-        self.font2 = pygame.font.SysFont("consolas", 36)
+        self.font = pygame.font.SysFont("orbitron", 16)
+        self.font2 = pygame.font.SysFont("orbitron", 36)
         self.clock = pygame.time.Clock()
         self.board = np.array(board_)
         self.stats = stats
