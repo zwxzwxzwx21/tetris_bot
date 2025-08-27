@@ -4,6 +4,7 @@ from board_operations.board_operations import clear_lines
 from board_operations.checking_valid_placements import drop_piece
 from board_operations.stack_checking import (
     check_holes,
+    get_heights,
     height_difference,
     uneven_stack_est,
 )
@@ -31,7 +32,9 @@ MAX_HEIGHT_DIFF = 6  # Prune stacks that are too tall
 def find_best_placement(board, queue, combo):
     move_history = []
     best_move = None
+    best_uneven = best_holes = best_height_diff = 0
     best_loss = 10000
+    best_max_height = 20
 
     current_piece = queue[0]
     assert current_piece in PIECES
@@ -39,6 +42,7 @@ def find_best_placement(board, queue, combo):
     for rotation_name, piece_shape in PIECES[current_piece].items():
         max_x = 10 - len(piece_shape[0])
         for x in range(max_x + 1):
+            print(f"considering {current_piece}_x{x}_{rotation_name}")
             new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
             board_after_clear, cleared_lines = clear_lines(new_board)
             attack_for_clear, new_combo = count_lines_clear(
@@ -46,18 +50,32 @@ def find_best_placement(board, queue, combo):
             )
             # --- HEIGHT & UNEVEN CHECK ---
             height_diff, heights = height_difference(board_after_clear)
+            max_height = max(heights)
+            print(f"{get_heights(board)=}")
             uneven = uneven_stack_est(heights)
 
             # --- HOLES CHECK ---
             holes = check_holes(board_after_clear)
 
-            if (loss := 5 * uneven + 2.5 * holes + 0.2 * height_diff) < best_loss:
+            if (
+                loss := 0 * uneven
+                + 1 * holes
+                + 0.0 * height_diff
+                + max(max_height - 4, 0)
+            ) < best_loss:
                 best_move = f"{current_piece}_x{x}_{rotation_name}"
                 move_history = [best_move]
-                best_loss = loss
-        print(f"""{best_loss=}
-            {uneven=}
-            {holes=}
-            {height_diff=}""")
-        assert move_history
-        return move_history, best_move
+                (
+                    best_loss,
+                    best_uneven,
+                    best_holes,
+                    best_height_diff,
+                    best_max_height,
+                ) = (loss, uneven, holes, height_diff, max_height)
+    print(f"""{best_loss=}
+        {best_uneven=}
+        {best_holes=}
+        {best_height_diff=}
+        {best_max_height=}""")
+    assert move_history
+    return move_history, best_move
