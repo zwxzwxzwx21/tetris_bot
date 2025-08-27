@@ -24,17 +24,14 @@ def height_difference(board):
     """
     Calculates the maximum height difference between columns and returns heights.
     """
-    # idfk why it works,apparently its bad but i will make testcases after realising it
-    # i really cannot be bothered to work on it now, im hungry
     height_array = []
     for col in range(10):
-        # checks from bottom up, looking for empty space
         for row in range(19, -1, -1):
             if board[row][col] == " ":
-                height_array.append(row + 1)  # Calculate height from the bottom
+                height_array.append(19-row) 
                 break
         if len(height_array) == col - 1:
-            height_array.append(0)  # If no blocks found, column is empty
+            height_array.append(0) 
     max_diff = max(height_array) - min(height_array)
     return max_diff, height_array
 
