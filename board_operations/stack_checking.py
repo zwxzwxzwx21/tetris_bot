@@ -58,7 +58,7 @@ def get_heights(board):
     for col in range(len(board[0])):
         for row in range(len(board)):
             if board[row][col] != " ":
-                heights.append(len(board) - row - 1)  # 0 index  !!!
+                heights.append(len(board) - row)
                 break
         else:
             heights.append(0)
