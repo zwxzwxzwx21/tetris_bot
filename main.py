@@ -225,7 +225,7 @@ if __name__ == "__main__":
     
     use_gui = "gui" in args.rules
     if use_gui:
-        viewer = TetrisBoardViewer(game.board, game.stats, game.start_signal, game.queue, game.game_over_signal, game.no_s_z_first_piece_signal,game.slow_mode)
+        viewer = TetrisBoardViewer(game.board, game.stats, game.queue, game.no_s_z_first_piece_signal,game.slow_mode)
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
         t.start()
         viewer.mainloop()
