@@ -25,7 +25,7 @@ PIECE_COLORS = {
 }
 
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, start_signal, queue,game_over_signal, no_s_z_first_piece_signal):
+    def __init__(self, board_, stats, start_signal, queue,game_over_signal, no_s_z_first_piece_signal,slow_mode):
         pygame.init()
         self.surface = pygame.display.set_mode((BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE))
         pygame.display.set_caption("tewi bot :3")
@@ -38,6 +38,7 @@ class TetrisBoardViewer:
         self.queue = queue
         self.game_over_signal = game_over_signal
         self.no_s_z_first_piece_signal = no_s_z_first_piece_signal
+        self.slow_mode = slow_mode
         self.running = True
         self.draw = True
         self.start_button = True
@@ -125,6 +126,7 @@ class TetrisBoardViewer:
         y += 6
         line("rules:")
         line(f"nosz: {self.no_s_z_first_piece_signal[0]}")
+        line(f"slow mode: {self.slow_mode[0]}")
 
         if self.start_button and not self.start_signal[0]:
             mouse = pygame.mouse.get_pos()
