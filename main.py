@@ -52,7 +52,8 @@ class GameStats:
         self.tetris = 0
         self.combo = 0
         self.burst_attack = 0 # unused, stil; thinking about it
-
+        self.total_attack = 0
+        self.APM = 0.0 # could do APS but it would reach insane values when bot gets better, so i might just make it float mby
 
 class TetrisGame:
     def __init__(self):
@@ -135,6 +136,7 @@ class TetrisGame:
                 board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
                 logging.debug(f"lines cleared: {lines_cleared_count}")
                 attack, self.combo = count_lines_clear(lines_cleared_count,self.combo,board_after_clear)
+                self.stats.total_attack += attack
                 self.stats.combo = self.combo
 
                 if lines_cleared_count == 1:
@@ -179,6 +181,7 @@ class TetrisGame:
                     self.stats.burst.append(elapsed)
                 logging.debug(self.stats.burst)
                 if elapsed > 0:
+                    self.stats.APM = (self.stats.total_attack / elapsed)*60
                     self.stats.pps = pieces_placed / elapsed
                     self.stats.burst_pps = (len(self.stats.burst) - 1) / (max(self.stats.burst) - min(self.stats.burst)) if len(self.stats.burst) > 9 else 0
                     logging.debug(f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps/10}")

@@ -114,6 +114,14 @@ class TetrisBoardViewer:
         line(f"PPS: {self.stats.pps:.2f}")
         line(f"combo: {self.stats.combo}")
         line(f"lines: {lines_total}")
+        line(f"total attack: {self.stats.total_attack}")
+        line(f"APM: {self.stats.APM:.2f}")
+        y += 6
+        line("clears:")
+        line(f"single: {self.stats.single}")
+        line(f"double: {self.stats.double}")
+        line(f"triple: {self.stats.triple}")
+        line(f"tetris: {self.stats.tetris}")
         y += 6
         line("rules:")
         line(f"nosz: {self.no_s_z_first_piece_signal[0]}")
