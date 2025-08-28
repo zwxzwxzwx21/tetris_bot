@@ -1,5 +1,5 @@
-import pygame
 import numpy as np
+import pygame
 
 CELL_SIZE = 28
 BOARD_WIDTH = 10
@@ -7,27 +7,30 @@ BOARD_HEIGHT = 20
 SIDE_WIDTH = 170
 FPS = 30
 
-COLOR_BG     = (0, 0, 0)
-COLOR_PANEL  = (28, 28, 36)
-COLOR_GRID   = (42, 42, 54)
-COLOR_TEXT   = (220, 220, 230)
+COLOR_BG = (0, 0, 0)
+COLOR_PANEL = (28, 28, 36)
+COLOR_GRID = (42, 42, 54)
+COLOR_TEXT = (220, 220, 230)
 COLOR_BUTTON = (30, 140, 40)
 
 PIECE_COLORS = {
-    'I': (0, 255, 255),
-    'J': (0, 0, 200),
-    'L': (255, 140, 0),
-    'O': (240, 230, 0),
-    'S': (0, 200, 0),
-    'Z': (200, 0, 0),
-    'T': (160, 0, 160),
-    ' ': (24, 24, 32),
+    "I": (0, 255, 255),
+    "J": (0, 0, 200),
+    "L": (255, 140, 0),
+    "O": (240, 230, 0),
+    "S": (0, 200, 0),
+    "Z": (200, 0, 0),
+    "T": (160, 0, 160),
+    " ": (24, 24, 32),
 }
 
+
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal,slow_mode):
+    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode):
         pygame.init()
-        self.surface = pygame.display.set_mode((BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE))
+        self.surface = pygame.display.set_mode(
+            (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
+        )
         pygame.display.set_caption("tewi bot :3")
         self.font = pygame.font.SysFont("orbitron", 16)
         self.clock = pygame.time.Clock()
@@ -40,27 +43,32 @@ class TetrisBoardViewer:
         self.draw = True
         self.start_button = True
         self.preview = None
-        
+
     def update_board(self, new_board):
         self.board = np.array(new_board)
         self.draw = True
 
     def set_preview(self, piece, shape, xpos, board_array):
-        height = len(shape); width = len(shape[0])
+        height = len(shape)
+        width = len(shape[0])
+
         def occupied(cell):
-            return cell not in (' ', 0)
+            return cell not in (" ", 0)
+
         def collides(ypos):
             for h in range(height):
                 for w in range(width):
                     if occupied(shape[h][w]):
                         yyy = ypos + h
                         xxx = xpos + w
-                        if yyy >= BOARD_HEIGHT: return True
-                        if board_array[yyy][xxx] != ' ' and board_array[yyy][xxx] != 0:
+                        if yyy >= BOARD_HEIGHT:
+                            return True
+                        if board_array[yyy][xxx] != " " and board_array[yyy][xxx] != 0:
                             return True
             return False
+
         y = 0
-        while not collides(y+1):
+        while not collides(y + 1):
             y += 1
         self.preview = (piece, shape, xpos, y)
         self.draw = True
@@ -78,25 +86,35 @@ class TetrisBoardViewer:
                 xx = x * CELL_SIZE
                 yy = y * CELL_SIZE
                 pygame.draw.rect(self.surface, color, (xx, yy, CELL_SIZE, CELL_SIZE))
-                pygame.draw.rect(self.surface, COLOR_GRID, (xx, yy, CELL_SIZE, CELL_SIZE), 1)
-        
+                pygame.draw.rect(
+                    self.surface, COLOR_GRID, (xx, yy, CELL_SIZE, CELL_SIZE), 1
+                )
+
         if self.preview:
             piece, shape, xpos, ypos = self.preview
-            base = PIECE_COLORS.get(piece, (180,180,180))
-            duszek = tuple(wawa//2 for wawa in base)
-            height = len(shape); width = len(shape[0])
+            base = PIECE_COLORS.get(piece, (180, 180, 180))
+            duszek = tuple(wawa // 2 for wawa in base)
+            height = len(shape)
+            width = len(shape[0])
             for h in range(height):
                 for w in range(width):
-                    if shape[h][w] not in (' ', 0):
+                    if shape[h][w] not in (" ", 0):
                         xx = (xpos + w) * CELL_SIZE
                         yy = (ypos + h) * CELL_SIZE
-                        pygame.draw.rect(self.surface, duszek, (xx, yy, CELL_SIZE, CELL_SIZE))
-                        pygame.draw.rect(self.surface, base,  (xx, yy, CELL_SIZE, CELL_SIZE), 1)
+                        pygame.draw.rect(
+                            self.surface, duszek, (xx, yy, CELL_SIZE, CELL_SIZE)
+                        )
+                        pygame.draw.rect(
+                            self.surface, base, (xx, yy, CELL_SIZE, CELL_SIZE), 1
+                        )
 
     def _draw_panel(self):
         xpos = BOARD_WIDTH * CELL_SIZE
-        pygame.draw.rect(self.surface, COLOR_PANEL,(xpos, 0, SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE))
+        pygame.draw.rect(
+            self.surface, COLOR_PANEL, (xpos, 0, SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
+        )
         y = 8
+
         def line(txt):
             nonlocal y
             bleh = self.font.render(txt, True, COLOR_TEXT)
@@ -108,11 +126,16 @@ class TetrisBoardViewer:
         line(" ".join(queue_) if queue_ else "-")
         y += 6
         line("stats:")
-        lines_total = (self.stats.single + self.stats.double + self.stats.triple + self.stats.tetris)
+        lines_total = (
+            self.stats.single
+            + self.stats.double
+            + self.stats.triple
+            + self.stats.tetris
+        )
         line(f"PPS: {self.stats.pps:.2f}")
         line(f"combo: {self.stats.combo}")
         line(f"lines: {lines_total}")
-        line(f"total attack: {self.stats.total_attack}")
+        # line(f"total attack: {self.stats.total_attack}")
         line(f"APM: {self.stats.APM:.2f}")
         y += 6
         line("clears:")
@@ -140,5 +163,5 @@ class TetrisBoardViewer:
                 self.draw = False
                 self._draw()
             self.clock.tick(FPS)
-        pygame.quit()   
+        pygame.quit()
         # buttons dont appear anymore (somehow?) and also i wanna make so you have button that just acts as pressing enter in slow mode

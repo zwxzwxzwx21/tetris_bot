@@ -53,6 +53,8 @@ class GameStats:
         self.tetris = 0
         self.combo = 0
         self.burst_attack = 0  # unused, stil; thinking about it
+        self.total_attack = 0
+        self.APM = 0.0  # could do APS but it would reach insane values when bot gets better, so i might just make it float mby
 
 
 class TetrisGame:
@@ -147,6 +149,7 @@ class TetrisGame:
                 attack, self.combo = count_lines_clear(
                     lines_cleared_count, self.combo, board_after_clear
                 )
+                self.stats.total_attack += attack
                 self.stats.combo = self.combo
 
                 if lines_cleared_count == 1:
@@ -193,6 +196,7 @@ class TetrisGame:
                     self.stats.burst.append(elapsed)
                 logging.debug(self.stats.burst)
                 if elapsed > 0:
+                    self.stats.APM = (self.stats.total_attack / elapsed) * 60
                     self.stats.pps = pieces_placed / elapsed
                     self.stats.burst_pps = (
                         (len(self.stats.burst) - 1)
@@ -234,9 +238,7 @@ if __name__ == "__main__":
     if game.custom_bag[0]:
         game.bag = create_bag(custom_bag=True)
         logging.debug(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
-        time.sleep(
-            1
-        )  
+        time.sleep(1)
     game.custom_board[0] = "custom_board" in args.rules
     if game.custom_board[0]:
         game.board = custom_board
@@ -249,10 +251,9 @@ if __name__ == "__main__":
         viewer = TetrisBoardViewer(
             game.board,
             game.stats,
-            game.start_signal,
             game.queue,
-            game.game_over_signal,
             game.no_s_z_first_piece_signal,
+            game.slow_mode,
         )
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
         t.start()
