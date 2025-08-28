@@ -59,7 +59,10 @@ def find_best_placement(board, queue, combo):
             holes = check_holes(board_after_clear)
 
             if (
-                loss := 0 * uneven + 1 * holes + 0.0 * height_diff + max_height
+                loss := 0.4 * uneven
+                + 1.5 * holes
+                + 0.0 * height_diff
+                + max(max_height - 4, 0)
             ) < best_loss:
                 best_move = f"{current_piece}_x{x}_{rotation_name}"
                 move_history = [best_move]
