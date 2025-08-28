@@ -49,19 +49,17 @@ def find_best_placement(board, queue, combo):
                 cleared_lines, combo, board_after_clear
             )
             # --- HEIGHT & UNEVEN CHECK ---
-            height_diff, heights = height_difference(board_after_clear)
+            height_diff, _ = height_difference(board_after_clear)
+            heights = get_heights(board_after_clear)
             max_height = max(heights)
-            print(f"{get_heights(board)=}")
+
             uneven = uneven_stack_est(heights)
 
             # --- HOLES CHECK ---
             holes = check_holes(board_after_clear)
 
             if (
-                loss := 0 * uneven
-                + 1 * holes
-                + 0.0 * height_diff
-                + max(max_height - 4, 0)
+                loss := 0 * uneven + 1 * holes + 0.0 * height_diff + max_height
             ) < best_loss:
                 best_move = f"{current_piece}_x{x}_{rotation_name}"
                 move_history = [best_move]
@@ -73,9 +71,9 @@ def find_best_placement(board, queue, combo):
                     best_max_height,
                 ) = (loss, uneven, holes, height_diff, max_height)
     print(f"""{best_loss=}
-        {best_uneven=}
-        {best_holes=}
-        {best_height_diff=}
-        {best_max_height=}""")
+{best_uneven=}
+{best_holes=}
+{best_height_diff=}
+{best_max_height=}""")
     assert move_history
     return move_history, best_move
