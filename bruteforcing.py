@@ -3,7 +3,7 @@ import copy
 from board_operations.board_operations import clear_lines
 from board_operations.checking_valid_placements import drop_piece
 from board_operations.stack_checking import (
-    check_holes,
+    check_holes2,
     get_heights,
     height_difference,
     uneven_stack_est,
@@ -57,7 +57,7 @@ def find_best_placement(board, queue, combo):
             uneven = uneven_stack_est(heights)
 
             # --- HOLES CHECK ---
-            holes = check_holes(board_after_clear)
+            holes = check_holes2(board_after_clear)
 
             # --- DIFFERENT HEIGHT CHECK ---
             different_heights = sum(
@@ -66,7 +66,7 @@ def find_best_placement(board, queue, combo):
 
             if (
                 loss := 0.4 * uneven
-                + 1.5 * holes
+                + 2 * holes
                 + 0.0 * height_diff
                 + max(max_height - 4, 0)
                 + 0.05 * different_heights

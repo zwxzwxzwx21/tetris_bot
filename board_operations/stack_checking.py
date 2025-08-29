@@ -20,6 +20,20 @@ def check_holes(board):
     return total
 
 
+def check_holes2(board):
+    total = 0
+    for x in range(10):
+        y = 1
+        while y < 20 and board[y][x] == " ":
+            y += 1
+        y += 1
+        while y < 20:
+            if board[y][x] == " ":
+                total += 1
+            y += 1
+    return total
+
+
 def height_difference(board):
     """
     Calculates the maximum height difference between columns and returns heights.
@@ -28,10 +42,10 @@ def height_difference(board):
     for col in range(10):
         for row in range(19, -1, -1):
             if board[row][col] == " ":
-                height_array.append(19-row) 
+                height_array.append(19 - row)
                 break
         if len(height_array) == col - 1:
-            height_array.append(0) 
+            height_array.append(0)
     max_diff = max(height_array) - min(height_array)
     return max_diff, height_array
 
