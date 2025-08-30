@@ -1,11 +1,11 @@
 import copy
+from pprint import pp
 
 from board_operations.board_operations import clear_lines
 from board_operations.checking_valid_placements import drop_piece
 from board_operations.stack_checking import (
     check_holes2,
     get_heights,
-    height_difference,
     uneven_stack_est,
 )
 from tetrio_parsing.calculate_attack import count_lines_clear
@@ -29,13 +29,27 @@ UNEVEN_THRESHOLD = 1.1  # Prune stacks that are too uneven
 MAX_HEIGHT_DIFF = 6  # Prune stacks that are too tall
 
 
+def loss(feature: dict) -> float:
+    return (
+        0.4 * feature["uneven"]
+        + 2 * feature["holes"]
+        + max(feature["max_height"] - 4, 0)
+        + 0.05 * feature["different_heights"]
+    )
+
+
 def find_best_placement(board, queue, combo):
     move_history = []
     best_move = None
-    best_uneven = best_holes = best_height_diff = 0
+    feature = {
+        "uneven": 0,
+        "holes": 0,
+        "height_diff": 0,
+        "max_height": 20,
+        "different_heights": 30,
+    }
+    best_feature = feature.copy()
     best_loss = 10000
-    best_max_height = 20
-    best_different_heights = 30
 
     current_piece = queue[0]
     assert current_piece in PIECES
@@ -50,42 +64,26 @@ def find_best_placement(board, queue, combo):
                 cleared_lines, combo, board_after_clear
             )
             # --- HEIGHT & UNEVEN CHECK ---
-            height_diff, _ = height_difference(board_after_clear)
             heights = get_heights(board_after_clear)
-            max_height = max(heights)
+            feature["max_height"] = max(heights)
 
-            uneven = uneven_stack_est(heights)
+            feature["uneven"] = int(uneven_stack_est(heights))
 
             # --- HOLES CHECK ---
-            holes = check_holes2(board_after_clear)
+            feature["holes"] = check_holes2(board_after_clear)
 
             # --- DIFFERENT HEIGHT CHECK ---
-            different_heights = sum(
+            feature["different_heights"] = sum(
                 heights[x] != heights[x + 1] for x in range(len(heights) - 1)
             )
 
-            if (
-                loss := 0.4 * uneven
-                + 2 * holes
-                + 0.0 * height_diff
-                + max(max_height - 4, 0)
-                + 0.05 * different_heights
-            ) < best_loss:
+            if (current_loss := loss(feature)) < best_loss:
                 best_move = f"{current_piece}_x{x}_{rotation_name}"
                 move_history = [best_move]
-                (
-                    best_loss,
-                    best_uneven,
-                    best_holes,
-                    best_height_diff,
-                    best_max_height,
-                    best_different_heights,
-                ) = (loss, uneven, holes, height_diff, max_height, different_heights)
-    print(f"""{best_loss=}
-{best_uneven=}
-{best_holes=}
-{best_height_diff=}
-{best_max_height=}
-{best_different_heights=}""")
+                best_loss = current_loss
+                best_feature = feature
+
+    pp(best_feature)
+    print()
     assert move_history
     return move_history, best_move
