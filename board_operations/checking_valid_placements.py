@@ -4,20 +4,22 @@ def find_drop_height(board, xpos):
     """
     Finds the height at which a piece would land if dropped in the given column.
     """
-    for y in range(20):  ##### HARDCODED
+    width,height = board.shape
+    for y in range(height): 
         if board[xpos][y] != ' ':  
             return y - 1  
-    return 20 - 1 # retuns last index of board, being 19 normally        ##### HARDCODED
+    return height - 1 # returns last index of board, being 19 normally 
 
 def can_place(piece, board, row, col):
     """
     Checks if a piece can be placed at the given position on the board.
     """
+    width,height = board.shape
     for dy, piece_row in enumerate(piece):
         for dx, cell in enumerate(piece_row):
             if cell != ' ':
                 x, y = col + dx, row + dy
-                if y >= 20 or x < 0 or x >= 10 or board[x][y] != ' ':    ##### HARDCODED
+                if y >= height or x < 0 or x >= width or board[x][y] != ' ':
                     return False
     return True
 

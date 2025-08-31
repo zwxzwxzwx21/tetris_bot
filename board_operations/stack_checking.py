@@ -35,14 +35,15 @@ def check_holes2(board):
 
 
 def height_difference(board):
+    width,height = board.shape
     """
     Calculates the maximum height difference between columns and returns heights.
     """
     height_array = []
-    for col in range(10):
-        for row in range(19, -1, -1):
+    for col in range(width):
+        for row in range(height,-1,-1):
             if board[col][row] == " ":
-                height_array.append(19 - row)
+                height_array.append(height - row)
                 break
         if len(height_array) == col - 1:
             height_array.append(0)
@@ -64,13 +65,12 @@ def uneven_stack_est(height_array):
 
 
 def get_heights(board):
-    print('eh oh')
-    print(board)
+    width,height = board.shape
     heights = []
-    for col in range(10):                      ##### HARDCODED 
-        for row in range(20):                  ##### HARDCODED
+    for col in range(width):                     
+        for row in range(height):                
             if board[col][row] != " ":
-                heights.append(20 - row)
+                heights.append(height - row)
                 break
         else:
             heights.append(0)
