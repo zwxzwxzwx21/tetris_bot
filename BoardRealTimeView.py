@@ -63,7 +63,7 @@ class TetrisBoardViewer:
                         xxx = xpos + w
                         if yyy >= BOARD_HEIGHT:
                             return True
-                        if board_array[yyy][xxx] != " " and board_array[yyy][xxx] != 0:
+                        if board_array[xxx][yyy] != " " and board_array[xxx][yyy] != 0:
                             return True
             return False
 
@@ -81,7 +81,7 @@ class TetrisBoardViewer:
     def _draw_board(self):
         for y in range(BOARD_HEIGHT):
             for x in range(BOARD_WIDTH):
-                a = self.board[y][x]
+                a = self.board[x][y]
                 color = PIECE_COLORS.get(a, (90, 90, 100))
                 xx = x * CELL_SIZE
                 yy = y * CELL_SIZE

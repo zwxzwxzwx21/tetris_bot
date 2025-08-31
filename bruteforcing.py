@@ -61,6 +61,10 @@ def find_best_placement(board, queue, combo):
             new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
             board_after_clear, cleared_lines = clear_lines(new_board)
             # --- HEIGHT & UNEVEN CHECK ---
+            from board_operations.board_operations import convert_board_numpy
+            print(board_after_clear)
+            board_after_clear = convert_board_numpy(board_after_clear)
+            print(board_after_clear)
             heights = get_heights(board_after_clear)
             feature["max_height"] = max(heights)
 

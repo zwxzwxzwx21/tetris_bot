@@ -1,6 +1,13 @@
-"""
-so this is basically a combine funtion that prints all important info i want to have in one place
-such as: heuristic estimations, future branch and bound estimations, and whatever else i might need
+import numpy as np
+board = np.full((10, 20), "o")
+#print(board)
 
-"""
-#wher functio?
+
+import copy
+board_copy = copy.deepcopy(board)  
+print(board_copy)
+'''row = 0
+while can_place(piece, board_copy, row + 1, col):
+    row += 1
+place_piece(piece, board_copy, row, col)'''
+   

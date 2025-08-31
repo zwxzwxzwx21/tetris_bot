@@ -4,10 +4,10 @@ def find_drop_height(board, xpos):
     """
     Finds the height at which a piece would land if dropped in the given column.
     """
-    for y in range(len(board)):  
-        if board[y][xpos] != ' ':  
+    for y in range(20):  ##### HARDCODED
+        if board[xpos][y] != ' ':  
             return y - 1  
-    return len(board) - 1 # retuns last index of board, being 19 normally 
+    return 20 - 1 # retuns last index of board, being 19 normally        ##### HARDCODED
 
 def can_place(piece, board, row, col):
     """
@@ -16,8 +16,8 @@ def can_place(piece, board, row, col):
     for dy, piece_row in enumerate(piece):
         for dx, cell in enumerate(piece_row):
             if cell != ' ':
-                y, x = row + dy, col + dx
-                if y >= len(board) or x < 0 or x >= len(board[0]) or board[y][x] != ' ':
+                x, y = col + dx, row + dy
+                if y >= 20 or x < 0 or x >= 10 or board[x][y] != ' ':    ##### HARDCODED
                     return False
     return True
 
@@ -26,7 +26,8 @@ def drop_piece(piece, board, col):
     Simulates dropping a piece in the given column and returns a new board.
     Does not modify the original board.
     """
-    board_copy = [row.copy() for row in board]  # deep copy
+    import copy
+    board_copy = copy.deepcopy(board)  
     row = 0
     while can_place(piece, board_copy, row + 1, col):
         row += 1
@@ -41,4 +42,4 @@ def place_piece(piece, board, row, col):
     for dy, piece_row in enumerate(piece):
         for dx, cell in enumerate(piece_row):
             if cell != ' ':
-                board[row + dy][col + dx] = cell
+                board[col + dx][row + dy] = cell

@@ -9,7 +9,7 @@ def hole_exists(board, x, y):
     assert 0 <= x <= 9
     assert 0 <= y <= 19
 
-    return (y == 0 or board[y - 1][x] != " ") and board[y][x] == " "
+    return (y == 0 or board[x][y - 1] != " ") and board[x][y] == " "
 
 
 def check_holes(board):
@@ -24,11 +24,11 @@ def check_holes2(board):
     total = 0
     for x in range(10):
         y = 1
-        while y < 20 and board[y][x] == " ":
+        while y < 20 and board[x][y] == " ":
             y += 1
         y += 1
         while y < 20:
-            if board[y][x] == " ":
+            if board[x][y] == " ":
                 total += 1
             y += 1
     return total
@@ -41,7 +41,7 @@ def height_difference(board):
     height_array = []
     for col in range(10):
         for row in range(19, -1, -1):
-            if board[row][col] == " ":
+            if board[col][row] == " ":
                 height_array.append(19 - row)
                 break
         if len(height_array) == col - 1:
@@ -64,11 +64,13 @@ def uneven_stack_est(height_array):
 
 
 def get_heights(board):
+    print('eh oh')
+    print(board)
     heights = []
-    for col in range(len(board[0])):
-        for row in range(len(board)):
-            if board[row][col] != " ":
-                heights.append(len(board) - row)
+    for col in range(10):                      ##### HARDCODED 
+        for row in range(20):                  ##### HARDCODED
+            if board[col][row] != " ":
+                heights.append(20 - row)
                 break
         else:
             heights.append(0)

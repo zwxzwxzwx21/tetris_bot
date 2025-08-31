@@ -60,6 +60,7 @@ class GameStats:
 class TetrisGame:
     def __init__(self):
         self.board = np.full((10, 20), " ")
+        print_board(self.board)
         self.queue = []
         self.bag = []
         self.combo = 0

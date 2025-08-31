@@ -1,5 +1,12 @@
 # all the functions that directly manipulate the board 
 # this file deserve a namechange
+import numpy as np
+def convert_board_numpy(board):
+    arr = np.array(board)
+    if arr.shape == (20,10):
+        return np.array(board).T
+    return arr
+    
 
 def clear_lines(board):
     """
@@ -8,11 +15,11 @@ def clear_lines(board):
     new_board = []
     lines_cleared = 0
 
-    for row in board:
-        if all(cell != ' ' for cell in row):
+    for col in board:
+        if all(cell != ' ' for cell in col):
             lines_cleared += 1
         else:
-            new_board.append(row)
+            new_board.append(col)
 
     # adds empty rows at the top for cleared lines
     for _ in range(lines_cleared):
