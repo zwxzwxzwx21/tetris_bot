@@ -73,7 +73,12 @@ custom_board= [
     ['x','x',' ','x','x','x','x','x','x','x'],
     ['x','x',' ','x','x','x','x','x','x','x'],
     ]
+import numpy as np # move up asp
+custom_board = np.array(custom_board)
 queue = ['I','I','L']
+from board_operations.stack_checking import *
+#a = height_difference(custom_board) # it doesnt work with np array now, idk how change tbh
+#print(a)
 #next testcase i wanna try is PC end with 2  o pieces, so it should be 2 double clears into p
 from bruteforcing import find_best_placement
 #best_move, total_attack = find_best_placement(custom_board, queue, 0)
