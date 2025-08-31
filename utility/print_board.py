@@ -3,7 +3,7 @@ def print_board(board):
     print(
         "===PRINTING BOARD==="
     )  # no logging cuz i think it sobv for now that its from this file
-    print(*(" ".join(s for s in row) for row in board.T), sep="\n")
+    print(*("".join(s for s in row) for row in board.T), sep="\n")
 
 
 # ye it just kinda prints the board
