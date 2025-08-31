@@ -13,7 +13,7 @@ import copy
 import logging
 import threading
 import time
-
+import numpy as np
 from GenerateBag import create_bag
 from tetrio_parsing.calculate_attack import count_lines_clear
 
@@ -54,12 +54,12 @@ class GameStats:
         self.combo = 0
         self.burst_attack = 0  # unused, stil; thinking about it
         self.total_attack = 0
-        self.APM = 0.0  # could do APS but it would reach insane values when bot gets better, so i might just make it float mby
-
+        self.APM = 0.0
+        self.APP = 0.0
 
 class TetrisGame:
     def __init__(self):
-        self.board = [[" " for _ in range(10)] for _ in range(20)]
+        self.board = np.full((10, 20), " ")
         self.queue = []
         self.bag = []
         self.combo = 0
@@ -197,6 +197,7 @@ class TetrisGame:
                 logging.debug(self.stats.burst)
                 if elapsed > 0:
                     self.stats.APM = (self.stats.total_attack / elapsed) * 60
+                    self.stats.APP = (self.stats.total_attack / pieces_placed) if pieces_placed > 0 else 0
                     self.stats.pps = pieces_placed / elapsed
                     self.stats.burst_pps = (
                         (len(self.stats.burst) - 1)

@@ -32,7 +32,7 @@ MAX_HEIGHT_DIFF = 6  # Prune stacks that are too tall
 def loss(feature: dict) -> float:
     return (
         0.4 * feature["uneven"]
-        + 2 * feature["holes"]
+        + 200 * feature["holes"]
         + max(feature["max_height"] - 4, 0)
         + 0.05 * feature["different_heights"]
     )
@@ -60,9 +60,6 @@ def find_best_placement(board, queue, combo):
             print(f"considering {current_piece}_x{x}_{rotation_name}")
             new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
             board_after_clear, cleared_lines = clear_lines(new_board)
-            attack_for_clear, new_combo = count_lines_clear(
-                cleared_lines, combo, board_after_clear
-            )
             # --- HEIGHT & UNEVEN CHECK ---
             heights = get_heights(board_after_clear)
             feature["max_height"] = max(heights)

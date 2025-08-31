@@ -137,6 +137,7 @@ class TetrisBoardViewer:
         line(f"lines: {lines_total}")
         # line(f"total attack: {self.stats.total_attack}")
         line(f"APM: {self.stats.APM:.2f}")
+        line(f"APP: {self.stats.APP:.2f}")
         y += 6
         line("clears:")
         line(f"single: {self.stats.single}")
