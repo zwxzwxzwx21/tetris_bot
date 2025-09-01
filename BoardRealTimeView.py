@@ -1,4 +1,3 @@
-import numpy as np
 import pygame
 
 CELL_SIZE = 28
@@ -34,7 +33,7 @@ class TetrisBoardViewer:
         pygame.display.set_caption("tewi bot :3")
         self.font = pygame.font.SysFont("orbitron", 16)
         self.clock = pygame.time.Clock()
-        self.board = np.array(board_)
+        self.board = board_
         self.stats = stats
         self.queue = queue
         self.no_s_z_first_piece_signal = no_s_z_first_piece_signal
@@ -45,7 +44,7 @@ class TetrisBoardViewer:
         self.preview = None
 
     def update_board(self, new_board):
-        self.board = np.array(new_board)
+        self.board = new_board
         self.draw = True
 
     def set_preview(self, piece, shape, xpos, board_array):

@@ -14,8 +14,6 @@ import logging
 import threading
 import time
 
-import numpy as np
-
 from tetrio_parsing.calculate_attack import count_lines_clear
 
 for handler in logging.root.handlers[:]:
