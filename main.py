@@ -72,6 +72,7 @@ class TetrisGame:
         self.custom_board = [False]
         self.gui_mode = [False]
         self.delay_mode = [False,-1] # on/off , delay
+        self.delay = -1
 
     def game_loop(self, viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
@@ -109,15 +110,19 @@ class TetrisGame:
 
                 logging.debug("\n=== Current Queue ===")
                 logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
+               
 
-                (
-                    move_history,
-                    best_move_str,
-                ) = find_best_placement(
+                
+                move_history_ = find_best_placement(
                     self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo
                 )
-
+                if not move_history_:
+                    logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
+                    self.game_over_signal[0] = True
+                    break    
+                move_history, best_move_str = move_history_            
                 piece_type_placed = [0]
+                
                 first_move = move_history[0]
                 piece_type, x_str, rotation = first_move.split("_")
                 x = int(x_str[1:])

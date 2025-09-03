@@ -30,6 +30,8 @@ def drop_piece(piece, board, col):
     row = 0
     while can_place(piece, board_copy, row + 1, col):
         row += 1
+    if row == 0: 
+        return None
     place_piece(piece, board_copy, row, col)
     return board_copy
 

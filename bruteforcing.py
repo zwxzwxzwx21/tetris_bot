@@ -40,6 +40,7 @@ def loss(feature: dict) -> float:
 
 def find_best_placement(board, queue, combo):
     move_history = []
+    GAMEOVER = False
     best_move = None
     feature = {
         "uneven": 0,
@@ -59,6 +60,10 @@ def find_best_placement(board, queue, combo):
         for x in range(max_x + 1):
             print(f"considering {current_piece}_x{x}_{rotation_name}")
             new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
+            if new_board is None:
+                print(f"GAMEOVER, score (best loss) : {best_loss} ")
+                GAMEOVER = True
+                break
             board_after_clear, cleared_lines = clear_lines(new_board)
             # --- HEIGHT & UNEVEN CHECK ---
             heights = get_heights(board_after_clear)
@@ -82,5 +87,7 @@ def find_best_placement(board, queue, combo):
 
     pp(best_feature)
     print()
+    if GAMEOVER:
+        return None
     assert move_history
     return move_history, best_move
