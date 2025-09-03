@@ -71,6 +71,7 @@ class TetrisGame:
         self.slow_mode = [False]
         self.custom_board = [False]
         self.gui_mode = [False]
+        self.delay_mode = [False,-1] # on/off , delay
 
     def game_loop(self, viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
@@ -135,6 +136,12 @@ class TetrisGame:
                     input(
                         f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue..."
                     )
+                
+                elif self.delay_mode[0] == True:
+                    self.delay = self.delay_mode[1]
+
+                if self.delay > 0:
+                    time.sleep(self.delay)
 
                 # its never none, usually its just first rotation and leftmost X, i think it would be good to change it
                 # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
@@ -223,7 +230,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument(
         "--rules",
-        choices=["custom_bag", "nosz", "custom_board", "slow", "gui"],
+        choices=["custom_bag", "nosz", "custom_board", "slow", "gui", "delay"],
         nargs="+",
         default=[],
         help="unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world",
@@ -247,7 +254,13 @@ if __name__ == "__main__":
     game.custom_board[0] = "custom_board" in args.rules
     if game.custom_board[0]:
         game.board = custom_board
-    game.slow_mode[0] = "slow" in args.rules
+
+    if "delay" in args.rules:
+        game.delay_mode[0] = True
+        game.delay_mode[1] = float(input("enter delay in seconds"))
+    elif "slow" in args.rules:
+        game.slow_mode[0] = True
+        logging.debug("slow mode enabled, press enter to place each piece")
 
     game.gui_mode[0] = "gui" in args.rules
 
