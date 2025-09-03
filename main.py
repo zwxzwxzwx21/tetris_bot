@@ -41,6 +41,15 @@ if not PIECES:
 
 DESIRED_QUEUE_PREVIEW_LENGTH = 5
 
+from dataclasses import dataclass
+
+@dataclass
+class MoveHistory:
+    board: list
+    queue: list
+    combo: int
+    stats: dict
+    move: str | None
 
 class GameStats:
     def __init__(self):
@@ -73,8 +82,42 @@ class TetrisGame:
         self.gui_mode = [False]
         self.delay_mode = [False,-1] # on/off , delay
         self.delay = -1
-        self.move_history_array = []
-        self.board_history_array = []
+        self.history = []
+        self.history_index = -1
+    
+    def save_game_state(self,move_str):
+        game_history = MoveHistory(
+            board=[row[:] for row in self.board],
+            queue = list(self.queue),
+            combo = self.combo,
+            stats = {
+                "total_attack": self.stats.total_attack,
+                "single": self.stats.single,
+                "double": self.stats.double,
+                "triple": self.stats.triple,
+                "tetris": self.stats.tetris,
+                "combo": self.stats.combo,
+            },
+            move = move_str,
+        )
+        if self.history_index < len(self.history) - 1:
+            self.history = self.history[: self.history_index + 1]
+        self.history.append(game_history)
+        self.history_index += 1
+
+    def load_game_state(self, index):
+        move_to_load = self.history[index]
+        for a,b in enumerate(self.board):
+            self.board[a][:] = b
+        self.queue[:] = move_to_load.queue
+        self.combo = move_to_load.combo
+        self.stats.total_attack = move_to_load.stats["total_attack"]
+        self.stats.single = move_to_load.stats["single"]
+        self.stats.double = move_to_load.stats["double"]
+        self.stats.triple = move_to_load.stats["triple"]
+        self.stats.tetris = move_to_load.stats["tetris"]
+        self.stats.combo = move_to_load.stats["combo"]
+        self.history_index = index
 
     def game_loop(self, viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
@@ -104,6 +147,9 @@ class TetrisGame:
                     logging.debug("failed to fill queue")
                     return
 
+            if not self.history:
+                self.save_game_state(move_str=None)
+
             while True:
                 if self.game_over_signal[0]:
                     # leftover from board viewer, useless
@@ -112,24 +158,23 @@ class TetrisGame:
 
                 logging.debug("\n=== Current Queue ===")
                 logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
-               
+                
 
                 
                 move_history_ = find_best_placement(
                     self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo
                 )
 
-                self.move_history_array.append(move_history_[0])
-                self.board_history_array.append(self.board)
+                
 
                 if not move_history_:
                     logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
                     logging.debug(f"piece that failed: {self.queue[0]}")
                     self.game_over_signal[0] = True
                     break    
+                
                 move_history, best_move_str = move_history_            
                 piece_type_placed = [0]
-                logging.debug(f"move history: {self.move_history_array}")
                 first_move = move_history[0]
                 piece_type, x_str, rotation = first_move.split("_")
                 x = int(x_str[1:])
@@ -145,10 +190,21 @@ class TetrisGame:
                     print_board(
                         board_after_drop
                     )  # print the board after dropping the piece
-                    input(
-                        f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue..."
+                    decision = input(
+                        f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...\n undo to move back, redo to redo if you have undone a move before "
                     )
-                
+                    if decision.lower() == "undo":
+                        if self.history_index > 0:
+                            self.load_game_state(self.history_index - 1)
+                        else:
+                            print("no move to undo")
+                        continue
+                    elif decision.lower() == "redo":
+                        if self.history_index < len(self.history) - 1:
+                            self.load_game_state(self.history_index + 1)
+                        else:
+                            print("no move to redo")
+                        continue
                 elif self.delay_mode[0] == True:
                     self.delay = self.delay_mode[1]
 
@@ -179,6 +235,8 @@ class TetrisGame:
                     self.stats.triple += 1
                 elif lines_cleared_count == 4:
                     self.stats.tetris += 1
+
+                self.save_game_state(best_move_str)
 
                 self.board[:] = board_after_clear
                 if viewer:
