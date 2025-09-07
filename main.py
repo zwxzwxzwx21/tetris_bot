@@ -84,10 +84,13 @@ class TetrisGame:
         self.delay = -1
         self.history = []
         self.history_index = -1
+        self.pending_save = None # the clogger 
     
-    def save_game_state(self,move_str):
+    def save_game_state(self,move_str,board):
+        print("SAVED BOARD:")
+        print_board(board)
         game_history = MoveHistory(
-            board=[row[:] for row in self.board],
+            board= [row[:] for row in board],
             queue = list(self.queue),
             combo = self.combo,
             stats = {
@@ -105,9 +108,11 @@ class TetrisGame:
         self.history.append(game_history)
         self.history_index += 1
 
-    def load_game_state(self, index):
+    def load_game_state(self, index, board):
+        print("LOADING STATE")
+        print_board(board)
         move_to_load = self.history[index]
-        for a,b in enumerate(self.board):
+        for a,b in enumerate(move_to_load.board):
             self.board[a][:] = b
         self.queue[:] = move_to_load.queue
         self.combo = move_to_load.combo
@@ -148,9 +153,13 @@ class TetrisGame:
                     return
 
             if not self.history:
-                self.save_game_state(move_str=None)
+                self.save_game_state(move_str=None, board=self.board)
 
             while True:
+                if self.pending_save is not None:
+                    self.save_game_state(self.pending_save,board=self.board)
+                    self.pending_save = None
+
                 if self.game_over_signal[0]:
                     # leftover from board viewer, useless
                     logging.debug("game loop finished by game_over_signal")
@@ -164,7 +173,7 @@ class TetrisGame:
                 move_history_ = find_best_placement(
                     self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo
                 )
-
+                
                 
 
                 if not move_history_:
@@ -183,25 +192,25 @@ class TetrisGame:
 
                 if viewer:
                     viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
-
+ 
                 board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
 
                 if self.slow_mode[0]:
                     print_board(
                         board_after_drop
-                    )  # print the board after dropping the piece
+                    )
                     decision = input(
                         f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...\n undo to move back, redo to redo if you have undone a move before "
                     )
                     if decision.lower() == "undo":
                         if self.history_index > 0:
-                            self.load_game_state(self.history_index - 1)
+                            self.load_game_state(self.history_index - 1, board=self.board)
                         else:
                             print("no move to undo")
                         continue
                     elif decision.lower() == "redo":
                         if self.history_index < len(self.history) - 1:
-                            self.load_game_state(self.history_index + 1)
+                            self.load_game_state(self.history_index + 1, board=self.board)
                         else:
                             print("no move to redo")
                         continue
@@ -236,14 +245,11 @@ class TetrisGame:
                 elif lines_cleared_count == 4:
                     self.stats.tetris += 1
 
-                self.save_game_state(best_move_str)
-
                 self.board[:] = board_after_clear
                 if viewer:
                     viewer.clear_preview()
                     viewer.update_board(self.board)
 
-                # logging.debug(f"\nplaced: {piece_type_placed} by move {best_move_str}")
                 print_board(self.board)
 
                 if self.queue:
@@ -289,7 +295,8 @@ class TetrisGame:
                     logging.debug(
                         f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps / 10}"
                     )
-
+                
+                self.pending_save = best_move_str  
         finally:
             logging.debug("game loop finished")
             self.game_over_signal[0] = True

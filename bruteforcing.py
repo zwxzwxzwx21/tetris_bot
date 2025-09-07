@@ -58,7 +58,6 @@ def find_best_placement(board, queue, combo):
     for rotation_name, piece_shape in PIECES[current_piece].items():
         max_x = 10 - len(piece_shape[0])
         for x in range(max_x + 1):
-            #print(f"considering {current_piece}_x{x}_{rotation_name}")
             new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
             if new_board is None:
                 print(f"GAMEOVER, score (best loss) : {best_loss} ")
@@ -84,7 +83,7 @@ def find_best_placement(board, queue, combo):
                 move_history = [best_move]
                 best_loss = current_loss
                 best_feature = feature
-
+                
     pp(best_feature)
     print()
     if GAMEOVER:
