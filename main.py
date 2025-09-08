@@ -11,6 +11,7 @@
 import argparse  # testing it
 import copy
 import logging
+import random
 import threading
 import time
 
@@ -29,7 +30,7 @@ from board_operations.board_operations import clear_lines
 from board_operations.checking_valid_placements import drop_piece
 from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
-from GenerateBag import add_piece_from_bag
+from GenerateBag import add_piece_from_bag, create_bag
 from tests.combo_attack_test import (
     custom_board,  # probably stupid way to do that, idk better yet
 )
@@ -47,9 +48,11 @@ from dataclasses import dataclass
 class MoveHistory:
     board: list
     queue: list
+    bag: list
     combo: int
     stats: dict
     move: str | None
+    rng: object
 
 class GameStats:
     def __init__(self):
@@ -67,7 +70,7 @@ class GameStats:
 
 
 class TetrisGame:
-    def __init__(self):
+    def __init__(self,seed):
         self.board = [[" " for _ in range(10)] for _ in range(20)]
         self.queue = []
         self.bag = []
@@ -85,13 +88,16 @@ class TetrisGame:
         self.history = []
         self.history_index = -1
         self.pending_save = None # the clogger 
-    
+        self.seed = seed
+        random.seed(self.seed)
+
     def save_game_state(self,move_str,board):
         print("SAVED BOARD:")
         print_board(board)
         game_history = MoveHistory(
-            board= [row[:] for row in board],
+            board = [row[:] for row in board],
             queue = list(self.queue),
+            bag = list(self.bag),
             combo = self.combo,
             stats = {
                 "total_attack": self.stats.total_attack,
@@ -102,6 +108,7 @@ class TetrisGame:
                 "combo": self.stats.combo,
             },
             move = move_str,
+            rng = random.getstate(),
         )
         if self.history_index < len(self.history) - 1:
             self.history = self.history[: self.history_index + 1]
@@ -115,6 +122,7 @@ class TetrisGame:
         for a,b in enumerate(move_to_load.board):
             self.board[a][:] = b
         self.queue[:] = move_to_load.queue
+        self.bag[:] = move_to_load.bag   #apparently needed lol
         self.combo = move_to_load.combo
         self.stats.total_attack = move_to_load.stats["total_attack"]
         self.stats.single = move_to_load.stats["single"]
@@ -122,7 +130,9 @@ class TetrisGame:
         self.stats.triple = move_to_load.stats["triple"]
         self.stats.tetris = move_to_load.stats["tetris"]
         self.stats.combo = move_to_load.stats["combo"]
+        random.setstate(move_to_load.rng)
         self.history_index = index
+        
 
     def game_loop(self, viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
@@ -305,9 +315,11 @@ class TetrisGame:
 # this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
+    parser.add_argument("--seed", type=int, help="override RNG seed")
+    
     parser.add_argument(
         "--rules",
-        choices=["custom_bag", "nosz", "custom_board", "slow", "gui", "delay"],
+        choices=["custom_bag", "nosz", "custom_board", "slow", "gui", "delay","seed"],
         nargs="+",
         default=[],
         help="unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world",
@@ -317,7 +329,12 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    game = TetrisGame()
+    if args.seed is not None:
+        seed = args.seed
+    else:
+        seed = time.time_ns() % (2**32 - 1)
+    logging.debug(f"using seed {seed}")
+    game = TetrisGame(seed=seed)
 
     game.start_signal[0] = True
 
