@@ -55,7 +55,7 @@ class MoveHistory:
     rng: object
 
 class GameStats:
-    def __init__(self):
+    def __init__(self,seed):
         self.burst = []  # (PPS) stores 10 times piece was placed, then max-min
         self.pps = 0.0
         self.single = 0
@@ -67,7 +67,7 @@ class GameStats:
         self.total_attack = 0
         self.APM = 0.0
         self.APP = 0.0
-
+        self.seed = seed
 
 class TetrisGame:
     def __init__(self,seed):
@@ -79,7 +79,7 @@ class TetrisGame:
         self.game_over_signal = [False]
         self.no_s_z_first_piece_signal = [False]
         self.custom_bag = [False]
-        self.stats = GameStats()
+        self.stats = GameStats(seed=seed)
         self.slow_mode = [False]
         self.custom_board = [False]
         self.gui_mode = [False]
@@ -366,6 +366,7 @@ if __name__ == "__main__":
             game.queue,
             game.no_s_z_first_piece_signal,
             game.slow_mode,
+            game.seed,
         )
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
         t.start()

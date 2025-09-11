@@ -25,7 +25,7 @@ PIECE_COLORS = {
 
 
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode):
+    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed):
         pygame.init()
         self.surface = pygame.display.set_mode(
             (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
@@ -148,6 +148,9 @@ class TetrisBoardViewer:
         line("rules:")
         line(f"nosz: {self.no_s_z_first_piece_signal[0]}")
         line(f"slow mode: {self.slow_mode[0]}")
+        y += 6
+        line("seed:")
+        line(f"{self.stats.seed}")
 
     def _draw(self):
         self.surface.fill(COLOR_BG)
