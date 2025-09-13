@@ -1,6 +1,6 @@
 import copy
 from pprint import pp
-
+#from BoardRealTimeView import 
 from board_operations.board_operations import clear_lines
 from board_operations.checking_valid_placements import drop_piece
 from board_operations.stack_checking import (
@@ -48,10 +48,12 @@ def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, a
     )
 
 
-def find_best_placement(board, queue, combo):
+def find_best_placement(board, queue, combo,atk,lines):
     move_history = []
     GAMEOVER = False
     best_move = None
+    total_lines = 0
+    total_attack = 0
     feature = {
         "uneven": 0,
         "holes": 0,
@@ -90,12 +92,14 @@ def find_best_placement(board, queue, combo):
                 move_history = [best_move]
                 best_loss = current_loss
                 best_feature = feature
+                total_attack += feature["attack"][0]
+                total_lines += cleared_lines
                 
     pp(best_feature)
     print()
     if GAMEOVER:
         print(
-            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus}\n"
+            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus}\n cleared lines: {lines}\n total attack: {atk}\n"
 )
         return None
     assert move_history

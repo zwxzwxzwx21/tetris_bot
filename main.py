@@ -181,7 +181,7 @@ class TetrisGame:
 
                 
                 move_history_ = find_best_placement(
-                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo
+                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats.total_attack,(self.stats.single + self.stats.double + self.stats.triple + self.stats.tetris)
                 )
                 
                 
