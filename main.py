@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-# if someone is reading that, i may or may not have used some AI help for comments and such to make code more readable
-# half of them i didnt even read but i dont remove them because fucking higlighting puts them there as it feels and it was usefull
-# ^ update i have cleared some useless things up, yeah you can mby look them up in previous commits but what for
-# those dont even have any working code so i wouldnt bother
-# once!! so i wil lleave them, so like whateverr sorry algosith dont bother with them
-# got an issue with that? better not or i will cry.
 
 # to test the argparse better, try running it in console using:
 # python .\main.py --rule, rules will be listed lower, as they are wip

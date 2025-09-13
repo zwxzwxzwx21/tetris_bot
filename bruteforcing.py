@@ -11,6 +11,8 @@ from board_operations.stack_checking import (
 from tetrio_parsing.calculate_attack import count_lines_clear
 from utility.pieces import PIECES
 
+import pandas as pd
+
 DEBUG = True
 
 rotations = {
@@ -24,9 +26,9 @@ rotations = {
 }
 MOVES_DONE = 0
 MOVES_REMOVED = 0
-TIME_LIMIT = 999  # Maximum time (in seconds) allowed for the search
-UNEVEN_THRESHOLD = 1.1  # Prune stacks that are too uneven
-MAX_HEIGHT_DIFF = 6  # Prune stacks that are too tall
+TIME_LIMIT = 999
+UNEVEN_THRESHOLD = 1.1  
+MAX_HEIGHT_DIFF = 6 
 
 
 def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus) -> float:
@@ -66,16 +68,11 @@ def find_best_placement(board, queue, combo):
                 GAMEOVER = True
                 break
             board_after_clear, cleared_lines = clear_lines(new_board)
-            # --- HEIGHT & UNEVEN CHECK ---
+
             heights = get_heights(board_after_clear)
             feature["max_height"] = max(heights)
-
             feature["uneven"] = int(uneven_stack_est(heights))
-
-            # --- HOLES CHECK ---
             feature["holes"] = check_holes2(board_after_clear)
-
-            # --- DIFFERENT HEIGHT CHECK ---
             feature["different_heights"] = sum(
                 heights[x] != heights[x + 1] for x in range(len(heights) - 1)
             )
