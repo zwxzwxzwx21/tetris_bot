@@ -134,7 +134,7 @@ class TetrisGame:
         self.history_index = index
         
 
-    def game_loop(self, viewer):
+    def game_loop(self, viewer, length=10000):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
         # i will change it i swear, just give me second :3
         while not self.start_signal[0]:

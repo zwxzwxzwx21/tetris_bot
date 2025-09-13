@@ -29,12 +29,13 @@ UNEVEN_THRESHOLD = 1.1  # Prune stacks that are too uneven
 MAX_HEIGHT_DIFF = 6  # Prune stacks that are too tall
 
 
-def loss(feature: dict) -> float:
+def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus) -> float:
     return (
-        0.4 * feature["uneven"]
-        + 200 * feature["holes"]
+        uneven_loss * feature["uneven"]
+        + holes_punishment * feature["holes"]
         + max(feature["max_height"] - 4, 0)
-        + 0.05 * feature["different_heights"]
+        + height_diff_punishment * feature["different_heights"]
+        - attack_bonus * feature["attack"][0]
     )
 
 
@@ -48,6 +49,7 @@ def find_best_placement(board, queue, combo):
         "height_diff": 0,
         "max_height": 20,
         "different_heights": 30,
+        "attack": 0,
     }
     best_feature = feature.copy()
     best_loss = 10000
@@ -77,8 +79,9 @@ def find_best_placement(board, queue, combo):
             feature["different_heights"] = sum(
                 heights[x] != heights[x + 1] for x in range(len(heights) - 1)
             )
+            feature["attack"] = count_lines_clear(cleared_lines, combo, board_after_clear)
 
-            if (current_loss := loss(feature)) < best_loss:
+            if (current_loss := loss(feature, 1, 1, 1, 1)) < best_loss:
                 best_move = f"{current_piece}_x{x}_{rotation_name}"
                 move_history = [best_move]
                 best_loss = current_loss
