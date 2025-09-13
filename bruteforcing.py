@@ -29,15 +29,22 @@ MOVES_REMOVED = 0
 TIME_LIMIT = 999
 UNEVEN_THRESHOLD = 1.1  
 MAX_HEIGHT_DIFF = 6 
+import random
 
-
+uneven_loss = random.uniform(0, 30)
+holes_punishment = random.uniform(0, 100)
+height_diff_punishment = random.uniform(0, 50)
+attack_bonus = random.uniform(0, 50)
+print(
+    f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}"
+)
 def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus) -> float:
     return (
         uneven_loss * feature["uneven"]
         + holes_punishment * feature["holes"]
         + max(feature["max_height"] - 4, 0)
         + height_diff_punishment * feature["different_heights"]
-        - attack_bonus * feature["attack"][0]
+        # - attack_bonus * feature["attack"][0]
     )
 
 
@@ -78,7 +85,7 @@ def find_best_placement(board, queue, combo):
             )
             feature["attack"] = count_lines_clear(cleared_lines, combo, board_after_clear)
 
-            if (current_loss := loss(feature, 1, 1, 1, 1)) < best_loss:
+            if (current_loss := loss(feature, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus)) < best_loss:
                 best_move = f"{current_piece}_x{x}_{rotation_name}"
                 move_history = [best_move]
                 best_loss = current_loss
@@ -87,6 +94,9 @@ def find_best_placement(board, queue, combo):
     pp(best_feature)
     print()
     if GAMEOVER:
+        print(
+            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus}\n"
+)
         return None
     assert move_history
     return move_history, best_move
