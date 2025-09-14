@@ -33,18 +33,17 @@ UNEVEN_THRESHOLD = 1.1
 MAX_HEIGHT_DIFF = 6 
 BRUTEFORCE_MODE = False
 
-if BRUTEFORCE_MODE: 
-    uneven_loss = random.uniform(0, 200)
-    holes_punishment = random.uniform(0, 200)
-    height_diff_punishment = random.uniform(0, 200)
-    attack_bonus = random.uniform(0, 200)
-    max_height_punishment = random.uniform(0, 200)
-else:
-    uneven_loss = 0.4
-    holes_punishment = 2
-    max_height_punishment = 1
-    height_diff_punishment = 0.05
-    attack_bonus = 0
+values = {
+    "uneven_loss": {"default": 0.4, "max": 200},
+    "holes_punishment": {"default": 2, "max": 200},
+    "height_diff_punishment": {"default": 0.05, "max": 200},
+    "attack_bonus": {"default": 0, "max": 200},
+    "max_height_punishment": {"default": 1, "max": 200}
+}
+
+for vals, configs in values.items():
+    value = random.uniform(0, configs["max"]) if BRUTEFORCE_MODE else configs["default"]
+    globals()[vals] = value
 
 print(
     f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}"

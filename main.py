@@ -349,11 +349,11 @@ def run_bruteforce_games(num_games=999999, max_pieces=9999999):
     start_time = time.time()
     
     for game_num in range(1, num_games + 1):
-        uneven_loss = random.uniform(0, 200)
-        holes_punishment = random.uniform(0, 200)
-        height_diff_punishment = random.uniform(0, 200)
-        attack_bonus = random.uniform(0, 200)
-        max_height_punishment = random.uniform(0, 200)
+        uneven_loss = random.randint(0, 200)
+        holes_punishment = random.randint(0, 200)
+        height_diff_punishment = random.randint(0, 200)
+        attack_bonus = random.randint(0, 200)
+        max_height_punishment = random.randint(0, 200)
 
         import bruteforcing
         bruteforcing.uneven_loss = uneven_loss
