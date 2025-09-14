@@ -1,8 +1,8 @@
-import os 
+import os
 import pandas as pd
 
 def save_game_stats(uneven_loss, holes_punishment, height_diff_punishment, 
-                   attack_bonus, lines_cleared, total_attack, seed):
+                   attack_bonus, max_height_punishment, lines_cleared, total_attack, seed):
     
     filepath = "bruteforcer_stats.xlsx"
     
@@ -11,10 +11,11 @@ def save_game_stats(uneven_loss, holes_punishment, height_diff_punishment,
         "holes_punishment": [holes_punishment],
         "height_diff_punishment": [height_diff_punishment],
         "attack_bonus": [attack_bonus],
+        "max_height_punishment": [max_height_punishment], 
         "lines_cleared": [lines_cleared],
         "total_attack": [total_attack],
         "seed": [seed],
-        "attack_per_line": [total_attack / max(1, lines_cleared)]  
+        "attack_per_line": [total_attack / max(1, lines_cleared)]
     }
     
     new_df = pd.DataFrame(new_data)

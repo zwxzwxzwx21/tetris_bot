@@ -373,16 +373,6 @@ def run_bruteforce_games(num_games=999999, max_pieces=9999999):
         game.start_signal[0] = True
         game.game_loop(None)
         
-        save_game_results(
-            uneven_loss, holes_punishment, height_diff_punishment, 
-            attack_bonus, game.stats, seed, game_num
-        )
-        
-        lines = game.stats.single + game.stats.double + game.stats.triple + game.stats.tetris
-        
-        elapsed = time.time() - start_time
-        avg_time = elapsed / game_num
-        remaining = avg_time * (num_games - game_num)
     
     print(f"\nall {num_games} games completed in {time.time() - start_time:.1f} seconds!!!!!")
 

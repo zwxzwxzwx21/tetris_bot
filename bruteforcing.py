@@ -1,6 +1,5 @@
 import copy
 from pprint import pp
-#from BoardRealTimeView import 
 from board_operations.board_operations import clear_lines
 from board_operations.checking_valid_placements import drop_piece
 from board_operations.stack_checking import (
@@ -12,6 +11,7 @@ from tetrio_parsing.calculate_attack import count_lines_clear
 from utility.pieces import PIECES
 
 import pandas as pd
+import os
 
 DEBUG = True
 
@@ -35,20 +35,36 @@ uneven_loss = random.uniform(0, 30)
 holes_punishment = random.uniform(0, 100)
 height_diff_punishment = random.uniform(0, 50)
 attack_bonus = random.uniform(0, 50)
+max_height_punishment = random.uniform(0, 60)
 print(
     f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}"
 )
-def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus) -> float:
+def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment) -> float:
     return (
         uneven_loss * feature["uneven"]
         + holes_punishment * feature["holes"]
-        + max(feature["max_height"] - 4, 0)
         + height_diff_punishment * feature["different_heights"]
-        # - attack_bonus * feature["attack"][0]
+        + max_height_punishment * max(feature["max_height"] - 4, 0) 
+        - attack_bonus * feature["attack"][0]
     )
 
+def is_better_result(lines_cleared):
+    filepath = "bruteforcer_stats.xlsx"
+    if not os.path.exists(filepath):
+        return True  
+        
+    try:
+        existing_df = pd.read_excel(filepath)
+        if existing_df.empty:
+            return True
+            
+        best_lines = existing_df['lines_cleared'].max()
+        return lines_cleared > best_lines
+    except Exception as e:
+        print(f"error checking previous results: {e}")
+        return True  
 
-def find_best_placement(board, queue, combo,stats):
+def find_best_placement(board, queue, combo, stats):
     move_history = []
     GAMEOVER = False
     best_move = None
@@ -87,7 +103,8 @@ def find_best_placement(board, queue, combo,stats):
             )
             feature["attack"] = count_lines_clear(cleared_lines, combo, board_after_clear)
 
-            if (current_loss := loss(feature, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus)) < best_loss:
+            if (current_loss := loss(feature, uneven_loss, holes_punishment, 
+                                    height_diff_punishment, attack_bonus, max_height_punishment)) < best_loss:
                 best_move = f"{current_piece}_x{x}_{rotation_name}"
                 move_history = [best_move]
                 best_loss = current_loss
@@ -98,19 +115,28 @@ def find_best_placement(board, queue, combo,stats):
     pp(best_feature)
     print()
     if GAMEOVER:
+        lines_cleared = (stats.single + stats.double + stats.triple + stats.tetris)
         print(
-            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus}\n cleared lines: {(stats.single + stats.double + stats.triple + stats.tetris)}\n total attack: {stats.total_attack}\n"
-)       
-        from coefficients_calculation import save_game_stats
-        save_game_stats(
-            uneven_loss=uneven_loss,
-            holes_punishment=holes_punishment, 
-            height_diff_punishment=height_diff_punishment,
-            attack_bonus=attack_bonus,
-            lines_cleared=(stats.single + stats.double + stats.triple + stats.tetris),
-            total_attack=stats.total_attack,
-            seed=stats.seed  # Dodaj parametr seed do funkcji
+            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n"
+            f"height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus},\n"
+            f"max_height_punishment: {max_height_punishment}\n cleared lines: {lines_cleared}\n"
+            f"total attack: {stats.total_attack}\n"
         )
+        
+        from coefficients_calculation import save_game_stats
+        
+        if is_better_result(lines_cleared):
+            save_game_stats(
+                uneven_loss=uneven_loss,
+                holes_punishment=holes_punishment, 
+                height_diff_punishment=height_diff_punishment,
+                attack_bonus=attack_bonus,
+                max_height_punishment=max_height_punishment, 
+                lines_cleared=lines_cleared,
+                total_attack=stats.total_attack,
+                seed=stats.seed  
+            )
+            
         return None
     assert move_history
     return move_history, best_move
