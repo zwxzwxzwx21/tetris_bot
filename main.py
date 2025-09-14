@@ -349,16 +349,18 @@ def run_bruteforce_games(num_games=999999, max_pieces=9999999):
     start_time = time.time()
     
     for game_num in range(1, num_games + 1):
-        uneven_loss = random.uniform(0, 30)
-        holes_punishment = random.uniform(0, 100)
-        height_diff_punishment = random.uniform(0, 50)
-        attack_bonus = random.uniform(0, 50)
-        
+        uneven_loss = random.uniform(0, 200)
+        holes_punishment = random.uniform(0, 200)
+        height_diff_punishment = random.uniform(0, 200)
+        attack_bonus = random.uniform(0, 200)
+        max_height_punishment = random.uniform(0, 200)
+
         import bruteforcing
         bruteforcing.uneven_loss = uneven_loss
         bruteforcing.holes_punishment = holes_punishment
         bruteforcing.height_diff_punishment = height_diff_punishment
         bruteforcing.attack_bonus = attack_bonus
+        bruteforcing.max_height_punishment = max_height_punishment
         
         seed = time.time_ns() % (2**32 - 1)  # idk why that is the formula that was suggested by vscode but okay buddy you do you im counting on that!
         
