@@ -399,6 +399,8 @@ if __name__ == "__main__":
     args = parse_args()
     
     if args.bruteforce:
+        import bruteforcing
+        bruteforcing.BRUTEFORCE_MODE = True
         run_bruteforce_games(num_games=args.bruteforce, max_pieces=args.max_pieces)
         exit(0)
     

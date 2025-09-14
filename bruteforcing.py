@@ -29,13 +29,23 @@ MOVES_REMOVED = 0
 TIME_LIMIT = 999
 UNEVEN_THRESHOLD = 1.1  
 MAX_HEIGHT_DIFF = 6 
-import random
+BRUTEFORCE_MODE = False
 
-uneven_loss = random.uniform(0, 30)
-holes_punishment = random.uniform(0, 100)
-height_diff_punishment = random.uniform(0, 50)
-attack_bonus = random.uniform(0, 50)
-max_height_punishment = random.uniform(0, 60)
+import random
+if BRUTEFORCE_MODE: 
+    uneven_loss = random.uniform(0, 200)
+    holes_punishment = random.uniform(0, 200)
+    height_diff_punishment = random.uniform(0, 200)
+    attack_bonus = random.uniform(0, 200)
+    max_height_punishment = random.uniform(0, 200)
+else:
+    uneven_loss = 0.4
+    holes_punishment = 2
+    max_height_punishment = 1
+    height_diff_punishment = 0.05
+    attack_bonus = 0
+    #YES i know it can be done better i will do it LATER
+
 print(
     f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}"
 )
