@@ -48,7 +48,7 @@ def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, a
     )
 
 
-def find_best_placement(board, queue, combo,atk,lines):
+def find_best_placement(board, queue, combo,stats):
     move_history = []
     GAMEOVER = False
     best_move = None
@@ -99,8 +99,18 @@ def find_best_placement(board, queue, combo,atk,lines):
     print()
     if GAMEOVER:
         print(
-            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus}\n cleared lines: {lines}\n total attack: {atk}\n"
-)
+            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus}\n cleared lines: {(stats.single + stats.double + stats.triple + stats.tetris)}\n total attack: {stats.total_attack}\n"
+)       
+        from coefficients_calculation import save_game_stats
+        save_game_stats(
+            uneven_loss=uneven_loss,
+            holes_punishment=holes_punishment, 
+            height_diff_punishment=height_diff_punishment,
+            attack_bonus=attack_bonus,
+            lines_cleared=(stats.single + stats.double + stats.triple + stats.tetris),
+            total_attack=stats.total_attack,
+            seed=stats.seed  # Dodaj parametr seed do funkcji
+        )
         return None
     assert move_history
     return move_history, best_move

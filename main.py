@@ -14,6 +14,8 @@ import logging
 import random
 import threading
 import time
+import pandas as pd
+import os
 
 from tetrio_parsing.calculate_attack import count_lines_clear
 
@@ -68,7 +70,7 @@ class GameStats:
         self.APM = 0.0
         self.APP = 0.0
         self.seed = seed
-
+        self.pieces_placed = 0 
 class TetrisGame:
     def __init__(self,seed):
         self.board = [[" " for _ in range(10)] for _ in range(20)]
@@ -181,7 +183,7 @@ class TetrisGame:
 
                 
                 move_history_ = find_best_placement(
-                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats.total_attack,(self.stats.single + self.stats.double + self.stats.triple + self.stats.tetris)
+                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
                 )
                 
                 
@@ -311,11 +313,85 @@ class TetrisGame:
             logging.debug("game loop finished")
             self.game_over_signal[0] = True
 
+def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
+                      attack_bonus, game_stats, seed, game_number):
+        # yea id admit most code i stole lol, tho i was doing fine before that!
+        filepath = "bruteforcer_stats.xlsx"
+        
+        lines_cleared = game_stats.single + game_stats.double + game_stats.triple + game_stats.tetris
+        
+        new_data = {
+            "game_number": [game_number],
+            "uneven_loss": [uneven_loss],
+            "holes_punishment": [holes_punishment],
+            "height_diff_punishment": [height_diff_punishment],
+            "attack_bonus": [attack_bonus],
+            "lines_cleared": [lines_cleared],
+            "total_attack": [game_stats.total_attack],
+            "pieces_placed": [game_stats.pieces_placed if hasattr(game_stats, 'pieces_placed') else 0],
+            "seed": [seed],
+            "attack_per_line": [game_stats.total_attack / max(1, lines_cleared)]
+        }
+        
+        new_df = pd.DataFrame(new_data)
+        
+        if os.path.exists(filepath):
+            existing_df = pd.read_excel(filepath)
+            updated_df = pd.concat([existing_df, new_df], ignore_index=True)
+        else:
+            updated_df = new_df
+        
+        updated_df.to_excel(filepath, index=False)
+        
+        return len(updated_df)
+def run_bruteforce_games(num_games=999999, max_pieces=9999999):
+    
+    start_time = time.time()
+    
+    for game_num in range(1, num_games + 1):
+        uneven_loss = random.uniform(0, 30)
+        holes_punishment = random.uniform(0, 100)
+        height_diff_punishment = random.uniform(0, 50)
+        attack_bonus = random.uniform(0, 50)
+        
+        import bruteforcing
+        bruteforcing.uneven_loss = uneven_loss
+        bruteforcing.holes_punishment = holes_punishment
+        bruteforcing.height_diff_punishment = height_diff_punishment
+        bruteforcing.attack_bonus = attack_bonus
+        
+        seed = time.time_ns() % (2**32 - 1)  # idk why that is the formula that was suggested by vscode but okay buddy you do you im counting on that!
+        
+        print(f"\n=== game {game_num}/{num_games} ===")
+        print(f"vals: uneven={uneven_loss:.2f}, holes={holes_punishment:.2f}, "
+              f"height_diff={height_diff_punishment:.2f}, attack={attack_bonus:.2f}")
+        print(f"seed: {seed}")
+        
+        game = TetrisGame(seed=seed)
+        game.stats.pieces_placed = 0
+        
+        game.start_signal[0] = True
+        game.game_loop(None)
+        
+        save_game_results(
+            uneven_loss, holes_punishment, height_diff_punishment, 
+            attack_bonus, game.stats, seed, game_num
+        )
+        
+        lines = game.stats.single + game.stats.double + game.stats.triple + game.stats.tetris
+        
+        elapsed = time.time() - start_time
+        avg_time = elapsed / game_num
+        remaining = avg_time * (num_games - game_num)
+    
+    print(f"\nall {num_games} games completed in {time.time() - start_time:.1f} seconds!!!!!")
 
 # this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument("--seed", type=int, help="override RNG seed")
+    parser.add_argument("--bruteforce", type=int,)
+    parser.add_argument("--max-pieces", type=int, default=99999999)
     
     parser.add_argument(
         "--rules",
@@ -329,6 +405,11 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+    
+    if args.bruteforce:
+        run_bruteforce_games(num_games=args.bruteforce, max_pieces=args.max_pieces)
+        exit(0)
+    
     if args.seed is not None:
         seed = args.seed
     else:
