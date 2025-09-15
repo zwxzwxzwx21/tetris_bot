@@ -1,4 +1,5 @@
 import copy
+from logging import config
 from pprint import pp
 from board_operations.board_operations import clear_lines
 from board_operations.checking_valid_placements import drop_piece
@@ -32,20 +33,20 @@ TIME_LIMIT = 999
 UNEVEN_THRESHOLD = 1.1  
 MAX_HEIGHT_DIFF = 6 
 BRUTEFORCE_MODE = False
-
+import config
 values = {
-    "uneven_loss": {"default": 0.4, "max": 200},
-    "holes_punishment": {"default": 2, "max": 200},
-    "height_diff_punishment": {"default": 0.05, "max": 200},
-    "attack_bonus": {"default": 0, "max": 200},
-    "max_height_punishment": {"default": 1, "max": 200}
+    "uneven_loss": {"default": 0.4, "max": 100},
+    "holes_punishment": {"default": 2, "max": 100},
+    "height_diff_punishment": {"default": 0.05, "max": 100},
+    "attack_bonus": {"default": 0, "max": 100},
+    "max_height_punishment": {"default": 1, "max": 100}
 }
 
 for vals, configs in values.items():
     value = random.uniform(0, configs["max"]) if BRUTEFORCE_MODE else configs["default"]
     globals()[vals] = value
-
-print(
+if config.PRINT_MODE:
+    print(
     f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}"
 )
 def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment) -> float:
@@ -70,7 +71,8 @@ def is_better_result(lines_cleared):
         best_lines = existing_df['lines_cleared'].max()
         return lines_cleared > best_lines
     except Exception as e:
-        print(f"error checking previous results: {e}")
+        if config.PRINT_MODE:
+            print(f"error checking previous results: {e}")
         return True  
 
 def find_best_placement(board, queue, combo, stats):
@@ -98,7 +100,8 @@ def find_best_placement(board, queue, combo, stats):
         for x in range(max_x + 1):
             new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
             if new_board is None:
-                print(f"GAMEOVER, score (best loss) : {best_loss} ")
+                if config.PRINT_MODE:
+                    print(f"GAMEOVER, score (best loss) : {best_loss} ")
                 GAMEOVER = True
                 break
             board_after_clear, cleared_lines = clear_lines(new_board)
@@ -121,11 +124,14 @@ def find_best_placement(board, queue, combo, stats):
                 total_attack += feature["attack"][0]
                 total_lines += cleared_lines
                 
-    pp(best_feature)
-    print()
+    if config.PRINT_MODE:
+        pp(best_feature)
+    if config.PRINT_MODE:
+        print()
     if GAMEOVER:
         lines_cleared = (stats.single + stats.double + stats.triple + stats.tetris)
-        print(
+        if config.PRINT_MODE:
+            print(
             f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n"
             f"height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus},\n"
             f"max_height_punishment: {max_height_punishment}\n cleared lines: {lines_cleared}\n"

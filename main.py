@@ -16,7 +16,7 @@ import threading
 import time
 import pandas as pd
 import os
-
+import config
 from tetrio_parsing.calculate_attack import count_lines_clear
 
 for handler in logging.root.handlers[:]:
@@ -94,8 +94,9 @@ class TetrisGame:
         random.seed(self.seed)
 
     def save_game_state(self,move_str,board):
-        print("SAVED BOARD:")
-        print_board(board)
+        if config.PRINT_MODE:
+            print("SAVED BOARD:")
+            print_board(board)
         game_history = MoveHistory(
             board = [row[:] for row in board],
             queue = list(self.queue),
@@ -118,8 +119,9 @@ class TetrisGame:
         self.history_index += 1
 
     def load_game_state(self, index, board):
-        print("LOADING STATE")
-        print_board(board)
+        if config.PRINT_MODE:
+            print("LOADING STATE")
+            print_board(board)
         move_to_load = self.history[index]
         for a,b in enumerate(move_to_load.board):
             self.board[a][:] = b
@@ -149,7 +151,8 @@ class TetrisGame:
 
         try:
             if not self.queue:
-                logging.debug("queue fill")
+                if config.PRINT_MODE:
+                    logging.debug("queue fill")
                 num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(self.queue)
                 if num_to_add > 0:
                     self.queue, self.bag = add_piece_from_bag(
@@ -161,7 +164,8 @@ class TetrisGame:
                 # algo youre may be reading this, those are kind of things ive asked
                 # like obv it wasnt my idea, i saw that and was just, fuck it we ball
                 if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
-                    logging.debug("failed to fill queue")
+                    if config.PRINT_MODE:
+                        logging.debug("failed to fill queue")
                     return
 
             if not self.history:
@@ -174,12 +178,14 @@ class TetrisGame:
 
                 if self.game_over_signal[0]:
                     # leftover from board viewer, useless
-                    logging.debug("game loop finished by game_over_signal")
+                    if config.PRINT_MODE:
+                        logging.debug("game loop finished by game_over_signal")
                     break
 
-                logging.debug("\n=== Current Queue ===")
-                logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
-                
+                if config.PRINT_MODE:
+                    logging.debug("\n=== Current Queue ===")
+                    logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
+
 
                 
                 move_history_ = find_best_placement(
@@ -189,8 +195,9 @@ class TetrisGame:
                 
 
                 if not move_history_:
-                    logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
-                    logging.debug(f"piece that failed: {self.queue[0]}")
+                    if config.PRINT_MODE:
+                        logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
+                        logging.debug(f"piece that failed: {self.queue[0]}")
                     self.game_over_signal[0] = True
                     break    
                 
@@ -208,9 +215,8 @@ class TetrisGame:
                 board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
 
                 if self.slow_mode[0]:
-                    print_board(
-                        board_after_drop
-                    )
+                    if config.PRINT_MODE:
+                        print_board(board_after_drop)
                     decision = input(
                         f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...\n undo to move back, redo to redo if you have undone a move before "
                     )
@@ -218,13 +224,15 @@ class TetrisGame:
                         if self.history_index > 0:
                             self.load_game_state(self.history_index - 1, board=self.board)
                         else:
-                            print("no move to undo")
+                            if config.PRINT_MODE:
+                                print("no move to undo")    
                         continue
                     elif decision.lower() == "redo":
                         if self.history_index < len(self.history) - 1:
                             self.load_game_state(self.history_index + 1, board=self.board)
                         else:
-                            print("no move to redo")
+                            if config.PRINT_MODE:
+                                print("no move to redo")
                         continue
                 elif self.delay_mode[0] == True:
                     self.delay = self.delay_mode[1]
@@ -236,12 +244,13 @@ class TetrisGame:
                 # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
                 # tho im not so sure, leaving it here just because of that
                 if board_after_drop is None:
-                    # logging.debug(f"error: drop_piece failed for valid move: {best_move_str} with piece {piece_type_placed}")
-                    logging.debug("cannot drop piece")
+                    if config.PRINT_MODE:
+                        logging.debug("cannot drop piece")
                     break
 
                 board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
-                logging.debug(f"lines cleared: {lines_cleared_count}")
+                if config.PRINT_MODE:
+                    logging.debug(f"lines cleared: {lines_cleared_count}")
                 attack, self.combo = count_lines_clear(
                     lines_cleared_count, self.combo, board_after_clear
                 )
@@ -261,13 +270,14 @@ class TetrisGame:
                 if viewer:
                     viewer.clear_preview()
                     viewer.update_board(self.board)
-
-                print_board(self.board)
+                if config.PRINT_MODE:
+                    print_board(self.board)
 
                 if self.queue:
                     self.queue.pop(0)  # remove the used piece
                 else:  # should never happen
-                    logging.debug(
+                    if config.PRINT_MODE:
+                        logging.debug(
                         "error: tried to pop from empty queue after placement"
                     )
                     break
@@ -289,7 +299,8 @@ class TetrisGame:
                 else:
                     self.stats.burst.pop(0)
                     self.stats.burst.append(elapsed)
-                logging.debug(self.stats.burst)
+                if config.PRINT_MODE:
+                    logging.debug(self.stats.burst)
                 if elapsed > 0:
                     self.stats.APM = (self.stats.total_attack / elapsed) * 60
                     self.stats.APP = (
@@ -304,13 +315,15 @@ class TetrisGame:
                         if len(self.stats.burst) > 9
                         else 0
                     )
-                    logging.debug(
+                    if config.PRINT_MODE:
+                        logging.debug(
                         f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps / 10}"
                     )
                 
                 self.pending_save = best_move_str  
         finally:
-            logging.debug("game loop finished")
+            
+            #logging.debug("game loop finished")
             self.game_over_signal[0] = True
 
 def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
@@ -349,7 +362,7 @@ def run_bruteforce_games(num_games=999999, max_pieces=9999999):
     start_time = time.time()
     
     for game_num in range(1, num_games + 1):
-        uneven_loss = random.randint(0, 200)
+        uneven_loss = 1
         holes_punishment = random.randint(0, 200)
         height_diff_punishment = random.randint(0, 200)
         attack_bonus = random.randint(0, 200)
@@ -363,20 +376,16 @@ def run_bruteforce_games(num_games=999999, max_pieces=9999999):
         bruteforcing.max_height_punishment = max_height_punishment
         
         seed = time.time_ns() % (2**32 - 1)  # idk why that is the formula that was suggested by vscode but okay buddy you do you im counting on that!
-        
-        print(f"\n=== game {game_num}/{num_games} ===")
-        print(f"vals: uneven={uneven_loss:.2f}, holes={holes_punishment:.2f}, "
-              f"height_diff={height_diff_punishment:.2f}, attack={attack_bonus:.2f}")
-        print(f"seed: {seed}")
+        #print(f"\n=== game {game_num}/{num_games} ===")
+        #print(f"vals: uneven={uneven_loss:.2f}, holes={holes_punishment:.2f}, "
+        #    f"height_diff={height_diff_punishment:.2f}, attack={attack_bonus:.2f}")
+        #print(f"seed: {seed}")
         
         game = TetrisGame(seed=seed)
         game.stats.pieces_placed = 0
         
         game.start_signal[0] = True
         game.game_loop(None)
-        
-    
-    print(f"\nall {num_games} games completed in {time.time() - start_time:.1f} seconds!!!!!")
 
 # this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
@@ -408,17 +417,21 @@ if __name__ == "__main__":
         seed = args.seed
     else:
         seed = time.time_ns() % (2**32 - 1)
-    logging.debug(f"using seed {seed}")
+    
     game = TetrisGame(seed=seed)
 
     game.start_signal[0] = True
 
+    game.print_mode[0] = "print" in args.rules
+    if config.PRINT_MODE:
+        logging.debug(f"using seed {seed}")
     game.no_s_z_first_piece_signal[0] = "nosz" in args.rules
 
     game.custom_bag[0] = "custom_bag" in args.rules
     if game.custom_bag[0]:
         game.bag = create_bag(custom_bag=True)
-        logging.debug(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
+        if config.PRINT_MODE:
+            logging.debug(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
         time.sleep(1)
     game.custom_board[0] = "custom_board" in args.rules
     if game.custom_board[0]:
@@ -429,7 +442,8 @@ if __name__ == "__main__":
         game.delay_mode[1] = float(input("enter delay in seconds"))
     elif "slow" in args.rules:
         game.slow_mode[0] = True
-        logging.debug("slow mode enabled, press enter to place each piece")
+        if config.PRINT_MODE:
+            logging.debug("slow mode enabled, press enter to place each piece")
 
     game.gui_mode[0] = "gui" in args.rules
 
