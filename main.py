@@ -18,6 +18,7 @@ import pandas as pd
 import os
 import config
 from tetrio_parsing.calculate_attack import count_lines_clear
+import itertools 
 
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(
@@ -358,15 +359,15 @@ def save_game_results(uneven_loss, holes_punishment, height_diff_punishment,
         
         return len(updated_df)
 def run_bruteforce_games(num_games=999999, max_pieces=9999999):
+    values = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     
-    start_time = time.time()
+    combinations = list(itertools.product(values, repeat=5))
+    total_combinations = len(combinations)
     
-    for game_num in range(1, num_games + 1):
-        uneven_loss = 1
-        holes_punishment = random.randint(0, 200)
-        height_diff_punishment = random.randint(0, 200)
-        attack_bonus = random.randint(0, 200)
-        max_height_punishment = random.randint(0, 200)
+    games_to_run = min(num_games, total_combinations)
+    
+    for game_index in range(games_to_run):
+        uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = combinations[game_index]
 
         import bruteforcing
         bruteforcing.uneven_loss = uneven_loss
@@ -375,18 +376,12 @@ def run_bruteforce_games(num_games=999999, max_pieces=9999999):
         bruteforcing.attack_bonus = attack_bonus
         bruteforcing.max_height_punishment = max_height_punishment
         
-        seed = time.time_ns() % (2**32 - 1)  # idk why that is the formula that was suggested by vscode but okay buddy you do you im counting on that!
-        #print(f"\n=== game {game_num}/{num_games} ===")
-        #print(f"vals: uneven={uneven_loss:.2f}, holes={holes_punishment:.2f}, "
-        #    f"height_diff={height_diff_punishment:.2f}, attack={attack_bonus:.2f}")
-        #print(f"seed: {seed}")
-        
+        seed = time.time_ns() % (2**32 - 1)
         game = TetrisGame(seed=seed)
         game.stats.pieces_placed = 0
         
         game.start_signal[0] = True
         game.game_loop(None)
-
 # this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
