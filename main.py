@@ -368,7 +368,11 @@ def run_bruteforce_games(num_games=999999, max_pieces=9999999):
     
     for game_index in range(games_to_run):
         uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = combinations[game_index]
-
+        if game_index % 100 == 0: 
+            print(f"\n=== game {game_index+1}/{games_to_run} ===")
+            print(f"uneven {uneven_loss}, holes {holes_punishment}, "
+                  f"height_diff {height_diff_punishment}, attack {attack_bonus}, "
+                  f"max_height {max_height_punishment}")
         import bruteforcing
         bruteforcing.uneven_loss = uneven_loss
         bruteforcing.holes_punishment = holes_punishment
