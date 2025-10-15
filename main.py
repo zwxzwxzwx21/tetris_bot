@@ -356,16 +356,11 @@ def save_game_results(uneven_loss, holes_punishment, height_diff_punishment,
         
         return len(updated_df)
 def run_bruteforce_games(params,num_games=3):
-
+    total_lines = 0
 
     for game_index in range(num_games):
         #print(f"running game {game_index+1}/{num_games} with params {params}")
         uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = params["uneven_loss"], params["holes_punishment"], params["height_diff_punishment"], params["attack_bonus"], params["max_height_punishment"]
-        if game_index % 3 == 0: 
-            print(f"\n=== game {game_index+1}/{num_games} ===")
-            print(f"uneven {uneven_loss}, holes {holes_punishment}, "
-                  f"height_diff {height_diff_punishment}, attack {attack_bonus}, "
-                  f"max_height {max_height_punishment}")
         import bruteforcing
         bruteforcing.uneven_loss = uneven_loss
         bruteforcing.holes_punishment = holes_punishment
@@ -381,6 +376,10 @@ def run_bruteforce_games(params,num_games=3):
         pieces = game.game_loop(None)
         print(f"pieces: {pieces}")
 
+        lines_cleared= game.stats.single + game.stats.double*2 + game.stats.triple*3 + game.stats.tetris*4
+        total_lines += lines_cleared
+        print(f"lines cleared: {lines_cleared}")
+    return total_lines/num_games
 # this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")

@@ -1,3 +1,10 @@
+# idea: run 5/10 games and get avg value of lines cleared, after that we have our E(s)
+# then we run new params and get new E(snew)
+# if E(snew) <= E(s) we accept new params
+# if E(snew) > E(s) we accept new params with probability P = exp(-(E(snew) - E(s)) / T)
+# T starts high (100) and goes to 0 over time
+# now its p much just write code for making 5-10 games and getting avg lines cleared which wont be hard 
+
 import bruteforcing
 import random
 import math
@@ -8,57 +15,67 @@ import math
     "attack_bonus": 1,
     "max_height_punishment": 1,
 }'''
+'''heuristic_params = {
+    "uneven_loss": 0.978169566086124,
+    "holes_punishment": 1.548520543539411,
+    "height_diff_punishment": 0.19829854187486598,
+    "attack_bonus": 1.199324363469116,
+    "max_height_punishment": 0.6259050858276255,
+}'''
 heuristic_params = {
-    "uneven_loss": 1,
-    "holes_punishment": 1,
-    "height_diff_punishment": 1,
-    "attack_bonus": 1,
-    "max_height_punishment": 1,
+    "uneven_loss": 1.5035072207505125,
+    "holes_punishment": 1.4133498342617155,
+    "height_diff_punishment": 0.08169071129276936,
+    "attack_bonus": 2.312996860233956,
+    "max_height_punishment": 0.45217681702487916,
 }
-
-def pick_neighbour(params,step_size=0.5):
+def pick_neighbour(params,step_size=0.3):
     new_params = params.copy()
     for param in new_params:
         change = random.uniform(-step_size,step_size)
         new_val = new_params[param] + change
-        new_val = max(0.0, min(5.0, new_val)) # thats smart isnt it lol
+        new_val = max(0.0, min(10.0, new_val)) 
         new_params[param] = new_val
-    print(f"NEIGHBOUR uneven: {params["uneven_loss"]}, holes: {params["holes_punishment"]}, height diff: {params["height_diff_punishment"]}, attack: {params["attack_bonus"]}, max height: {params["max_height_punishment"]}")
+    #print(f"NEIGHBOUR uneven: {params["uneven_loss"]}, holes: {params["holes_punishment"]}, height diff: {params["height_diff_punishment"]}, attack: {params["attack_bonus"]}, max height: {params["max_height_punishment"]}")
 
     return new_params
 
-# idea: run 5/10 games and get avg value of lines cleared, after that we have our E(s)
-# then we run new params and get new E(snew)
-# if E(snew) <= E(s) we accept new params
-# if E(snew) > E(s) we accept new params with probability P = exp(-(E(snew) - E(s)) / T)
-# T starts high (100) and goes to 0 over time
-# now its p much just write code for making 5-10 games and getting avg lines cleared which wont be hard 
-
 from main import run_bruteforce_games
-def E(params, games=3):
+def E(params, games=10):
     print(f"uneven: {params["uneven_loss"]}, holes: {params["holes_punishment"]}, height diff: {params["height_diff_punishment"]}, attack: {params["attack_bonus"]}, max height: {params["max_height_punishment"]}")
+    total_lines = 0
     for i in range(games):
-        lines = 0
-        run_bruteforce_games(params, 10)
-        # no reutrn yet
-    return lines / games
+        print(f" ===Game {i+1}=== ",)
+        lines = run_bruteforce_games(params, 1) # 1 game per call
+        total_lines += lines
+    return total_lines / games
+
 def P(E_s, E_snew, T):
-    return math.exp(-(E_snew - E_s) / T)
-    # redundant
+    if E_snew >= E_s:  
+        return 1.0
+    else:  
+        diff = (E_s - E_snew) / T
+        if diff > 700:
+            return 0.0
+        return math.exp(-diff)
 
 T = 100
-min_temp = 0.1
+min_temp = 0.01
 iteration = 0
-max_iterations = 100
+max_iterations = 200
 params = heuristic_params.copy()
 
 for iteration in range(max_iterations):
-    T = T * (1 - (iteration + 1) / max_iterations)
+    T = T * (1 - (iteration + 1) / max_iterations)    
     if T < min_temp:
-        T = min_temp
+        break
     new_params = pick_neighbour(params)
+    print("Iteration:", iteration, "Temperature:", T)
+    print("Current params: uneven", params["uneven_loss"], "holes", params["holes_punishment"], "height diff", params["height_diff_punishment"], "attack", params["attack_bonus"], "max height", params["max_height_punishment"])
+    print("New params: uneven", new_params["uneven_loss"], "holes", new_params["holes_punishment"], "height diff", new_params["height_diff_punishment"], "attack", new_params["attack_bonus"], "max height", new_params["max_height_punishment"])
     if P(E(params), E(new_params), T) >= random.uniform(0, 1):
         params = new_params
+        print("Accepted new params")
 
 
 """Let s = s0
