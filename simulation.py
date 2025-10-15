@@ -1,5 +1,6 @@
 import bruteforcing
 import random
+import math
 #ill do range 0.00 to 5 with random steps 
 '''heuristic_params = {
     "uneven_loss": 0.4,
@@ -23,6 +24,7 @@ def pick_neighbour(params,step_size=0.1):
         new_val = new_params[param] + change
         new_val = max(0.0, min(5.0, new_val)) # thats smart isnt it lol
         new_params[param] = new_val
+    print(new_params)
     return new_params
 
 # idea: run 5/10 games and get avg value of lines cleared, after that we have our E(s)
@@ -34,18 +36,26 @@ def pick_neighbour(params,step_size=0.1):
 
 from main import run_bruteforce_games
 def E(params, games=10):
+    print(f"test {params}")
     for i in range(games):
         lines = 0
-
+        run_bruteforce_games(params, 10)
+        # no reutrn yet
     return lines / games
+def P(E_s, E_snew, T):
+    return math.exp(-(E_snew - E_s) / T)
+    # redundant
 
 T = 100
 min_temp = 0.1
 iteration = 0
-max_iterations = 10000
+max_iterations = 100
 params = heuristic_params.copy()
+
 for iteration in range(max_iterations):
     T = T * (1 - (iteration + 1) / max_iterations)
+    if T < min_temp:
+        T = min_temp
     new_params = pick_neighbour(params)
     if P(E(params), E(new_params), T) >= random.uniform(0, 1):
         params = new_params

@@ -359,7 +359,8 @@ def run_bruteforce_games(params,num_games=10):
 
 
     for game_index in range(num_games):
-        uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = params
+        print(f"running game {game_index+1}/{num_games} with params {params}")
+        uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = params["uneven_loss"], params["holes_punishment"], params["height_diff_punishment"], params["attack_bonus"], params["max_height_punishment"]
         if game_index % 1 == 0:  # xd
             print(f"\n=== game {game_index+1}/{num_games} ===")
             print(f"uneven {uneven_loss}, holes {holes_punishment}, "
@@ -378,7 +379,8 @@ def run_bruteforce_games(params,num_games=10):
         
         game.start_signal[0] = True
         game.game_loop(None)
-        
+        print(f"pieces: {game.stats.pieces_placed}")
+
 # this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
