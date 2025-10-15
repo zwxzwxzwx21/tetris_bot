@@ -1,7 +1,6 @@
 import bruteforcing
 import random
 import math
-#ill do range 0.00 to 5 with random steps 
 '''heuristic_params = {
     "uneven_loss": 0.4,
     "holes_punishment": 2,
@@ -17,14 +16,15 @@ heuristic_params = {
     "max_height_punishment": 1,
 }
 
-def pick_neighbour(params,step_size=0.1):
+def pick_neighbour(params,step_size=0.5):
     new_params = params.copy()
     for param in new_params:
         change = random.uniform(-step_size,step_size)
         new_val = new_params[param] + change
         new_val = max(0.0, min(5.0, new_val)) # thats smart isnt it lol
         new_params[param] = new_val
-    print(new_params)
+    print(f"NEIGHBOUR uneven: {params["uneven_loss"]}, holes: {params["holes_punishment"]}, height diff: {params["height_diff_punishment"]}, attack: {params["attack_bonus"]}, max height: {params["max_height_punishment"]}")
+
     return new_params
 
 # idea: run 5/10 games and get avg value of lines cleared, after that we have our E(s)
@@ -35,8 +35,8 @@ def pick_neighbour(params,step_size=0.1):
 # now its p much just write code for making 5-10 games and getting avg lines cleared which wont be hard 
 
 from main import run_bruteforce_games
-def E(params, games=10):
-    print(f"test {params}")
+def E(params, games=3):
+    print(f"uneven: {params["uneven_loss"]}, holes: {params["holes_punishment"]}, height diff: {params["height_diff_punishment"]}, attack: {params["attack_bonus"]}, max height: {params["max_height_punishment"]}")
     for i in range(games):
         lines = 0
         run_bruteforce_games(params, 10)
