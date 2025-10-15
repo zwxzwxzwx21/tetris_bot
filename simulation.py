@@ -40,7 +40,8 @@ params = heuristic_params.copy()
 for iteration in range(max_iterations):
     T = T * (1 - (iteration + 1) / max_iterations)
     new_params = pick_neighbour(params)
-    if P()
+    if P(E(params), E(new_params), T) >= random.uniform(0, 1):
+        params = new_params
 
 
 """Let s = s0
