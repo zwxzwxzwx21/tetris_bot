@@ -32,6 +32,13 @@ def pick_neighbour(params,step_size=0.1):
 # T starts high (100) and goes to 0 over time
 # now its p much just write code for making 5-10 games and getting avg lines cleared which wont be hard 
 
+from main import run_bruteforce_games
+def E(params, games=10):
+    for i in range(games):
+        lines = 0
+
+    return lines / games
+
 T = 100
 min_temp = 0.1
 iteration = 0

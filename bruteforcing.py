@@ -58,23 +58,6 @@ def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, a
         - attack_bonus * feature["attack"][0]
     )
 
-def is_better_result(lines_cleared):
-    filepath = "bruteforcer_stats.xlsx"
-    if not os.path.exists(filepath):
-        return True  
-        
-    try:
-        existing_df = pd.read_excel(filepath)
-        if existing_df.empty:
-            return True
-            
-        best_lines = existing_df['lines_cleared'].max()
-        return lines_cleared > best_lines
-    except Exception as e:
-        if config.PRINT_MODE:
-            print(f"error checking previous results: {e}")
-        return True  
-
 def find_best_placement(board, queue, combo, stats):
     move_history = []
     GAMEOVER = False
@@ -137,20 +120,6 @@ def find_best_placement(board, queue, combo, stats):
             f"max_height_punishment: {max_height_punishment}\n cleared lines: {lines_cleared}\n"# type: ignore
             f"total attack: {stats.total_attack}\n"
         )
-        
-        from coefficients_calculation import save_game_stats
-        
-        if is_better_result(lines_cleared):
-            save_game_stats(
-                uneven_loss=uneven_loss,# type: ignore
-                holes_punishment=holes_punishment, # type: ignore
-                height_diff_punishment=height_diff_punishment,# type: ignore
-                attack_bonus=attack_bonus,# type: ignore
-                max_height_punishment=max_height_punishment, # type: ignore
-                lines_cleared=lines_cleared,
-                total_attack=stats.total_attack,
-                seed=stats.seed  
-            )
             
         return None
     assert move_history

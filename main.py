@@ -141,7 +141,7 @@ class TetrisGame:
 
     def game_loop(self, viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
-        # i will change it i swear, just give me second :3
+        # i will change it i swear, just give me second
         while not self.start_signal[0]:
             time.sleep(0.1)
             if self.game_over_signal[0]:
@@ -162,8 +162,6 @@ class TetrisGame:
                         num_pieces=num_to_add,
                         no_s_z_first_piece=self.no_s_z_first_piece_signal[0],
                     )
-                # algo youre may be reading this, those are kind of things ive asked
-                # like obv it wasnt my idea, i saw that and was just, fuck it we ball
                 if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
                     if config.PRINT_MODE:
                         logging.debug("failed to fill queue")
@@ -329,7 +327,6 @@ class TetrisGame:
 
 def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
                       attack_bonus, game_stats, seed, game_number):
-        # yea id admit most code i stole lol, tho i was doing fine before that!
         filepath = "bruteforcer_stats.xlsx"
         
         lines_cleared = game_stats.single + game_stats.double + game_stats.triple + game_stats.tetris
@@ -358,18 +355,13 @@ def save_game_results(uneven_loss, holes_punishment, height_diff_punishment,
         updated_df.to_excel(filepath, index=False)
         
         return len(updated_df)
-def run_bruteforce_games(num_games=999999):
-    values = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    
-    combinations = list(itertools.product(values, repeat=5))
-    total_combinations = len(combinations)
-    
-    games_to_run = min(num_games, total_combinations)
-    
-    for game_index in range(games_to_run):
-        uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = combinations[game_index]
-        if game_index % 100 == 0: 
-            print(f"\n=== game {game_index+1}/{games_to_run} ===")
+def run_bruteforce_games(params,num_games=10):
+
+
+    for game_index in range(num_games):
+        uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = params
+        if game_index % 1 == 0:  # xd
+            print(f"\n=== game {game_index+1}/{num_games} ===")
             print(f"uneven {uneven_loss}, holes {holes_punishment}, "
                   f"height_diff {height_diff_punishment}, attack {attack_bonus}, "
                   f"max_height {max_height_punishment}")
@@ -386,6 +378,7 @@ def run_bruteforce_games(num_games=999999):
         
         game.start_signal[0] = True
         game.game_loop(None)
+        
 # this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
