@@ -47,7 +47,7 @@ for vals, configs in values.items():
     globals()[vals] = value
 if config.PRINT_MODE:
     print(
-    f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}"
+    f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}" # type: ignore
 )
 def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment) -> float:
     return (
@@ -115,8 +115,8 @@ def find_best_placement(board, queue, combo, stats):
             )
             feature["attack"] = count_lines_clear(cleared_lines, combo, board_after_clear)
 
-            if (current_loss := loss(feature, uneven_loss, holes_punishment, 
-                                    height_diff_punishment, attack_bonus, max_height_punishment)) < best_loss:
+            if (current_loss := loss(feature, uneven_loss, holes_punishment,  # type: ignore
+                                    height_diff_punishment, attack_bonus, max_height_punishment)) < best_loss:# type: ignore
                 best_move = f"{current_piece}_x{x}_{rotation_name}"
                 move_history = [best_move]
                 best_loss = current_loss
@@ -132,9 +132,9 @@ def find_best_placement(board, queue, combo, stats):
         lines_cleared = (stats.single + stats.double + stats.triple + stats.tetris)
         if config.PRINT_MODE:
             print(
-            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n"
-            f"height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus},\n"
-            f"max_height_punishment: {max_height_punishment}\n cleared lines: {lines_cleared}\n"
+            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n" # type: ignore
+            f"height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus},\n"# type: ignore
+            f"max_height_punishment: {max_height_punishment}\n cleared lines: {lines_cleared}\n"# type: ignore
             f"total attack: {stats.total_attack}\n"
         )
         
@@ -142,11 +142,11 @@ def find_best_placement(board, queue, combo, stats):
         
         if is_better_result(lines_cleared):
             save_game_stats(
-                uneven_loss=uneven_loss,
-                holes_punishment=holes_punishment, 
-                height_diff_punishment=height_diff_punishment,
-                attack_bonus=attack_bonus,
-                max_height_punishment=max_height_punishment, 
+                uneven_loss=uneven_loss,# type: ignore
+                holes_punishment=holes_punishment, # type: ignore
+                height_diff_punishment=height_diff_punishment,# type: ignore
+                attack_bonus=attack_bonus,# type: ignore
+                max_height_punishment=max_height_punishment, # type: ignore
                 lines_cleared=lines_cleared,
                 total_attack=stats.total_attack,
                 seed=stats.seed  

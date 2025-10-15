@@ -358,7 +358,7 @@ def save_game_results(uneven_loss, holes_punishment, height_diff_punishment,
         updated_df.to_excel(filepath, index=False)
         
         return len(updated_df)
-def run_bruteforce_games(num_games=999999, max_pieces=9999999):
+def run_bruteforce_games(num_games=999999):
     values = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     
     combinations = list(itertools.product(values, repeat=5))
