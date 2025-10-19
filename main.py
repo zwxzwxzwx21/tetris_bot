@@ -415,7 +415,7 @@ if __name__ == "__main__":
 
     game.start_signal[0] = True
 
-    game.print_mode[0] = "print" in args.rules
+    #game.print_mode[0] = "print" in args.rules
     if config.PRINT_MODE:
         logging.debug(f"using seed {seed}")
     game.no_s_z_first_piece_signal[0] = "nosz" in args.rules

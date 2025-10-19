@@ -31,7 +31,8 @@ heuristic_params = {
 }
 def pick_neighbour(params,step_size=0.3):
     new_params = params.copy()
-    for param in new_params:
+    params_to_tweak = random.sample(list(new_params.keys()), k=random.randint(1, len(new_params)))
+    for param in params_to_tweak:
         change = random.uniform(-step_size,step_size)
         new_val = new_params[param] + change
         new_val = max(0.0, min(10.0, new_val)) 
@@ -48,34 +49,49 @@ def E(params, games=10):
         print(f" ===Game {i+1}=== ",)
         lines = run_bruteforce_games(params, 1) # 1 game per call
         total_lines += lines
-    return total_lines / games
+        print(f"Game {i+1} cleared {lines} lines")
+    avg_lines = total_lines / games
+    print(f"Average lines cleared: {avg_lines}")
+    return avg_lines
 
 def P(E_s, E_snew, T):
     if E_snew >= E_s:  
         return 1.0
     else:  
-        diff = (E_s - E_snew) / T
+        diff = (E_snew - E_s) / T
         if diff > 700:
             return 0.0
         return math.exp(-diff)
 
 T = 100
-min_temp = 0.01
+min_temp = 0.5
 iteration = 0
-max_iterations = 200
+max_iterations = 500
 params = heuristic_params.copy()
-
+best_params = params.copy()
+best_score = E(params)
 for iteration in range(max_iterations):
     T = T * (1 - (iteration + 1) / max_iterations)    
     if T < min_temp:
         break
     new_params = pick_neighbour(params)
-    print("Iteration:", iteration, "Temperature:", T)
+
+    E_current = E(params)
+    E_new = E(new_params)
+    
+    if P(E_current, E_new, T) >= random.uniform(0, 1):
+        params = new_params
+        print(f"\n Iteration {iteration}: ACCEPTED (T={T:.2f})")
+        
+        if E_new > best_score:
+            best_score = E_new
+            best_params = new_params.copy()
+            print(f"  NEW BEST: {best_score:.1f} lines!")
+    else:
+        print(f"\n Iteration {iteration}: rejected (T={T:.2f})")
+
     print("Current params: uneven", params["uneven_loss"], "holes", params["holes_punishment"], "height diff", params["height_diff_punishment"], "attack", params["attack_bonus"], "max height", params["max_height_punishment"])
     print("New params: uneven", new_params["uneven_loss"], "holes", new_params["holes_punishment"], "height diff", new_params["height_diff_punishment"], "attack", new_params["attack_bonus"], "max height", new_params["max_height_punishment"])
-    if P(E(params), E(new_params), T) >= random.uniform(0, 1):
-        params = new_params
-        print("Accepted new params")
 
 
 """Let s = s0
