@@ -2,14 +2,14 @@ import copy
 from logging import config
 from pprint import pp
 from board_operations.board_operations import clear_lines
-from board_operations.checking_valid_placements import drop_piece
+from board_operations.checking_valid_placements import soft_drop_simulation
 from board_operations.stack_checking import (
     check_holes2,
     get_heights,
     uneven_stack_est,
 )
 from tetrio_parsing.calculate_attack import count_lines_clear
-from utility.pieces import PIECES
+from utility.pieces import PIECES, PIECES_soft_drop
 
 import pandas as pd
 import os
@@ -61,6 +61,8 @@ def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, a
 def find_best_placement(board, queue, combo, stats):
     move_history = []
     GAMEOVER = False
+    spin = False
+    check_sideways = False
     best_move = None
     total_lines = 0
     total_attack = 0
@@ -76,12 +78,20 @@ def find_best_placement(board, queue, combo, stats):
     best_loss = 10000
 
     current_piece = queue[0]
-    assert current_piece in PIECES
+    assert current_piece in PIECES_soft_drop
 
-    for rotation_name, piece_shape in PIECES[current_piece].items():
+    for rotation_name, piece_shape in PIECES_soft_drop[current_piece].items():
         max_x = 10 - len(piece_shape[0])
         for x in range(max_x + 1):
-            new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
+            new_board = soft_drop_simulation(piece_shape, copy.deepcopy(board), x)
+            # ordering:
+            # simulate soft drop
+            # check if you can move left right
+            # if no, then you know what range of positions youwill be working on, could be 1 or entire board (10 -piece lenghth)
+            # rotate and apply kick table?
+            # go through eachj rotation and if kick table doesnt apply 3 times in row just skip rotating anymore
+
+            # almost every single kick (unsure which not but idk) can be reversed with pressing opposite direction
             if new_board is None:
                 if config.PRINT_MODE:
                     print(f"GAMEOVER, score (best loss) : {best_loss} ")

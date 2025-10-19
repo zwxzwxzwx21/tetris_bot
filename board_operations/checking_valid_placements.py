@@ -21,7 +21,7 @@ def can_place(piece, board, row, col):
                     return False
     return True
 
-def drop_piece(piece, board, col):
+def soft_drop_simulation(piece, board, col):
     """
     Simulates dropping a piece in the given column and returns a new board.
     Does not modify the original board.
