@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 tspin_double_testcase = [
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
@@ -45,3 +49,7 @@ tspin_triple_testcase = [
     ]
 
 queue = ['T'] #  vro is alonje :sob: 
+from board_operations.checking_valid_placements import sideways_movement_simulation
+
+arr = sideways_movement_simulation(tspin_triple_testcase,'T','flat_0',0,15,[])
+print(arr)

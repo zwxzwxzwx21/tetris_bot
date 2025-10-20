@@ -74,49 +74,59 @@ def find_best_placement(board, queue, combo, stats):
         "different_heights": 30,
         "attack": 0,
     }
+
+    from spins_funcions import simulate_kicks
+    from board_operations.checking_valid_placements import find_lowest_y_for_piece, soft_drop_simulation
+            
     best_feature = feature.copy()
     best_loss = 10000
 
+    piece_info_array = []
+
     current_piece = queue[0]
     assert current_piece in PIECES_soft_drop
-
+    # 
     for rotation_name, piece_shape in PIECES_soft_drop[current_piece].items():
         max_x = 10 - len(piece_shape[0])
         for x in range(max_x + 1):
-            new_board = soft_drop_simulation(piece_shape, copy.deepcopy(board), x)
-            # ordering:
-            # simulate soft drop
-            # check if you can move left right
-            # if no, then you know what range of positions youwill be working on, could be 1 or entire board (10 -piece lenghth)
-            # rotate and apply kick table?
-            # go through eachj rotation and if kick table doesnt apply 3 times in row just skip rotating anymore
+            #new_board = soft_drop_simulation(piece_shape, copy.deepcopy(board), x)
+            lowest_y = find_lowest_y_for_piece(piece_shape, board, x)
+            piece_info_array.append([rotation_name, lowest_y]) # should be filled only with flat_0 at first
+            
+        new_board = simulate_kicks(board, piece_shape, rotation_name, x, lowest_y,piece_info_array)
+        # ordering:
+        # simulate soft drop
+        # check if you can move left right
+        # if no, then you know what range of positions youwill be working on, could be 1 or entire board (10 -piece lenghth)
+        # rotate and apply kick table?
+        # go through eachj rotation and if kick table doesnt apply 3 times in row just skip rotating anymore
 
-            # almost every single kick (unsure which not but idk) can be reversed with pressing opposite direction
-            if new_board is None:
-                if config.PRINT_MODE:
-                    print(f"GAMEOVER, score (best loss) : {best_loss} ")
-                GAMEOVER = True
-                break
-            board_after_clear, cleared_lines = clear_lines(new_board)
+        # almost every single kick (unsure which not but idk) can be reversed with pressing opposite direction
+        if new_board is None:
+            if config.PRINT_MODE:
+                print(f"GAMEOVER, score (best loss) : {best_loss} ")
+            GAMEOVER = True
+            break
+        board_after_clear, cleared_lines = clear_lines(new_board)
 
-            heights = get_heights(board_after_clear)
-            feature["max_height"] = max(heights)
-            feature["uneven"] = int(uneven_stack_est(heights))
-            feature["holes"] = check_holes2(board_after_clear)
-            feature["different_heights"] = sum(
-                heights[x] != heights[x + 1] for x in range(len(heights) - 1)
-            )
-            feature["attack"] = count_lines_clear(cleared_lines, combo, board_after_clear)
+        heights = get_heights(board_after_clear)
+        feature["max_height"] = max(heights)
+        feature["uneven"] = int(uneven_stack_est(heights))
+        feature["holes"] = check_holes2(board_after_clear)
+        feature["different_heights"] = sum(
+            heights[x] != heights[x + 1] for x in range(len(heights) - 1)
+        )
+        feature["attack"] = count_lines_clear(cleared_lines, combo, board_after_clear)
 
-            if (current_loss := loss(feature, uneven_loss, holes_punishment,  # type: ignore
-                                    height_diff_punishment, attack_bonus, max_height_punishment)) < best_loss:# type: ignore
-                best_move = f"{current_piece}_x{x}_{rotation_name}"
-                move_history = [best_move]
-                best_loss = current_loss
-                best_feature = feature
-                total_attack += feature["attack"][0]
-                total_lines += cleared_lines
-                
+        if (current_loss := loss(feature, uneven_loss, holes_punishment,  # type: ignore
+                                height_diff_punishment, attack_bonus, max_height_punishment)) < best_loss:# type: ignore
+            best_move = f"{current_piece}_x{x}_{rotation_name}"
+            move_history = [best_move]
+            best_loss = current_loss
+            best_feature = feature
+            total_attack += feature["attack"][0]
+            total_lines += cleared_lines
+            
     if config.PRINT_MODE:
         pp(best_feature)
     if config.PRINT_MODE:

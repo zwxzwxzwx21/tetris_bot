@@ -18,3 +18,13 @@ def change_rotations(rotation):
     elif rotation in rotation_map_T_180:
         return rotation_map_T_180[rotation]
     
+from spins import * 
+def simulate_kicks(board,piece,rotation,x_pos,y_pos,piece_info_array):
+    # if one position after softdrop unlocks every x pos (for example with a flat board)
+    # you can use formula 10- width of block, and if in one for loop, 10-width entries were added
+    # into piece_info_array, that means that we have a flat board and we DO NOT need to go through
+    # every single x position, just that one on the same y level
+    
+    return None
+
+
