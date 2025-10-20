@@ -1,3 +1,4 @@
+from shutil import copy
 import sys
 import os
 from time import time
@@ -62,7 +63,7 @@ def place_piece(piece, board, row, col):
             if new_board[row + dy][col + dx] == ' ':
                 if cell != ' ':
                     new_board[row + dy][col + dx] = cell
-                    print('placing piece at:', row + dy, col + dx)
+                    #print('placing piece at:', row + dy, col + dx)
                 
             elif new_board[row + dy][col + dx] != ' ' and cell == ' ':
                 continue
@@ -71,6 +72,27 @@ def place_piece(piece, board, row, col):
                 print('returning old board cuz piece cant be placed, failed at :', row + dy, col + dx)
                 return old_board
     return new_board 
+def can_place2(piece, board, row, col):
+    """
+    Places a piece on the board at the specified position.
+    doesnt modify the board, needs to use returns now
+    """
+    new_board = [row.copy() for row in board]
+    old_board = [row.copy() for row in board]
+    for dy, piece_row in enumerate(piece):
+        for dx, cell in enumerate(piece_row):
+            if new_board[row + dy][col + dx] == ' ':
+                if cell != ' ':
+                    new_board[row + dy][col + dx] = cell
+                    #print('placing piece at:', row + dy, col + dx)
+                
+            elif new_board[row + dy][col + dx] != ' ' and cell == ' ':
+                continue
+            else:
+                
+                print('returning old board cuz piece cant be placed, failed at :', row + dy, col + dx)
+                return False
+    return True 
 from utility.print_board import print_board
 from utility.pieces import *
 def sideways_movement_simulation(board,piece,rotation,x_pos,y_pos,piece_info_array):
@@ -78,39 +100,73 @@ def sideways_movement_simulation(board,piece,rotation,x_pos,y_pos,piece_info_arr
     # you can use formula 10- width of block, and if in one for loop, 10-width entries were added
     # into piece_info_array, that means that we have a flat board and we DO NOT need to go through
     # every single x position, just that one on the same y level
+    
+    from utility.pieces import PIECES
+    piece_val  = piece# like 'T' or 'L' neede dlater
     piece = PIECES[piece][rotation]
-    print(piece)
+    #print(piece)
     piece_width = len(piece[0])
-    print(piece_width)
-    expected_positions = 10 - piece_width + 1
-    print(expected_positions)
-    row = x_pos 
+    #print(piece_width)
+    row = x_pos
+    max_left,max_right = False, False
     assert -1 < row < 11 # that HAJS to be wtohng
-    while True:
+    while max_left == False:
         #tseting
         brd = [row.copy() for row in board]
-        can_move_left = can_place(piece, board, y_pos, row - 1)
+        
+        can_move_left = can_place2(piece, board, y_pos, row - 1)
         brd = place_piece(piece, brd, y_pos, row)
-        #brd2 = [row.copy() for row in board]
-        can_move_right = can_place(piece, board, y_pos, row + 1)
-        #brd2 = place_piece(piece, brd2, y_pos, row + 1)
-        print_board(brd)
+
+        #print_board(brd)
         #print("----")
-        #print_board(brd2)
-        time.sleep(3)
-        if can_move_left:
+
+        while can_move_left and -1 < row < 11:
+            can_move_left = can_place2(piece, board, y_pos, row - 1)
+            print(can_move_left, row)
             row -= 1
-            if [rotation, y_pos] not in piece_info_array:
-                piece_info_array.append([rotation, y_pos])
+            if [piece_val, rotation, row, y_pos] not in piece_info_array:
+                piece_info_array.append([piece_val, rotation, row, y_pos])
                 print(f" from position x:{row} can move to left to x:{row-1}")
-        if can_move_right:
-            row += 1
-            if [rotation, y_pos] not in piece_info_array:
-                piece_info_array.append([rotation, y_pos])
-                print(f" from position x:{row} can move to right to x:{row+1}")
-        if not can_move_left and not can_move_right:
+            brd = [row.copy() for row in board]
+            brd = place_piece(piece, brd, y_pos, row)
+
+            print_board(brd)
+            print("----")
+                
+        max_left = True
+        
+        if not can_move_left:
             break
 
+    '''while max_left == False and max_right == False:
+        #tseting
+        brd = [row.copy() for row in board]
+        
+        can_move_left = can_place(piece, board, y_pos, row - 1)
+        brd = place_piece(piece, brd, y_pos, row)
+        brd2 = [row.copy() for row in board]
+        can_move_right = can_place(piece, board, y_pos, row + 1)
+        brd2 = place_piece(piece, brd2, y_pos, row + 1)
+        print_board(brd)
+        print("----")
+        print_board(brd2)
+        
+        while can_move_left and -1 < row < 11:
+            row -= 1
+            if [piece_val, rotation, row, y_pos] not in piece_info_array:
+                piece_info_array.append([piece_val, rotation, row, y_pos])
+                print(f" from position x:{row} can move to left to x:{row-1}")
+                
+        max_left = True
+        while can_move_right and -1 < row < 11:
+            row += 1
+            if [piece_val, rotation, row, y_pos] not in piece_info_array:
+                piece_info_array.append([piece_val, rotation, row, y_pos])
+                print(f" from position x:{row} can move to right to x:{row+1}")
+        max_right = True
+        if not can_move_left and not can_move_right:
+            break'''
+    print(piece_info_array)
     return piece_info_array
     # position array is array that has:
     # [rotation,y_pos], its with a purpose to keep track of branches and not run into infinite loops

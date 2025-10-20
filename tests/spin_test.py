@@ -51,5 +51,5 @@ tspin_triple_testcase = [
 queue = ['T'] #  vro is alonje :sob: 
 from board_operations.checking_valid_placements import sideways_movement_simulation
 
-arr = sideways_movement_simulation(tspin_triple_testcase,'T','flat_0',0,15,[])
+arr = sideways_movement_simulation(tspin_triple_testcase,'T','flat_0',7,15,['T','flat_0',7,15])
 print(arr)
