@@ -50,7 +50,28 @@ tspin_triple_testcase = [
     ['x','x','x',' ',' ','x','x','x','x','x'],
     ['x','x','x',' ','x','x','x','x','x','x'],
     ]
-
+sspin_triple_testcase = [
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],  
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ','x',' ',' ',' ',' '],
+    ['x','x','x',' ','x','x','x','x','x','x'],
+    ['x','x','x',' ',' ','x','x','x','x','x'],
+    ['x','x','x','x',' ','x','x','x','x','x'],
+    ]
 queue = ['T'] #  vro is alonje :sob: 
 from board_operations.checking_valid_placements import place_piece, sideways_movement_simulation
 
@@ -58,7 +79,7 @@ from board_operations.checking_valid_placements import place_piece, sideways_mov
 #print(arr)
 from spins import SRS_rest_pieces_kick_table
 from spins_funcions import try_place_piece
-#brd,a = place_piece(PIECES["T"]['flat_0'],tspin_triple_testcase,15,3)
-#print_board(brd)
+brd,a = place_piece(PIECES["S"]['flat_0'],sspin_triple_testcase,15,3)
+print_board(brd)
 #print("a")
-try_place_piece(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',3,15],'R')
+try_place_piece(sspin_triple_testcase,SRS_rest_pieces_kick_table, ['S','flat_0',3,15],'R')
