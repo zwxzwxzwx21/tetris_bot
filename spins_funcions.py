@@ -50,7 +50,9 @@ def simulate_kicks(board,piece,rotation,x_pos,y_pos,piece_info_array):
         kick_table = SRS_rest_pieces_kick_table
     elif piece == "I":
         kick_table = SRS_I_piece_kick_table
-
+    rotation_goal = None
+    # here would we just cycle trhough rotation goals like R,2,L 
+    # if they can be placed, go on, if no, try next one
     result = try_place_piece(board,kick_table,piece_info_array,rotation_goal)
     if result is not None:
         pass # save it 
