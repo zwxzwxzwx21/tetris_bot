@@ -55,23 +55,25 @@ def place_piece(piece, board, row, col):
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
+    returns true or false if succeded or failed
     """
     new_board = [row.copy() for row in board]
     old_board = [row.copy() for row in board]
     for dy, piece_row in enumerate(piece):
         for dx, cell in enumerate(piece_row):
+            print(row + dy, col + dx, "place piece", cell, "<-")
             if new_board[row + dy][col + dx] == ' ':
                 if cell != ' ':
                     new_board[row + dy][col + dx] = cell
                     #print('placing piece at:', row + dy, col + dx)
-                
+                print_board(new_board)
             elif new_board[row + dy][col + dx] != ' ' and cell == ' ':
                 continue
             else:
                 
                 print('returning old board cuz piece cant be placed, failed at :', row + dy, col + dx)
-                return old_board
-    return new_board 
+                return old_board,False
+    return new_board ,True
 def can_place2(piece, board, row, col):
     """
     Places a piece on the board at the specified position.

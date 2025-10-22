@@ -172,49 +172,49 @@ PIECES = {
 }
 PIECES_soft_drop = { # pieces without rotations, basically 0
     'O': {
-        'flat' :
+        'flat_0' :
         [
             ['O', 'O'],
             ['O', 'O']
         ]
     },
     'I': {
-        'flat' :
+        'flat_0' :
         [
             ['I', 'I', 'I', 'I']
         ]
         
     },    
     'T': {
-        'flat': 
+        'flat_0': 
         [
             [' ', 'T', ' '],
             ['T', 'T', 'T']
         ]
     },
     'L': {
-        'flat': 
+        'flat_0': 
         [
             [' ', ' ', 'L'],
             ['L', 'L', 'L']
         ]
     },
     'J': {
-        'flat': 
+        'flat_0': 
         [
             ['J', ' ', ' '],
             ['J', 'J', 'J']
         ]
     },
     'S': {
-        'flat': 
+        'flat_0': 
         [
             [' ', 'S', 'S'],
             ['S', 'S', ' ']
         ]
     },
     'Z': {
-        'flat': 
+        'flat_0': 
         [
             ['Z', 'Z', ' '],
             [' ', 'Z', 'Z']
