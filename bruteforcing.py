@@ -92,8 +92,9 @@ def find_best_placement(board, queue, combo, stats):
             #new_board = soft_drop_simulation(piece_shape, copy.deepcopy(board), x)
             lowest_y = find_lowest_y_for_piece(piece_shape, board, x)
             piece_info_array.append([piece_shape, rotation_name, x, lowest_y]) # should be filled only with flat_0 at first
-        
+            print(piece_info_array)
         new_board = simulate_kicks(board, piece_shape, rotation_name, x, lowest_y, piece_info_array)
+        
         # ordering:
         # simulate soft drop
         # check if you can move left right

@@ -57,23 +57,28 @@ def place_piece(piece, board, row, col):
     doesnt modify the board, needs to use returns now
     returns true or false if succeded or failed
     """
+    print(f"row: {row},row len {len(board[0])-len(piece)},col: {col},col len: {len(board)-len(piece)}")
+    assert 0 <= row <= len(board[0])-len(piece) , "Row out of bounds"
+    assert 0 <= col <= len(board)- len(piece) , "Col out of bounds" # maybe error
+    
     new_board = [row.copy() for row in board]
     old_board = [row.copy() for row in board]
     for dy, piece_row in enumerate(piece):
         for dx, cell in enumerate(piece_row):
-            print(row + dy, col + dx, "place piece", cell, "<-")
-            if new_board[row + dy][col + dx] == ' ':
-                if cell != ' ':
-                    new_board[row + dy][col + dx] = cell
-                    #print('placing piece at:', row + dy, col + dx)
-                print_board(new_board)
-            elif new_board[row + dy][col + dx] != ' ' and cell == ' ':
-                continue
-            else:
-                
-                print('returning old board cuz piece cant be placed, failed at :', row + dy, col + dx)
-                return old_board,False
-    return new_board ,True
+            #if  -1 < (row + dy) > 10 and -1 < (col + dx) > 10: 
+                print(row + dy, col + dx, "place piece", cell, "<-")
+                if new_board[row + dy][col + dx] == ' ':
+                    if cell != ' ':
+                        new_board[row + dy][col + dx] = cell
+                        print('placing piece at:', row + dy, col + dx)
+                    print_board(new_board)
+                elif new_board[row + dy][col + dx] != ' ' and cell == ' ':
+                    pass # ? 
+                else:
+                    
+                    print('returning old board cuz piece cant be placed, failed at :', row + dy, col + dx)
+                    return old_board,False
+    return new_board , True
 def can_place2(piece, board, row, col):
     """
     Places a piece on the board at the specified position.
