@@ -30,7 +30,7 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 from board_operations.board_operations import clear_lines
-from board_operations.checking_valid_placements import drop_piece
+#from board_operations.checking_valid_placements import drop_piece
 from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
 from GenerateBag import add_piece_from_bag, create_bag
@@ -211,8 +211,10 @@ class TetrisGame:
                 if viewer:
                     viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
  
-                board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
-
+                #board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
+                # this has to be replaced with function like, solidify a piece rather than drop it, for more clarity
+                #so board_with_piece = solidify_piece(board_before_piece_placement, piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))
+                # then move on as normal, so far it wont work fro a bit because i have other trhings to do but when im done it would be all fixed
                 if self.slow_mode[0]:
                     if config.PRINT_MODE:
                         print_board(board_after_drop)
@@ -416,8 +418,8 @@ if __name__ == "__main__":
     game.start_signal[0] = True
 
     #game.print_mode[0] = "print" in args.rules
-    if config.PRINT_MODE:
-        logging.debug(f"using seed {seed}")
+    #if config.PRINT_MODE:
+    #    logging.debug(f"using seed {seed}")
     game.no_s_z_first_piece_signal[0] = "nosz" in args.rules
 
     game.custom_bag[0] = "custom_bag" in args.rules

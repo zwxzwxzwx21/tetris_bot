@@ -51,35 +51,34 @@ def find_lowest_y_for_piece(piece,board,col):
         return 20
     return row
 
-def place_piece(piece, board, row, col):
+def place_piece(piece, board, x, y):
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
     returns true or false if succeded or failed
     """
-    print(f"row: {row},row len {len(board[0])-len(piece)},col: {col},col len: {len(board)-len(piece)}")
-    assert 0 <= row <= len(board[0])-len(piece) , "Row out of bounds"
-    assert 0 <= col <= len(board)- len(piece) , "Col out of bounds" # maybe error
+    print(f"x: {x},x len {len(board[0])-len(piece)},y: {y},y len: {len(board)-len(piece)}")
+    assert 0 <= x <= len(board[0])-len(piece) , "x out of bounds"
+    assert 0 <= y <= len(board)- len(piece) , "y out of bounds" # maybe error
     
     new_board = [row.copy() for row in board]
     old_board = [row.copy() for row in board]
-    for dy, piece_row in enumerate(piece):
-        for dx, cell in enumerate(piece_row):
-            #if  -1 < (row + dy) > 10 and -1 < (col + dx) > 10: 
-                print(row + dy, col + dx, "place piece", cell, "<-")
-                if new_board[row + dy][col + dx] == ' ':
+    for dx, piece_row in enumerate(piece):
+        for dy, cell in enumerate(piece_row):
+                print(x + dx, y + dy, "place piece", cell, "<-")
+                if new_board[x + dx][y + dy] == ' ':
                     if cell != ' ':
-                        new_board[row + dy][col + dx] = cell
-                        print('placing piece at:', row + dy, col + dx)
+                        new_board[x + dx][y + dy] = cell
+                        print('placing piece at:', x + dx, y + dy)
                     print_board(new_board)
-                elif new_board[row + dy][col + dx] != ' ' and cell == ' ':
+                elif new_board[x + dx][y + dy] != ' ' and cell == ' ':
                     pass # ? 
                 else:
                     
-                    print('returning old board cuz piece cant be placed, failed at :', row + dy, col + dx)
+                    print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
                     return old_board,False
     return new_board , True
-def can_place2(piece, board, row, col):
+def can_place2(piece, board, x, y):
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
@@ -89,12 +88,12 @@ def can_place2(piece, board, row, col):
     piece_h = len(piece)
     piece_w = len(piece[0])
     # bounds check
-    if row < 0 or col < 0 or row + piece_h > rows or col + piece_w > cols:
+    if x < 0 or y < 0 or x + piece_h > rows or y + piece_w > cols:
         return False
     # collision check
     for dy, prow in enumerate(piece):
         for dx, cell in enumerate(prow):
-            if cell != ' ' and board[row + dy][col + dx] != ' ':
+            if cell != ' ' and board[x + dy][y + dx] != ' ':
                 return False
     return True
 from utility.print_board import print_board

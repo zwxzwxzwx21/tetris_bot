@@ -78,15 +78,16 @@ from board_operations.checking_valid_placements import place_piece, sideways_mov
 
 #arr = sideways_movement_simulation(tspin_triple_testcase,'I','spin_0',7,12,[['T','flat_0',4,15]]) # this seems to be off by one for some reason, id fix that later
 #print(arr)
+
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 from spins_funcions import try_place_piece
 print(PIECES["I"]['flat_0'])
-x,y = 0,6
+x,y = 0,0
 brd,a = place_piece(PIECES["I"]['flat_0'],tspin_triple_testcase,x,y )
 #print_board(brd)
 print("a")
 
-a=  try_place_piece(tspin_triple_testcase,SRS_I_piece_kick_table, ['I','flat_0',y,x],'R')
+a=  try_place_piece(tspin_triple_testcase,SRS_I_piece_kick_table, ['I','flat_0',x,y],'R')
 print(a)
 #from bruteforcing import find_best_placement
 #find_best_placement(tspin_triple_testcase,queue,0,{})
