@@ -4,6 +4,7 @@ import os
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utility.pieces_index import PIECES_index
 from utility.pieces import PIECES
 from utility.print_board import print_board
 tspin_double_testcase = [
@@ -81,13 +82,23 @@ from board_operations.checking_valid_placements import place_piece, sideways_mov
 
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 from spins_funcions import try_place_piece
-print(PIECES["I"]['flat_0'])
-x,y = 0,0
-brd,a = place_piece(PIECES["I"]['flat_0'],tspin_triple_testcase,x,y )
+#print(PIECES["I"]['flat_0'])
+#x,y = 0,0
+#brd,a = place_piece(PIECES["I"]['flat_0'],tspin_triple_testcase,x,y )
 #print_board(brd)
 print("a")
 
-a=  try_place_piece(tspin_triple_testcase,SRS_I_piece_kick_table, ['I','flat_0',x,y],'R')
-print(a)
+#a=  try_place_piece(tspin_triple_testcase,SRS_I_piece_kick_table, ['I','flat_0',x,y],'R')
+#print(a)
 #from bruteforcing import find_best_placement
 #find_best_placement(tspin_triple_testcase,queue,0,{})
+def testprint(piece,rotation):
+    board = [[' ' for _ in range(6)] for _ in range(6)]
+    for pos in PIECES_index[piece][rotation]:
+        print(pos)
+        board[pos[1]+2][2+pos[0]] = piece
+    print_board(board)
+testprint("Z",'flat_0')
+testprint("Z",'flat_180')
+testprint("Z",'spin_R')
+testprint("Z",'spin_L')
