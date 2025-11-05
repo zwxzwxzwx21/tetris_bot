@@ -1,8 +1,9 @@
 import copy
 from logging import config
 from pprint import pp
+import time
 from board_operations.board_operations import clear_lines
-from board_operations.checking_valid_placements import soft_drop_simulation
+from board_operations.checking_valid_placements import can_place, soft_drop_simulation
 from board_operations.stack_checking import (
     check_holes2,
     get_heights,
@@ -10,6 +11,7 @@ from board_operations.stack_checking import (
 )
 from tetrio_parsing.calculate_attack import count_lines_clear
 from utility.pieces import PIECES, PIECES_soft_drop
+from utility.pieces_index import PIECES_soft_drop_index
 
 import pandas as pd
 import os
@@ -81,19 +83,35 @@ def find_best_placement(board, queue, combo, stats):
     best_feature = feature.copy()
     best_loss = 10000
 
-    piece_info_array = []
+    arr_piece_info_array = []
 
     current_piece = queue[0]
-    assert current_piece in PIECES_soft_drop
+    assert current_piece in PIECES_soft_drop_index
     # 
-    for rotation_name, piece_shape in PIECES_soft_drop[current_piece].items():
-        max_x = 10 - len(piece_shape[0])
-        for x in range(max_x + 1):
+    for rotation_name, piece_pos_array in PIECES_soft_drop_index[current_piece].items():
+        min_x = min(dx for dx, dy in piece_pos_array)  
+        max_x = max(dx for dx, dy in piece_pos_array)  
+        piece_width = max_x - min_x + 1  
+        print("piece width:",piece_width)
+        x_offset = -min_x
+        max_start_x = 10 - piece_width
+        for start_x in range(max_start_x + 1):
+            actual_x = start_x + x_offset
             #new_board = soft_drop_simulation(piece_shape, copy.deepcopy(board), x)
-            lowest_y = find_lowest_y_for_piece(piece_shape, board, x)
-            piece_info_array.append([piece_shape, rotation_name, x, lowest_y]) # should be filled only with flat_0 at first
-            print(piece_info_array)
-        new_board = simulate_kicks(board, piece_shape, rotation_name, x, lowest_y, piece_info_array)
+            #assert abs(min(dx for dx, dy in piece_pos_array)) <= x <= len(board[0])-max(dx for dx, dy in piece_pos_array) - 1 , "x out of bounds"
+            lowest_y = find_lowest_y_for_piece(PIECES_soft_drop_index[current_piece][rotation_name], board, actual_x)
+            
+            for y in range(lowest_y, 20):
+
+                if can_place(PIECES_soft_drop_index[current_piece][rotation_name], board, y, actual_x):
+                    print("can place at x: ",start_x, " y: ",y)
+                    arr_piece_info_array.append([current_piece, rotation_name, actual_x, y])
+            #arr_piece_info_array.append([current_piece, rotation_name, dxx, lowest_y]) 
+            #print(arr_piece_info_array,len(arr_piece_info_array))
+        print("total positions to try:",len(arr_piece_info_array))
+        
+        time.sleep(2000)    
+        new_board = simulate_kicks(board, arr_piece_info_array)
         
         # ordering:
         # simulate soft drop
@@ -121,7 +139,7 @@ def find_best_placement(board, queue, combo, stats):
 
         if (current_loss := loss(feature, uneven_loss, holes_punishment,  # type: ignore
                                 height_diff_punishment, attack_bonus, max_height_punishment)) < best_loss:# type: ignore
-            best_move = f"{current_piece}_x{x}_{rotation_name}"
+            best_move = f"{current_piece}_x{start_x}_{rotation_name}"
             move_history = [best_move]
             best_loss = current_loss
             best_feature = feature

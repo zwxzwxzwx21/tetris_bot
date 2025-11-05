@@ -16,9 +16,12 @@ import threading
 import time
 import pandas as pd
 import os
+from board_operations.stack_checking import find_highest_y
 import config
 from tetrio_parsing.calculate_attack import count_lines_clear
-import itertools 
+import itertools
+
+from utility.pieces_index import PIECES_index 
 
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(
@@ -185,14 +188,10 @@ class TetrisGame:
                     logging.debug("\n=== Current Queue ===")
                     logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
-
-                
                 move_history_ = find_best_placement(
                     self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
                 )
-                
-                
-
+            
                 if not move_history_:
                     if config.PRINT_MODE:
                         logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
@@ -210,10 +209,13 @@ class TetrisGame:
 
                 if viewer:
                     viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
- 
+
                 #board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
+                
+                
                 # this has to be replaced with function like, solidify a piece rather than drop it, for more clarity
-                #so board_with_piece = solidify_piece(board_before_piece_placement, piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))
+                #board_with_piece = solidify_piece(board_before_piece_placement, piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))
+                #board_after_drop = solidify_piece(copy.deepcopy(self.board), piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))
                 # then move on as normal, so far it wont work fro a bit because i have other trhings to do but when im done it would be all fixed
                 if self.slow_mode[0]:
                     if config.PRINT_MODE:

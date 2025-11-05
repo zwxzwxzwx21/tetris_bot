@@ -15,18 +15,19 @@ def find_drop_height(board, xpos):
             return y - 1  
     return len(board) - 1 # retuns last index of board, being 19 normally 
 
-def can_place(piece, board, row, col):
+def can_place(piece, board, ypos, xpos, print_debug=False):
     """
     Checks if a piece can be placed at the given position on the board.
     """
-    for dy, piece_row in enumerate(piece):
-        for dx, cell in enumerate(piece_row):
-            if cell != ' ':
-                y, x = row + dy, col + dx
-                if y >= len(board) or x < 0 or x >= len(board[0]) or board[y][x] != ' ':
-                    return False
+    if print_debug:
+        print(f"can_place check at x:{xpos}, y:{ypos} with piece:{piece}")
+    for (dy, dx) in piece:
+        x, y = xpos + dx, ypos + dy
+        if y >= len(board) or x < 0 or x >= len(board[0]) or board[y][x] != ' ':
+            return False
+    brd,a = place_piece(piece, 'V', board, xpos, ypos)  
+    if print_debug: print_board(brd) 
     return True
-
 def soft_drop_simulation(piece, board, col):
     """
     Simulates dropping a piece in the given column and returns a new board.
@@ -51,34 +52,34 @@ def find_lowest_y_for_piece(piece,board,col):
         return 20
     return row
 
-def place_piece(piece, board, x, y):
+def place_piece(piece_pos_array, piece_type, board, x, y, print_debug=False):
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
     returns true or false if succeded or failed
     """
-    print(f"x: {x},x len {len(board[0])-len(piece)},y: {y},y len: {len(board)-len(piece)}")
-    assert 0 <= x <= len(board[0])-len(piece) , "x out of bounds"
-    assert 0 <= y <= len(board)- len(piece) , "y out of bounds" # maybe error
-    
+    if print_debug:
+        print(f"x: {x},x len {len(board[0])-len(piece_pos_array)},y: {y},y len: {len(board)-len(piece_pos_array)}")
+    assert 0 <= x <= len(board[0])-max(dx for dx, dy in piece_pos_array) - 1 , "x out of bounds"
+    assert 0 <= y <= len(board) - max(dy for dx, dy in piece_pos_array) - 1, "y out of bounds"
+
     new_board = [row.copy() for row in board]
     old_board = [row.copy() for row in board]
-    for dx, piece_row in enumerate(piece):
-        for dy, cell in enumerate(piece_row):
-                print(x + dx, y + dy, "place piece", cell, "<-")
-                if new_board[x + dx][y + dy] == ' ':
-                    if cell != ' ':
-                        new_board[x + dx][y + dy] = cell
-                        print('placing piece at:', x + dx, y + dy)
-                    print_board(new_board)
-                elif new_board[x + dx][y + dy] != ' ' and cell == ' ':
-                    pass # ? 
-                else:
-                    
-                    print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
-                    return old_board,False
+    #piece_tuple_array = PIECES_index[piece_pos_array[0]][piece_pos_array[1]]
+    for (dx,dy) in piece_pos_array:
+        if print_debug:
+            print(x + dx, y + dy, "place piece", piece_type, "<-")
+        if new_board[y + dy][x + dx] == ' ':
+                new_board[y + dy][x + dx] = piece_type
+                if print_debug:
+                    print('placing piece at:', x + dx, y + dy)
+                #print_board(new_board)
+        else:
+            if print_debug:
+                print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
+            return old_board,False
     return new_board , True
-def can_place2(piece, board, x, y):
+def can_place2(piece, board, xpos, ypos):
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
@@ -88,14 +89,14 @@ def can_place2(piece, board, x, y):
     piece_h = len(piece)
     piece_w = len(piece[0])
     # bounds check
-    if x < 0 or y < 0 or x + piece_h > rows or y + piece_w > cols:
-        return False
+    if xpos < 0 or ypos < 0 or xpos + piece_h > rows or ypos + piece_w > cols:
+        return False # ^ this can be replaces with assert
     # collision check
-    for dy, prow in enumerate(piece):
-        for dx, cell in enumerate(prow):
-            if cell != ' ' and board[x + dy][y + dx] != ' ':
+    for (dx,dy) in piece:
+            if board[xpos + dy][ypos + dx] != ' ':
                 return False
     return True
+from utility.pieces_index import PIECES_index
 from utility.print_board import print_board
 from utility.pieces import *
 def sideways_movement_simulation(board,piece,rotation,x_pos,y_pos,piece_info_array):
@@ -106,7 +107,7 @@ def sideways_movement_simulation(board,piece,rotation,x_pos,y_pos,piece_info_arr
     
     from utility.pieces import PIECES
     piece_val  = piece# like 'T' or 'L' neede dlater
-    piece = PIECES[piece][rotation]
+    piece = PIECES_index[piece][rotation]
     #print(piece)
     piece_width = len(piece[0])
     #print(piece_width)

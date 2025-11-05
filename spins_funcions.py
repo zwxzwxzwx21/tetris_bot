@@ -20,22 +20,24 @@ def change_rotations(rotation):
 from board_operations.checking_valid_placements import place_piece    
 from utility.pieces import PIECES
 from spins import SRS_I_piece_kick_table,SRS_rest_pieces_kick_table,SRS_Tpiece_180_kick_table
+from utility.pieces_index import PIECES_index
 from utility.print_board import print_board
 
 def try_place_piece(board,kick_table,info_array,rotation_goal):
+    # rename that function to ..._with_kick or sth 
     """this function tries to place a piece by using a spin, if it fails, it tries puttinga  kick offset on it
     when fails completely,returns none"""
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
     str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_180'] else 'flat_'+rotation_goal # change it to table
-    rotated_piece = PIECES[info_array[0]][str_piece_rotation_goal]
+    rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
     print(rotated_piece)
     print(str_piece_rotation_goal)
     for offset in kick_table[info_array[1][-1]+'-'+rotation_goal]:
         print(info_array[1][-1]+'-'+rotation_goal)
         print(kick_table[info_array[1][-1]+'-'+rotation_goal])
         print(offset,info_array[2] + int(offset[0]), info_array[3] + int(offset[1]))
-        board_,result = place_piece(rotated_piece,board,info_array[3] + int(offset[1]),info_array[2] + int(offset[0]))
+        board_,result = place_piece(rotated_piece,info_array[0],board,info_array[3] + int(offset[1]),info_array[2] + int(offset[0]))
         print("result:",result)
         if result:
             # returning board makes no sense, ill return position array instead

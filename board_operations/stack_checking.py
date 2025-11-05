@@ -73,3 +73,9 @@ def get_heights(board):
         else:
             heights.append(0)
     return heights
+
+def find_highest_y(board):
+    for y in range(len(board)):
+        if any(cell != ' ' for cell in board[y]):
+            return y
+    return len(board)
