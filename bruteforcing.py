@@ -11,7 +11,7 @@ from board_operations.stack_checking import (
 )
 from tetrio_parsing.calculate_attack import count_lines_clear
 from utility.pieces import PIECES, PIECES_soft_drop
-from utility.pieces_index import PIECES_soft_drop_index
+from utility.pieces_index import PIECES_index, PIECES_xpos_indexing_value, PIECES_startpos_indexing_value
 
 import pandas as pd
 import os
@@ -78,7 +78,7 @@ def find_best_placement(board, queue, combo, stats):
     }
 
     from spins_funcions import simulate_kicks
-    from board_operations.checking_valid_placements import find_lowest_y_for_piece, soft_drop_simulation
+    from board_operations.checking_valid_placements import find_lowest_y_for_piece, soft_drop_simulation,get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin,get_piece_height,get_piece_lowest_index_from_origin,get_piece_width
             
     best_feature = feature.copy()
     best_loss = 10000
@@ -86,41 +86,36 @@ def find_best_placement(board, queue, combo, stats):
     arr_piece_info_array = []
 
     current_piece = queue[0]
-    assert current_piece in PIECES_soft_drop_index
+    assert current_piece in PIECES_index
     # 
-    for rotation_name, piece_pos_array in PIECES_soft_drop_index[current_piece].items():
-        min_x = min(dx for dx, dy in piece_pos_array)  
-        max_x = max(dx for dx, dy in piece_pos_array)  
-        piece_width = max_x - min_x + 1  
+    for rotation_name, piece_pos_array in PIECES_index[current_piece].items():
+        
+        piece_width = get_piece_width(PIECES_index[current_piece][rotation_name]) 
         print("piece width:",piece_width)
-        x_offset = -min_x
-        max_start_x = 10 - piece_width
-        for start_x in range(max_start_x + 1):
-            actual_x = start_x + x_offset
-            #new_board = soft_drop_simulation(piece_shape, copy.deepcopy(board), x)
-            #assert abs(min(dx for dx, dy in piece_pos_array)) <= x <= len(board[0])-max(dx for dx, dy in piece_pos_array) - 1 , "x out of bounds"
-            lowest_y = find_lowest_y_for_piece(PIECES_soft_drop_index[current_piece][rotation_name], board, actual_x)
+        temp_array = []
+        for start_x in range(PIECES_startpos_indexing_value[current_piece][rotation_name],11-PIECES_xpos_indexing_value[current_piece][rotation_name]):
+        #for start_x in range(7,8):
+        #for start_x in range(abs(get_piece_leftmost_index_from_origin(PIECES_index[current_piece][rotation_name])), max_start_x):
+        # TODO can do sth like this ^   
             
+            lowest_y = find_lowest_y_for_piece(PIECES_index[current_piece][rotation_name], board, start_x)
+            #print("lowest y for piece at x:",start_x," is ",lowest_y)
             for y in range(lowest_y, 20):
+                print(lowest_y,"y:",y)
+                if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x):
+                    print("can place at x: ", start_x, " y: ", y)
+                    arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
+                    temp_array.append([current_piece, rotation_name, start_x, y])
+            print(f"range: {PIECES_startpos_indexing_value[current_piece][rotation_name]} to {11-PIECES_xpos_indexing_value[current_piece][rotation_name]} for piece {current_piece} rotation {rotation_name}")
+            time.sleep(0.1) 
+        print(f"added {len(temp_array)} positions for rotation {rotation_name}")    
+        time.sleep(2)  
+    print("total positions to try:",len(arr_piece_info_array))
 
-                if can_place(PIECES_soft_drop_index[current_piece][rotation_name], board, y, actual_x):
-                    print("can place at x: ",start_x, " y: ",y)
-                    arr_piece_info_array.append([current_piece, rotation_name, actual_x, y])
-            #arr_piece_info_array.append([current_piece, rotation_name, dxx, lowest_y]) 
-            #print(arr_piece_info_array,len(arr_piece_info_array))
-        print("total positions to try:",len(arr_piece_info_array))
-        
-        time.sleep(2000)    
+
+    time.sleep(2137)
+    for position_info in arr_piece_info_array:
         new_board = simulate_kicks(board, arr_piece_info_array)
-        
-        # ordering:
-        # simulate soft drop
-        # check if you can move left right
-        # if no, then you know what range of positions youwill be working on, could be 1 or entire board (10 -piece lenghth)
-        # rotate and apply kick table?
-        # go through eachj rotation and if kick table doesnt apply 3 times in row just skip rotating anymore
-
-        # almost every single kick (unsure which not but idk) can be reversed with pressing opposite direction
         if new_board is None:
             if config.PRINT_MODE:
                 print(f"GAMEOVER, score (best loss) : {best_loss} ")

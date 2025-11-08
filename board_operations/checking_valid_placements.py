@@ -15,17 +15,17 @@ def find_drop_height(board, xpos):
             return y - 1  
     return len(board) - 1 # retuns last index of board, being 19 normally 
 
-def can_place(piece, board, ypos, xpos, print_debug=False):
+def can_place(piece, board, ypos, xpos, print_debug=True):
     """
     Checks if a piece can be placed at the given position on the board.
     """
     if print_debug:
         print(f"can_place check at x:{xpos}, y:{ypos} with piece:{piece}")
-    for (dy, dx) in piece:
+    for (dx, dy) in piece:
         x, y = xpos + dx, ypos + dy
         if y >= len(board) or x < 0 or x >= len(board[0]) or board[y][x] != ' ':
             return False
-    brd,a = place_piece(piece, 'V', board, xpos, ypos)  
+    brd,a = place_piece(piece, 'V', board, xpos, ypos, print_debug=False)  
     if print_debug: print_board(brd) 
     return True
 def soft_drop_simulation(piece, board, col):
@@ -46,13 +46,15 @@ def soft_drop_simulation(piece, board, col):
 def find_lowest_y_for_piece(piece,board,col):
     board_copy = [row.copy() for row in board]
     row = 0
-    while can_place(piece, board_copy, row + 1, col):
+    while can_place(piece, board_copy, row + 1, col,print_debug=False):
         row += 1
+        if can_place(piece, board_copy, row + 1, col,print_debug=False) == False:
+            return row
     if row == 0: 
         return 20
     return row
 
-def place_piece(piece_pos_array, piece_type, board, x, y, print_debug=False):
+def place_piece(piece_pos_array, piece_type, board, x, y, print_debug=True):
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
@@ -135,3 +137,31 @@ def sideways_movement_simulation(board,piece,rotation,x_pos,y_pos,piece_info_arr
     # [rotation,y_pos], its with a purpose to keep track of branches and not run into infinite loops
     # if one of the branch will yeald a result we already got higher, we can omit that immediately
 
+def get_piece_width(piece):
+    '''returns the piece width in int'''
+    min_x = min(dx for dx, dy in piece)  
+    max_x = max(dx for dx, dy in piece)  
+    piece_width = max_x - min_x + 1  
+    return piece_width
+
+def get_piece_height(piece):   
+    '''returns the piece height in int'''
+    min_y = min(dy for dx, dy in piece)  
+    max_y = max(dy for dx, dy in piece)  
+    piece_height = max_y - min_y + 1  
+    return piece_height
+
+def get_piece_lowest_index_from_origin(piece):
+    '''this function returns the lowest Y from the origin of piece (0,0), [1,1]'''
+    min_y = max(dy for dx, dy in piece)  
+    return min_y
+
+def get_piece_leftmost_index_from_origin(piece):
+    '''this function returns the leftmost X from the origin of piece (0,0), [1,1]'''
+    min_x = min(dx for dx, dy in piece)  
+    return min_x
+
+def get_piece_rightmost_index_from_origin(piece):
+    '''this function returns the rightmost X from the origin of piece (0,0), [1,1]'''
+    max_x = max(dx for dx, dy in piece)  
+    return max_x
