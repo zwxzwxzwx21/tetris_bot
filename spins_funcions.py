@@ -30,7 +30,10 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
     str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_180'] else 'flat_'+rotation_goal # change it to table
-    rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
+    try:
+        rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
+    except KeyError:
+        rotated_piece = PIECES_index[info_array[0]][rotation_goal]
     print(rotated_piece)
     print(str_piece_rotation_goal)
     for offset in kick_table[info_array[1][-1]+'-'+rotation_goal]:
@@ -43,15 +46,18 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
             # returning board makes no sense, ill return position array instead
             print_board(board_)
             print([info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])])
-
-            return [info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])]
+            if offset == (0,0):
+                spin = False
+            else:
+                spin = True
+            return [info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])],spin
             #distinguishing spins would be easier than just making sure they work so spins dont do mpre than normal clears
             #print_board(board_)
             #return board_ # now continue on heuristic from this point
 
-    return None 
+    return None, False
 def simulate_kicks(board,piece,rotation,x_pos,y_pos,piece_info_array):
-    # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
+    # piece info array example [("T",'flat_0',x(fore xample 4),y(for example 15))]
     possible_positions_array = []
     # clockwise/counter clockwise
     if piece != "I":

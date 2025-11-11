@@ -153,12 +153,15 @@ def find_best_placement(board, queue, combo, stats):
                                 height_diff_punishment, attack_bonus, max_height_punishment)) < best_loss:# type: ignore
             #best_move = f"{current_piece}_x{start_x}_{rotation_name}"
             best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
+            best_move_y_pos = position_info[3]
             move_history = [best_move]
             best_loss = current_loss
             best_feature = feature
             total_attack += feature["attack"][0]
             total_lines += cleared_lines
             print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
+    from search_for_best_move import search_for_best_move
+    sequence_of_moves = search_for_best_move(best_move,board,best_move_y_pos) # would probably need pieces for more than one move
             
     if config.PRINT_MODE:
         pp(best_feature)

@@ -28,21 +28,33 @@ def can_place(piece, board, ypos, xpos, print_debug=True):
     brd,a = place_piece(piece, 'V', board, xpos, ypos, print_debug=False)  
     if print_debug: print_board(brd) 
     return True
-def soft_drop_simulation(piece, board, col):
+def soft_drop_simulation(piece, board, col,print_ = False):
     """
     Simulates dropping a piece in the given column and returns a new board.
     Does not modify the original board.
     """
     board_copy = [row.copy() for row in board]  # deep copy
     row = 0
-    while can_place(piece, board_copy, row + 1, col):
+    while can_place(piece, board_copy, row + 1, col,print_):
         row += 1
     if row == 0: 
         return None
-    board_copy = place_piece(piece, board_copy, row, col)
+    board_copy = place_piece(piece, board_copy, row, col,print_)
     return board_copy
  # ^  this function doenst seem to do much so id remove it at some point when im done wtih spins ^ 
-
+def soft_drop_simulation_returning_ypos(piece, board, col,print_ = False):
+    """
+    Simulates dropping a piece in the given column and returns a ypos of the piece after dropping.
+    Does not modify the original board.
+    """
+    board_copy = [row.copy() for row in board]  # deep copy
+    row = 0
+    while can_place(piece, board_copy, row + 1, col,print_):
+        row += 1
+    if row == 0: 
+        return 19
+    
+    return row
 def find_lowest_y_for_piece(piece,board,col):
     board_copy = [row.copy() for row in board]
     row = 0
@@ -101,27 +113,28 @@ def can_place2(piece, board, xpos, ypos):
 from utility.pieces_index import PIECES_index
 from utility.print_board import print_board
 from utility.pieces import *
-def sideways_movement_simulation(board,piece,rotation,x_pos,y_pos,piece_info_array):
+def sideways_movement_simulation(board, piece, rotation, x_pos, y_pos, piece_info_array):
+    '''returns array'''
     # if one position after softdrop unlocks every x pos (for example with a flat board)
     # you can use formula 10- width of block, and if in one for loop, 10-width entries were added
     # into piece_info_array, that means that we have a flat board and we DO NOT need to go through
     # every single x position, just that one on the same y level
     
-    from utility.pieces import PIECES
+    #from utility.pieces import PIECES
     piece_val  = piece# like 'T' or 'L' neede dlater
     piece = PIECES_index[piece][rotation]
     #print(piece)
-    piece_width = len(piece[0])
+    piece_width = get_piece_width(piece)
     #print(piece_width)
-
+    piece_info_arrays_array = []
     col_x = x_pos
     while col_x > 0:
         if not can_place2(piece, board, y_pos, col_x - 1):
             break
         col_x -= 1
         entry = [piece_val, rotation, col_x, y_pos]
-        if entry not in piece_info_array:
-            piece_info_array.append(entry)
+        if entry not in piece_info_arrays_array:
+            piece_info_arrays_array.append(entry)
         
     col_x = x_pos
     while col_x < 10 - piece_width:
@@ -129,10 +142,10 @@ def sideways_movement_simulation(board,piece,rotation,x_pos,y_pos,piece_info_arr
             break
         col_x += 1
         entry = [piece_val, rotation, col_x, y_pos]
-        if entry not in piece_info_array:
-            piece_info_array.append(entry)
-    print(piece_info_array)
-    return piece_info_array
+        if entry not in piece_info_arrays_array:
+            piece_info_arrays_array.append(entry)
+    print(piece_info_arrays_array)
+    return  piece_info_arrays_array
     # position array is array that has:
     # [rotation,y_pos], its with a purpose to keep track of branches and not run into infinite loops
     # if one of the branch will yeald a result we already got higher, we can omit that immediately

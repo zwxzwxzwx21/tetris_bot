@@ -3,7 +3,10 @@ import sys
 import os
 
 
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from search_for_best_move import search_for_best_move
 from board_operations.stack_checking import find_highest_y
 from bruteforcing import find_best_placement
 from utility.pieces_index import PIECES_index
@@ -100,7 +103,8 @@ o_testcase = [
     ]
 queue = ['T'] #  vro is alonje :sob: 
 
-find_best_placement(tspin_double_testcase,queue,0,{}) 
+#find_best_placement(tspin_double_testcase,queue,0,{}) 
+test = search_for_best_move("T_x7_flat_180",tspin_double_testcase,18)
 from board_operations.checking_valid_placements import can_place, find_lowest_y_for_piece, place_piece, sideways_movement_simulation, get_piece_height, get_piece_lowest_index_from_origin, get_piece_width, get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin
 
 #arr = sideways_movement_simulation(tspin_triple_testcase,'I','spin_0',7,12,[['T','flat_0',4,15]]) # this seems to be off by one for some reason, id fix that later
