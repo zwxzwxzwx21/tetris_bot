@@ -17,7 +17,7 @@ def search_for_best_move(goal,board,best_move_y_pos):
     goal_as_pos_array = [piece, rotation, x_pos, y_pos]
     print(f"piece : {piece}, x_pos: {x_pos}, rotation: {rotation}, y_pos: {y_pos}")
     sequence_of_moves = []  # array that contains moves that would reach the goal
-    rotations = ["flat_0","spin_R","flat_180","spin_L"]
+    rotations = ["flat_0","spin_R","flat_2","spin_L"]
     already_checked_positions = [] # this array is like: if we have an X position and we rotate it, if the new position is already in the array, we skip it, otherwise we could have infinite loops
     # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
     # idea for 180 spins: just replace indexes of X spin into the 180 variant of that one for exaple if you have spin_l s_piece with some indexes, just take indexes from spin_r s_piece, that should work just fine 
@@ -36,9 +36,9 @@ def search_for_best_move(goal,board,best_move_y_pos):
                     kick_table = SRS_I_piece_kick_table
                 else:
                     kick_table = SRS_rest_pieces_kick_table
-                if position_array[1] == 'flat_0' and rot_goal == 'flat_180':
+                if position_array[1] == 'flat_0' and rot_goal == 'flat_2':
                     continue # skipping 180 spins for now
-                if position_array[1] == 'flat_180' and rot_goal == 'flat_0':
+                if position_array[1] == 'flat_2' and rot_goal == 'flat_0':
                     continue # skipping 180 spins for now
                 if position_array[1] == 'spin_R' and rot_goal == 'spin_L':
                     continue # skipping 180 spins for now

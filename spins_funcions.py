@@ -29,11 +29,13 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
     when fails completely,returns none"""
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
-    str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_180'] else 'flat_'+rotation_goal # change it to table
+    str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
     try:
         rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
     except KeyError:
-        rotated_piece = PIECES_index[info_array[0]][rotation_goal]
+        rotation_goal = rotation_goal[-1]
+        str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
+        rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
     print(rotated_piece)
     print(str_piece_rotation_goal)
     for offset in kick_table[info_array[1][-1]+'-'+rotation_goal]:
@@ -76,8 +78,8 @@ def simulate_kicks(board,piece,rotation,x_pos,y_pos,piece_info_array):
     if piece == 'T':
         kick_table = SRS_Tpiece_180_kick_table 
         if piece_info_array[1] == "flat_0":
-            rotation_goal = "flat_180"
-        elif piece_info_array[1] == "flat_180":
+            rotation_goal = "flat_2"
+        elif piece_info_array[1] == "flat_2":
             rotation_goal = "flat_0"
         elif piece_info_array[1] == "spin_R":
             rotation_goal = "spin_L"
