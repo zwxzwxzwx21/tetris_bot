@@ -130,6 +130,7 @@ def find_best_placement(board, queue, combo, stats):
 
     
     for position_info in arr_piece_info_array:
+        
         #new_board = simulate_kicks(board, arr_piece_info_array)
         new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], print_debug=False)
         if not is_place_piece_successful:

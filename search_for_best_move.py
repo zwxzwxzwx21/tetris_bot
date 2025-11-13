@@ -1,12 +1,15 @@
 from board_operations.checking_valid_placements import find_lowest_y_for_piece, sideways_movement_simulation, soft_drop_simulation, place_piece, soft_drop_simulation_returning_ypos
 from spins import SRS_rest_pieces_kick_table,SRS_I_piece_kick_table
+from utility.print_board import print_board
 from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
 from spins_funcions import simulate_kicks, try_place_piece
+import time
 def search_for_best_move(goal,board,best_move_y_pos):
+    import time
     # i tihnk the best way to approach it, is to work on a board and do: board  == goal_board
     '''this function would search for the best move to reach goal on board, goal is string like 'T_x4_flat_0'
     would return move history to reach that goal'''
-    applied_kicks_counter = 3 
+    
     move_array = [] 
     goal_parts = goal.split('_') # ['T','x4','flat','0']
     
@@ -24,49 +27,88 @@ def search_for_best_move(goal,board,best_move_y_pos):
     for rot in rotations:
         
         print(f"checking rotation: {rot}")
+        #time.sleep(0.5)
         for dx in range(PIECES_startpos_indexing_value[piece][rot],11-PIECES_xpos_indexing_value[piece][rot]):
-            lowest_Y = find_lowest_y_for_piece(PIECES_index[piece][rot], board, dx)
+            lowest_Y = find_lowest_y_for_piece(PIECES_index[piece][rot], board, dx,rot,piece=piece)
             #print("lowest y ",lowest_Y) 
-            already_checked_positions.append([piece,rot,dx,lowest_Y]) 
-    for position_array in already_checked_positions:
+            already_checked_positions.append([piece,rot,dx,lowest_Y]) # apprends all the places available without tucking or spins/kicks
+    print("already cheked possition array: ","len:" , len(already_checked_positions), already_checked_positions)        
+    for position_array in already_checked_positions: # for every harddropped position, rotate it and see if we can reach new positions
+        
+        applied_kicks_counter = 3 
         board_copy = [row.copy() for row in board]
-        for rot_goal in rotations:
-            if rot_goal != position_array[1]:
-                if piece == "I":
-                    kick_table = SRS_I_piece_kick_table
-                else:
-                    kick_table = SRS_rest_pieces_kick_table
-                if position_array[1] == 'flat_0' and rot_goal == 'flat_2':
-                    continue # skipping 180 spins for now
-                if position_array[1] == 'flat_2' and rot_goal == 'flat_0':
-                    continue # skipping 180 spins for now
-                if position_array[1] == 'spin_R' and rot_goal == 'spin_L':
-                    continue # skipping 180 spins for now
-                if position_array[1] == 'spin_L' and rot_goal == 'spin_R':
-                    continue # skipping 180 spins for now
-                print(f"trying to rotate piece {piece} from {position_array[1]} to {rot_goal} at x:{position_array[2]} y:{position_array[3]}")
-        while applied_kicks_counter > 0:        
+        print("copying board for position array:",position_array)
+        #print_board(board_copy)
+        #time.sleep(0.5)
+        print("selecting kick table")
+        #time.sleep(0.5)
+        if piece == "I":
+            kick_table = SRS_I_piece_kick_table
+        else:
+            kick_table = SRS_rest_pieces_kick_table
+        
+            
+        while applied_kicks_counter > 0:   
+                    for rot_goal in rotations: # trying to rotate to every possible rotation
+                        print("entering while loop for kicks, kicks left:",applied_kicks_counter)     
+                        
+                        print(f"kicks left to apply: {applied_kicks_counter}")
+                        print("try piece place vals: ", rot_goal, position_array)
+                        #time.sleep(0.5)
+                        new_ypos = None
+
+                        if rot_goal != position_array[1]: # rotation isnt the same as current one
+                            
+                            if position_array[1] == 'flat_0' and rot_goal == 'flat_2':
+                                print("skipping 180 spin from flat_0 to flat_2")
+                                continue # skipping 180 spins for now
+                            if position_array[1] == 'flat_2' and rot_goal == 'flat_0':
+                                print("skipping 180 spin from flat_2 to flat_0")
+                                continue # skipping 180 spins for now
+                            if position_array[1] == 'spin_R' and rot_goal == 'spin_L':
+                                print("skipping 180 spin from spin_R to spin_L")
+                                continue # skipping 180 spins for now
+                            if position_array[1] == 'spin_L' and rot_goal == 'spin_R':
+                                print("skipping 180 spin from spin_L to spin_R")
+                                continue # skipping 180 spins for now
+                            print(f"trying to rotate piece {piece} from {position_array[1]} to {rot_goal} at x:{position_array[2]} y:{position_array[3]}")
+                        else: continue # rotation is the same as current one, no need to try it
+                        position_array, spin = try_place_piece(board_copy,kick_table,position_array,rot_goal) 
+                        print("position after rotation attempt:",position_array)   
+                        if position_array is not None and position_array not in sequence_of_moves:
+                            sequence_of_moves.append(position_array)
+                            if position_array == goal_as_pos_array:
+                                print(f"goal found! {position_array}")
+                                return sequence_of_moves
+                        elif position_array is None: # failed to place with kicks/ checking for softdrops
+                            new_ypos = soft_drop_simulation_returning_ypos(piece,board_copy,position_array[2],)
+                        '''if new_ypos is None: # piece is completely stuck
+                            continue'''
+                        if new_ypos is not None: # softdrop is possible
+                            position_array[3] = new_ypos
+                            sequence_of_moves.append(position_array)
+                            if position_array == goal_as_pos_array:
+                                print(f"goal found! {position_array}")
+                                return sequence_of_moves
+                            print(f"after soft drop new ypos is {new_ypos}")
+                            new_positions_from_y_change_arrays = sideways_movement_simulation(board_copy,piece,position_array[1],position_array[2],new_ypos,position_array)
+                            for new_position in new_positions_from_y_change_arrays and new_position not in sequence_of_moves:
+                                if new_position not in sequence_of_moves: # can replace with sets to remove tihngs liek taht 
+                                    sequence_of_moves.append(new_position)
+                                    if position_array == goal_as_pos_array:
+                                        print(f"goal found! {position_array}")
+                                        return sequence_of_moves
+                                    print(new_position, " is not in ", sequence_of_moves," adding it now")
+                        # can fail in abscard cases when the piece is moved 3 times without kicking (soft drop and X movements only) 
+                        print(f"was spin successful: {spin}")
+                        if spin == False: 
+                            applied_kicks_counter -= 1 
+                            if applied_kicks_counter < 0:
+                                break
+                        elif spin == True:
+                            applied_kicks_counter = 3
+                        print(applied_kicks_counter," kicks left| ",len(sequence_of_moves)," positions found so far, sequence of moves ", sequence_of_moves)
                     
-            pos_array_after_rotation, spin = try_place_piece(board_copy,kick_table,position_array,rot_goal)    
-            if pos_array_after_rotation is not None:
-                sequence_of_moves.append(pos_array_after_rotation)
-            elif pos_array_after_rotation is None:
-                new_ypos = soft_drop_simulation_returning_ypos(piece,board_copy,position_array[2],print_=True)
-            if new_ypos is None: 
-                continue
-            elif new_ypos is not None:
-                pos_array_after_rotation[3] = new_ypos
-                sequence_of_moves.append(pos_array_after_rotation)
-                print(f"after soft drop new ypos is {new_ypos}")
-                new_positions_from_y_change_arrays = sideways_movement_simulation(board_copy,piece,pos_array_after_rotation[1],pos_array_after_rotation[2],new_ypos,pos_array_after_rotation)
-                for new_position in new_positions_from_y_change_arrays and new_position not in sequence_of_moves:
-                    if new_position not in sequence_of_moves: # can replace with sets to remove tihngs liek taht 
-                        sequence_of_moves.append(new_position)
-            # can fail in abscard cases when the piece is moved 3 times without kicking (soft drop and X movements only) 
-            if spin == False: 
-                applied_kicks_counter -= 1 
-            elif spin == True:
-                applied_kicks_counter = 3
     # checking new positions using kicks
     # im feeling like omitting tucking pieces for now to save on calculations, can add it later
 

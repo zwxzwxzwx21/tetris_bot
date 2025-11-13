@@ -29,24 +29,33 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
     when fails completely,returns none"""
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
-    str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
+    #str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
+    print("info array:",info_array, "rotation goal", rotation_goal)
+    rotation_goal_backup = rotation_goal
     try:
-        rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
+        rotated_piece = PIECES_index[info_array[0]][rotation_goal]
     except KeyError:
         rotation_goal = rotation_goal[-1]
         str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
         rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
     print(rotated_piece)
-    print(str_piece_rotation_goal)
+    str_piece_rotation_goal = rotation_goal
+    #print(str_piece_rotation_goal)
+    rotation_goal = rotation_goal[-1]
     for offset in kick_table[info_array[1][-1]+'-'+rotation_goal]:
         print(info_array[1][-1]+'-'+rotation_goal)
         print(kick_table[info_array[1][-1]+'-'+rotation_goal])
         print(offset,info_array[2] + int(offset[0]), info_array[3] + int(offset[1]))
-        board_,result = place_piece(rotated_piece,info_array[0],board,info_array[3] + int(offset[1]),info_array[2] + int(offset[0]))
-        print("result:",result)
+        if len(rotation_goal) == 1:
+            board_,result = place_piece(rotated_piece,info_array[0],board,info_array[2] + int(offset[0]),info_array[3] + int(offset[1]),rotation_goal_backup)
+        else:
+            board_,result = place_piece(rotated_piece,info_array[0],board,info_array[2] + int(offset[0]),info_array[3] + int(offset[1]),rotation_goal)
+        
+        print("result(places piece):",result)
+        #print_board(board_)
         if result:
             # returning board makes no sense, ill return position array instead
-            print_board(board_)
+            print("offset ", offset)
             print([info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])])
             if offset == (0,0):
                 spin = False
@@ -54,7 +63,7 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
                 spin = True
             return [info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])],spin
             #distinguishing spins would be easier than just making sure they work so spins dont do mpre than normal clears
-            #print_board(board_)
+            
             #return board_ # now continue on heuristic from this point
 
     return None, False
