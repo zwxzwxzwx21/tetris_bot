@@ -6,6 +6,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from board_operations.checking_valid_placements import place_piece
 from search_for_best_move import search_for_best_move
 from board_operations.stack_checking import find_highest_y
 from bruteforcing import find_best_placement
@@ -102,15 +103,20 @@ o_testcase = [
     [' ',' ','x',' ',' ','x',' ',' ',' ','x'],
     ]
 queue = ['T'] #  vro is alonje :sob: 
-
+from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 #find_best_placement(tspin_double_testcase,queue,0,{}) 
-#test = search_for_best_move("T_x3_spin_R",tspin_triple_testcase,18)
-
+#test = search_for_best_move("T_x4_flat_0",tspin_triple_testcase,16)
+from spins_funcions import try_place_piece
+#test,a = try_place_piece(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',4,16],'spin_R')
+#place_piece_test = place_piece(PIECES_index["T"]['spin_R'],test[0],tspin_triple_testcase,test[2],test[3],test[1] )
+#print_board(place_piece_test[0])
 from board_operations.checking_valid_placements import can_place, find_lowest_y_for_piece, place_piece, sideways_movement_simulation, get_piece_height, get_piece_lowest_index_from_origin, get_piece_width, get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin
-#place_piece_test = place_piece(PIECES_index["T"]['flat_0'],"T",tspin_triple_testcase,5,16,"flat_0" )
+#place_piece_test = place_piece(PIECES_index["T"]['spin_R'],"T",tspin_triple_testcase,3,18,"spin_R" )
 #print("place piece test result:\n",place_piece_test)
-test = sideways_movement_simulation(tspin_triple_testcase,'T','flat_0',6,16,[['T','flat_0',6,16]])
-print("sideways movement simulation test result:",test)
+#test = sideways_movement_simulation(tspin_triple_testcase,'T','flat_0',6,16,[['T','flat_0',6,16]])
+#print("sideways movement simulation test result:",test)
+import time
+time.sleep(2)
 #arr = sideways_movement_simulation(tspin_triple_testcase,'I','spin_0',7,12,[['T','flat_0',4,15]]) # this seems to be off by one for some reason, id fix that later
 #print(arr)
 
@@ -122,9 +128,15 @@ from spins_funcions import try_place_piece
 ##print_board(brd)
 
 
-#a=  try_place_piece(tspin_triple_testcase,SRS_I_piece_kick_table, ['I','flat_0',x,y],'R')
-#print(a)
-#from bruteforcing import find_best_placement
+a=  try_place_piece(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',4,16],'spin_L')
+print(a)
+'''place_piece_test = place_piece(PIECES_index["T"]['flat_0'],"T",tspin_triple_testcase,4,16,"flat_0" )
+print(place_piece_test)
+print_board(place_piece_test[0])
+place_piece_test2 = place_piece(PIECES_index["T"]['spin_R'],"T",tspin_triple_testcase,3,18,"spin_R" )
+print(place_piece_test2)
+print_board(place_piece_test2[0])
+'''#from bruteforcing import find_best_placement
 #find_best_placement(tspin_triple_testcase,queue,0,{})
 def testprint(piece,rotation):
     board = [[' ' for _ in range(6)] for _ in range(6)]
