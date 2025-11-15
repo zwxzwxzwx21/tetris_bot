@@ -89,20 +89,20 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
         if print_debug:
             print(x + dx, y + dy, "place piece", piece, "<-")
         #if  (x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20): 
-        try:
-            if new_board[y + dy][x + dx] == ' ' and x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20:
-                    new_board[y + dy][x + dx] = piece
-                    if print_debug:
-                        print('placing piece at:', x + dx, y + dy)
-                    #print_board(new_board)
-            else:
+        
+        if new_board[y + dy][x + dx] == ' ' and x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20:
+                new_board[y + dy][x + dx] = piece
                 if print_debug:
-                    print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
-                return old_board,False
-        except IndexError:
+                    print('placing piece at:', x + dx, y + dy)
+                #print_board(new_board)
+        else:
             if print_debug:
-                print(f"IndexError at pos x:{x + dx} y:{y + dy}, out of bounds, returning old board")
+                print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
             return old_board,False
+    
+        if print_debug:
+            print(f"IndexError at pos x:{x + dx} y:{y + dy}, out of bounds, returning old board")
+        return old_board,False
     return new_board , True
 def can_place2(piece, board, xpos, ypos,side):
     """

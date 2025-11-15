@@ -67,7 +67,7 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
             
             #return board_ # now continue on heuristic from this point
 
-    return None, False
+    return info_array, False
 def simulate_kicks(board,piece,rotation,x_pos,y_pos,piece_info_array):
     # piece info array example [("T",'flat_0',x(fore xample 4),y(for example 15))]
     possible_positions_array = []
