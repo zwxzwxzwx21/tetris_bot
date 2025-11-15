@@ -66,26 +66,29 @@ def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
     if row == 0: 
         return 20
     return row
-from utility.pieces_index import PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
+from utility.pieces_index import PIECES_lowest_point_from_origin, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
 def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True):
+    print_board(board
+                )
+    import time
+    #time.sleep(0.1)
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
     returns true or false if succeded or failed
     """
-    if print_debug:
-        print(f"x: {x},x len {len(board[0])-len(piece_index_array)},y: {y},y len: {len(board)-len(piece_index_array)}")
-        print("piece width:", get_piece_width(piece_index_array), "piece height:", get_piece_height(piece_index_array))
+   
     if PIECES_startpos_indexing_value[piece][rotation] > x or x > len(board[0])-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation]):
         print(f"x out of bounds {x} max available:{len(board[0])-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation])}")
         return board,False
-    if 0 > y or y > len(board) - get_piece_height(piece_index_array)+1:
+    if 0 > y or y > len(board) - PIECES_lowest_point_from_origin[piece][rotation]:
         print(f"y out of bounds {y} max available:{len(board)-get_piece_height(piece_index_array)+1}")
         return board,False
     new_board = [row.copy() for row in board]
     old_board = [row.copy() for row in board]
     #piece_tuple_array = PIECES_index[piece_pos_array[0]][piece_pos_array[1]]
     for (dx,dy) in piece_index_array:
+        print(f"all offsets = {piece_index_array} current offset dx:{dx} dy:{dy}")
         if print_debug:
             print(x + dx, y + dy, "place piece", piece, "<-")
         #if  (x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20): 
@@ -94,15 +97,13 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
                 new_board[y + dy][x + dx] = piece
                 if print_debug:
                     print('placing piece at:', x + dx, y + dy)
-                #print_board(new_board)
+                print_board(new_board)
         else:
             if print_debug:
                 print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
             return old_board,False
     
-        if print_debug:
-            print(f"IndexError at pos x:{x + dx} y:{y + dy}, out of bounds, returning old board")
-        return old_board,False
+       
     return new_board , True
 def can_place2(piece, board, xpos, ypos,side):
     """

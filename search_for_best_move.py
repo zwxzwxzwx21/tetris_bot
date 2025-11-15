@@ -47,7 +47,7 @@ def search_for_best_move(goal, board, best_move_y_pos):
         
         applied_kicks_counter = 3
         board_copy = [row.copy() for row in board]
-        print(position_array,  goal_as_pos_array)
+        #print(position_array,  goal_as_pos_array)
         if position_array == goal_as_pos_array:
             print(f"goal found!! {position_array}")
             return reconstruct_path(came_from, position_array_tuple)
@@ -77,13 +77,15 @@ def search_for_best_move(goal, board, best_move_y_pos):
                         continue  # skipping 180 spins for now
                     if position_array[1] == 'spin_L' and rot_goal == 'spin_R':
                         continue  # skipping 180 spins for now
-                    print(f"trying to rotate piece {piece} from {position_array[1]} to {rot_goal} at x:{position_array[2]} y:{position_array[3]}")
+                    #print(f"trying to rotate piece {piece} from {position_array[1]} to {rot_goal} at x:{position_array[2]} y:{position_array[3]}")
                 else:
                     continue  # rotation is the same as current one, no need to try it
 
                 #arg_position_array = position_array.copy()
                 #print("position before rotation attempt:", position_array)
-                position_array, spin = try_place_piece(board_copy, kick_table, position_array, rot_goal)
+                if position_array == ['T', 'flat_0', 4, 16]:
+                    print("rot goal" ,rot_goal)
+                    position_array, spin = try_place_piece(board_copy, kick_table, position_array, rot_goal)
                 #print("position after rotation attempt:", position_array)
 
                 if position_array is not None and tuple(position_array) not in visited_positions:
@@ -116,7 +118,7 @@ def search_for_best_move(goal, board, best_move_y_pos):
                 
                     if tuple(new_position) not in visited_positions:  # can replace with sets to remove tihngs liek taht
                         queue_of_positions.append(new_position)
-                        print("found new positions from sideways movement simulation:", new_positions_from_sidewways_movement_arrays)
+                        #print("found new positions from sideways movement simulation:", new_positions_from_sidewways_movement_arrays)
                         '''if new_position == goal_as_pos_array:
                             print(f"goal found! {position_array}")
                             
@@ -125,12 +127,14 @@ def search_for_best_move(goal, board, best_move_y_pos):
 
                 # can fail in abscard cases when the piece is moved 3 times without kicking (soft drop and X movements only)
                 #print(f"was spin successful: {spin}")
-                if spin == False:
+                '''if spin == False:
                     applied_kicks_counter -= 1
                     if applied_kicks_counter < 0:
                         break
                 elif spin == True:
-                    applied_kicks_counter = 3
+                    applied_kicks_counter = 3'''
+
+                applied_kicks_counter -= 1
                 # print(applied_kicks_counter," kicks left| ",len(sequence_of_moves)," positions found so far, sequence of moves ", sequence_of_moves)
 
         

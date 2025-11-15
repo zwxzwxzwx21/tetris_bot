@@ -43,7 +43,7 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
     #print(str_piece_rotation_goal)
     rotation_goal = rotation_goal[-1]
     for offset in kick_table[info_array[1][-1]+'-'+rotation_goal]:
-        print("trying offset:",offset)
+        #print("trying offset:",offset)
         #print(info_array[1][-1]+'-'+rotation_goal)
         #print(kick_table[info_array[1][-1]+'-'+rotation_goal])
         #print(offset,info_array[2] + int(offset[0]), info_array[3] + int(offset[1]))
