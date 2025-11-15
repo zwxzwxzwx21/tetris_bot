@@ -88,31 +88,51 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=Fals
     for (dx,dy) in piece_index_array:
         if print_debug:
             print(x + dx, y + dy, "place piece", piece, "<-")
-        if new_board[y + dy][x + dx] == ' ' and x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20:
-                new_board[y + dy][x + dx] = piece
-                if print_debug:
-                    print('placing piece at:', x + dx, y + dy)
-                #print_board(new_board)
+        if  (x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20):   
+            if new_board[y + dy][x + dx] == ' ' and x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20:
+                    new_board[y + dy][x + dx] = piece
+                    if print_debug:
+                        print('placing piece at:', x + dx, y + dy)
+                    #print_board(new_board)
         else:
             if print_debug:
                 print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
             return old_board,False
     return new_board , True
-def can_place2(piece, board, xpos, ypos):
+def can_place2(piece, board, xpos, ypos,side):
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
     """
     rows = len(board)
     cols = len(board[0])
-    piece_h = len(piece)
-    piece_w = len(piece[0])
+    piece_leftmost_index = get_piece_leftmost_index_from_origin(piece)
+    piece_rightmost_index = get_piece_rightmost_index_from_origin(piece)
+    piece_h = get_piece_height(piece)
+    piece_w = get_piece_width(piece)
+    print("piece width:", piece_w, "piece height:", piece_h)
     # bounds check
-    if xpos < 0 or ypos < 0 or xpos + piece_h > rows or ypos + piece_w > cols:
-        return False # ^ this can be replaces with assert
-    # collision check
+    print("checksing bounds:", xpos, ypos, xpos + piece_h, ypos + piece_w, rows, cols)
+    print(f" {xpos} + {piece_leftmost_index} < 0 or {ypos} < 0 or {xpos} + {piece_rightmost_index} > {cols}")
+
+    print("checking side: ", side)
+    '''if side == "to_left":
+        if xpos+piece_leftmost_index < 0 or ypos < 0 or xpos + piece_rightmost_index > cols or ypos + piece_h > rows:
+            print("out of bounds check failed")
+            return False # ^ this can be replaces with assert'''
+        # collision 
+    '''elif side == "to_right":
+        if xpos+piece_rightmost_index > cols or ypos < 0 or xpos + piece_leftmost_index < 0 or ypos + piece_h > rows:
+            print("out of bounds check failed")
+            return False # ^ this can be replaces with assert'''
     for (dx,dy) in piece:
-            if board[xpos + dy][ypos + dx] != ' ':
+            print("checking board pos:", f"x: {xpos} + {dx}", f"y: {ypos} + {dy}")
+            try:
+                if board[ypos + dy][xpos + dx] != ' ':
+                    print(f"values at pos x:{xpos + dx} y:{ypos + dy} is occupied by {board[ypos + dy][xpos + dx]}")
+                    return False
+            except IndexError:
+                print(f"IndexError at pos x:{xpos + dx} y:{ypos + dy}, out of bounds")
                 return False
     return True
 from utility.pieces_index import PIECES_index
@@ -133,8 +153,9 @@ def sideways_movement_simulation(board, piece, rotation, x_pos, y_pos, piece_inf
     #print(piece_width)
     piece_info_arrays_array = []
     col_x = x_pos
-    while col_x > 0:
-        if not can_place2(piece_index_array, board, col_x - 1,y_pos):
+    while col_x + get_piece_leftmost_index_from_origin(piece_index_array) > 0:
+        side = "to_left"
+        if not can_place2(piece_index_array, board, col_x - 1,y_pos, side):
             break
         col_x -= 1
         entry = [piece_val, rotation, col_x, y_pos]
@@ -142,8 +163,9 @@ def sideways_movement_simulation(board, piece, rotation, x_pos, y_pos, piece_inf
             piece_info_arrays_array.append(entry)
         
     col_x = x_pos
-    while col_x < 10 - piece_width:
-        if not can_place2(piece_index_array, board, col_x + 1, y_pos):
+    while col_x < 10 - get_piece_rightmost_index_from_origin(piece_index_array):
+        side = "to_right"
+        if not can_place2(piece_index_array, board, col_x + 1, y_pos, side):
             break
         col_x += 1
         entry = [piece_val, rotation, col_x, y_pos]

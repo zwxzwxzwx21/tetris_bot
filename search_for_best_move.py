@@ -10,7 +10,7 @@ def search_for_best_move(goal,board,best_move_y_pos):
     '''this function would search for the best move to reach goal on board, goal is string like 'T_x4_flat_0'
     would return move history to reach that goal'''
     
-    move_array = [] 
+    domino_chain_of_moves = [] # movve on index 0 leads to move on index 1  
     goal_parts = goal.split('_') # ['T','x4','flat','0']
     
     piece = goal_parts[0]
@@ -73,21 +73,37 @@ def search_for_best_move(goal,board,best_move_y_pos):
                                 continue # skipping 180 spins for now
                             print(f"trying to rotate piece {piece} from {position_array[1]} to {rot_goal} at x:{position_array[2]} y:{position_array[3]}")
                         else: continue # rotation is the same as current one, no need to try it
+                        
+                        arg_position_array = position_array.copy() 
                         position_array, spin = try_place_piece(board_copy,kick_table,position_array,rot_goal) 
+                        domino = (tuple(arg_position_array), tuple(position_array))
+                        if position_array is not None and domino not in domino_chain_of_moves:
+                            domino_chain_of_moves.append(domino)
+                            time.sleep(0)
                         print("position after rotation attempt:",position_array)   
                         if position_array is not None and position_array not in sequence_of_moves:
                             sequence_of_moves.append(position_array)
                             if position_array == goal_as_pos_array:
                                 print(f"goal found! {position_array}")
+                                print(domino_chain_of_moves)
                                 return sequence_of_moves
                         elif position_array is None: # failed to place with kicks/ checking for softdrops
                             new_ypos = soft_drop_simulation_returning_ypos(piece,board_copy,position_array[2],)
                         '''if new_ypos is None: # piece is completely stuck
                             continue'''
                         if new_ypos is not None: # softdrop is possible
+                            arg_position_array_softdrop = position_array.copy()
                             position_array[3] = new_ypos
+
+                            domino_softdrop = (tuple(arg_position_array_softdrop), tuple(position_array))
+                            if domino_softdrop not in domino_chain_of_moves:
+                                domino_chain_of_moves.append(domino_softdrop)
+                                time.sleep(1)
+
                             sequence_of_moves.append(position_array)
                             if position_array == goal_as_pos_array:
+                                print(position_array)
+                                time.sleep(1)
                                 print(f"goal found! {position_array}")
                                 return sequence_of_moves
                             print(f"after soft drop new ypos is {new_ypos}")
@@ -95,8 +111,13 @@ def search_for_best_move(goal,board,best_move_y_pos):
                             for new_position in new_positions_from_y_change_arrays and new_position not in sequence_of_moves:
                                 if new_position not in sequence_of_moves: # can replace with sets to remove tihngs liek taht 
                                     sequence_of_moves.append(new_position)
+                                    domino_sideways = (tuple(position_array), tuple(new_position))
+                                    if domino_sideways not in domino_chain_of_moves:
+                                        domino_chain_of_moves.append(domino_sideways)
+                                        time.sleep(1)
                                     if position_array == goal_as_pos_array:
                                         print(f"goal found! {position_array}")
+                                        
                                         return sequence_of_moves
                                     print(new_position, " is not in ", sequence_of_moves," adding it now")
                         # can fail in abscard cases when the piece is moved 3 times without kicking (soft drop and X movements only) 
@@ -107,8 +128,9 @@ def search_for_best_move(goal,board,best_move_y_pos):
                                 break
                         elif spin == True:
                             applied_kicks_counter = 3
-                        print(applied_kicks_counter," kicks left| ",len(sequence_of_moves)," positions found so far, sequence of moves ", sequence_of_moves)
-                    
+                        #print(applied_kicks_counter," kicks left| ",len(sequence_of_moves)," positions found so far, sequence of moves ", sequence_of_moves)
+        for domino in domino_chain_of_moves:
+            print(f"move {domino[0]} leads to {domino[1]}")
     # checking new positions using kicks
     # im feeling like omitting tucking pieces for now to save on calculations, can add it later
 

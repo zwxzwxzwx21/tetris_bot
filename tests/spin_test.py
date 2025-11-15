@@ -30,7 +30,7 @@ tspin_double_testcase = [
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
-    [' ',' ',' ','x',' ','x','x',' ',' ','x'],
+    ['x','x','x','x','x','x','x',' ',' ','x'],
     ['x','x','x','x','x','x',' ',' ',' ','x'],
     ['x','x','x','x','x','x','x',' ','x','x'],
     ]
@@ -104,9 +104,13 @@ o_testcase = [
 queue = ['T'] #  vro is alonje :sob: 
 
 #find_best_placement(tspin_double_testcase,queue,0,{}) 
-test = search_for_best_move("T_x7_flat_2",tspin_double_testcase,18)
-from board_operations.checking_valid_placements import can_place, find_lowest_y_for_piece, place_piece, sideways_movement_simulation, get_piece_height, get_piece_lowest_index_from_origin, get_piece_width, get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin
+#test = search_for_best_move("T_x3_spin_R",tspin_triple_testcase,18)
 
+from board_operations.checking_valid_placements import can_place, find_lowest_y_for_piece, place_piece, sideways_movement_simulation, get_piece_height, get_piece_lowest_index_from_origin, get_piece_width, get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin
+#place_piece_test = place_piece(PIECES_index["T"]['flat_0'],"T",tspin_triple_testcase,5,16,"flat_0" )
+#print("place piece test result:\n",place_piece_test)
+test = sideways_movement_simulation(tspin_triple_testcase,'T','flat_0',6,16,[['T','flat_0',6,16]])
+print("sideways movement simulation test result:",test)
 #arr = sideways_movement_simulation(tspin_triple_testcase,'I','spin_0',7,12,[['T','flat_0',4,15]]) # this seems to be off by one for some reason, id fix that later
 #print(arr)
 
