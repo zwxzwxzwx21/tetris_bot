@@ -76,8 +76,8 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
     doesnt modify the board, needs to use returns now
     returns true or false if succeded or failed
     """
-   
-    if PIECES_startpos_indexing_value[piece][rotation] > x or x > len(board[0])-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation]):
+    
+    if PIECES_startpos_indexing_value[piece][rotation] > x or x > len(board[0])-1-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation]):
         print(f"x out of bounds {x} max available:{len(board[0])-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation])}")
         return board,False
     if 0 > y or y > len(board) - PIECES_lowest_point_from_origin[piece][rotation]:

@@ -92,11 +92,15 @@ def search_for_best_move(goal, board, best_move_y_pos):
 
                 #arg_position_array = position_array.copy()
                 #print("position before rotation attempt:", position_array)
-                if position_array == ['T', 'flat_0', 4, 16]:
-                    print("rot goal" ,rot_goal)
-                    position_array, spin = try_place_piece(board_copy, kick_table, position_array.copy(), rot_goal)
-                    print("result after try place piece:", position_array, spin)
-                    print(goal_as_pos_array)
+                if position_array == ['T', 'flat_0', 4, 16]:   
+                    print("a")     
+                    time.sleep(21)
+
+                print("rot goal" ,rot_goal)
+                position_array, spin = try_place_piece(board_copy, kick_table, position_array.copy(), rot_goal)
+                print("result after try place piece:", position_array, spin)
+
+                print(goal_as_pos_array)
                 #print("position after rotation attempt:", position_array)
 
                 if position_array is not None and tuple(position_array) not in visited_positions:
