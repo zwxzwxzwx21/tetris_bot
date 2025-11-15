@@ -17,12 +17,12 @@ def search_for_best_move(goal, board, best_move_y_pos):
     x_pos = int(goal_parts[1][1:])
     rotation = goal_parts[2] + '_' + goal_parts[3]  # flat_0
     y_pos = best_move_y_pos
+    came_from = {}
     goal_as_pos_array = [piece, rotation, x_pos, y_pos]
     #print(f"piece : {piece}, x_pos: {x_pos}, rotation: {rotation}, y_pos: {y_pos}")
 
     rotations = ["flat_0", "spin_R", "flat_2", "spin_L"]
     queue_of_positions = deque()  # this array is like: if we have an X position and we rotate it, if the new position is already in the array, we skip it, otherwise we could have infinite loops
-    came_from = {tuple(position): (None, "harddrop") for position in queue_of_positions} # to reconstruct path later if needed    
     
     # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
     # idea for 180 spins: just replace indexes of X spin into the 180 variant of that one for exaple if you have spin_l s_piece with some indexes, just take indexes from spin_r s_piece, that should work just fine
@@ -32,26 +32,35 @@ def search_for_best_move(goal, board, best_move_y_pos):
         for dx in range(PIECES_startpos_indexing_value[piece][rot], 11 - PIECES_xpos_indexing_value[piece][rot]):
             lowest_Y = find_lowest_y_for_piece(PIECES_index[piece][rot], board, dx, rot, piece=piece)
             # print("lowest y ",lowest_Y)
-            came_from[tuple([piece, rot, dx, lowest_Y])] = (None, "harddrop")
-            queue_of_positions.append([piece, rot, dx, lowest_Y])  # apprends all the places available without tucking or spins/kicks
+            start_pos = [piece, rot, dx, lowest_Y]
+            queue_of_positions.append(start_pos )  # apprends all the places available without tucking or spins/kicks
+            came_from[tuple(start_pos)] = (None, "harddrop")  # lub inny etykietujący tekst
     visited_positions = set()  # to avoid processing the same position multiple times
     
     #print("already cheked possition array: ", "len:", len(queue_of_positions), queue_of_positions)
     
     while queue_of_positions:  # for every harddropped position, rotate it and see if we can reach new positions
+        #came_from[tuple([piece, rot, dx, lowest_Y])] = (None, "harddrop")
         position_array = queue_of_positions.popleft()
-        position_array_tuple = tuple(position_array)
+        position_array_tuple = tuple(position_array.copy())
+        new_pos = position_array.copy()
         if position_array_tuple in visited_positions:
             continue
         visited_positions.add(position_array_tuple)
-        
+        #a = set(queue_of_positions[0])
+        #b = set(visited_positions)
+        #c = a.difference(b)
+        #print(c)
         applied_kicks_counter = 3
         board_copy = [row.copy() for row in board]
         #print(position_array,  goal_as_pos_array)
+        #print("checking position array:", visited_positions)
         if position_array == goal_as_pos_array:
             print(f"goal found!! {position_array}")
             return reconstruct_path(came_from, position_array_tuple)
-
+        if new_pos == goal_as_pos_array:
+            print(f"goal found!! {position_array}")
+            return reconstruct_path(came_from, position_array_tuple)
         #print("copying board for position array:", position_array)
         # print_board(board_copy)
         # time.sleep(0.5)
@@ -85,12 +94,16 @@ def search_for_best_move(goal, board, best_move_y_pos):
                 #print("position before rotation attempt:", position_array)
                 if position_array == ['T', 'flat_0', 4, 16]:
                     print("rot goal" ,rot_goal)
-                    position_array, spin = try_place_piece(board_copy, kick_table, position_array, rot_goal)
+                    position_array, spin = try_place_piece(board_copy, kick_table, position_array.copy(), rot_goal)
+                    print("result after try place piece:", position_array, spin)
+                    print(goal_as_pos_array)
                 #print("position after rotation attempt:", position_array)
 
                 if position_array is not None and tuple(position_array) not in visited_positions:
-                    queue_of_positions.append(position_array)
-                    came_from[tuple(position_array)] = (position_array_tuple, f"rotate_{position_array_tuple[1][-1]}_to_{rot_goal[-1]}")
+                    if position_array == ['T', 'spin_R', 3, 18]:
+                        print("test")
+                    queue_of_positions.append(position_array.copy())
+                    came_from[tuple(position_array.copy())] = (position_array_tuple, f"rotate_{position_array_tuple[1][-1]}_to_{rot_goal[-1]}")
                     '''if position_array == goal_as_pos_array:
                         print(f"goal found! {position_array}")
                         
@@ -99,26 +112,47 @@ def search_for_best_move(goal, board, best_move_y_pos):
                     new_ypos = soft_drop_simulation_returning_ypos(PIECES_index[position_array[0]][position_array[1]], board_copy, position_array[2],position_array[1],position_array[0])
                 '''if new_ypos is None: # piece is completely stuck
                     continue''' 
+                position_index_softdrop_copy = position_array.copy()
+                if new_ypos is not None:
+                    position_index_softdrop_copy[3] = new_ypos
+                position_index_softdrop_tuple = tuple(position_index_softdrop_copy)
+                if position_index_softdrop_tuple not in visited_positions:
+                    queue_of_positions.append(position_index_softdrop_copy)
+                    came_from[position_index_softdrop_tuple] = (position_array_tuple, f"softdrop_to_y{new_ypos}")
                 if new_ypos != position_array[3] and new_ypos is not None:  # softdrop is possible
                     #arg_position_array_softdrop = position_array.copy()
-                    position_array[3] = new_ypos
-
-                    queue_of_positions.append(position_array)
+                    softdrop_copy = position_array.copy()
+                    softdrop_copy[3] = new_ypos
+                    softdrop_tuple = tuple(softdrop_copy)
+                    if softdrop_tuple not in visited_positions:
+                        queue_of_positions.append(softdrop_copy)
+                        if softdrop_tuple not in came_from:
+                            came_from[softdrop_tuple] = (position_array_tuple, f"softdrop_to_y{new_ypos}")
+                    
+                        if softdrop_copy == goal_as_pos_array:
+                            print(f"goal found! {softdrop_copy}")
+                            return reconstruct_path(came_from, softdrop_tuple)
                     '''if position_array == goal_as_pos_array:
                         print(position_array)
                         time.sleep(1)
                         print(f"goal found! {position_array}")
                         return reconstruct_path(came_from, tuple(position_array))'''
                     #print(f"after soft drop new ypos is {new_ypos}")
-
+                print(position_array)
                 new_positions_from_sidewways_movement_arrays = sideways_movement_simulation(board_copy, piece, position_array[1], position_array[2], position_array[3], position_array)
                 for new_position in new_positions_from_sidewways_movement_arrays:
                     #if len(new_positions_from_sidewways_movement_arrays) > 0:
                         
-                
+                    position_array_new_tuple = tuple(new_position)
+                    if position_array_new_tuple not in visited_positions:
+                        queue_of_positions.append(new_position.copy())
+                    
                     if tuple(new_position) not in visited_positions:  # can replace with sets to remove tihngs liek taht
-                        queue_of_positions.append(new_position)
-                        #print("found new positions from sideways movement simulation:", new_positions_from_sidewways_movement_arrays)
+                        came_from[position_array_new_tuple] = (position_array_tuple, f"sideways_move_to_x{new_position[2]}_y{new_position[3]}")
+                        
+                    if new_position == goal_as_pos_array:
+                        print(f"goal found! {new_position}")
+                        return reconstruct_path(came_from, tuple(new_position))
                         '''if new_position == goal_as_pos_array:
                             print(f"goal found! {position_array}")
                             
@@ -149,11 +183,15 @@ def search_for_best_move(goal, board, best_move_y_pos):
 
 
 def reconstruct_path(came_from, goal_tuple):
+    print("paus")
+    time.sleep(1.5)
     path = []
     current = goal_tuple
     while current is not None:
         parent,action  = came_from[current]
         path.append((action,list(current)))
         current = parent
-    path.reverse()
+    path.reverse()  
+    print("here is the path:", path)
+    time.sleep(989)
     return path

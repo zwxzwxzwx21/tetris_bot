@@ -51,7 +51,7 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
             board_,result = place_piece(rotated_piece,info_array[0],board,info_array[2] + int(offset[0]),info_array[3] + int(offset[1]),rotation_goal_backup)
         else:
             board_,result = place_piece(rotated_piece,info_array[0],board,info_array[2] + int(offset[0]),info_array[3] + int(offset[1]),rotation_goal)
-        
+        print([info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])])
         #print("result(places piece):",result)
         #print_board(board_)
         if result:

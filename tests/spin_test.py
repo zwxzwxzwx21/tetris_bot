@@ -105,9 +105,9 @@ o_testcase = [
 queue = ['T'] #  vro is alonje :sob: 
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 #find_best_placement(tspin_double_testcase,queue,0,{}) 
-#test = search_for_best_move("T_x3_spin_R",tspin_triple_testcase,18)
+test = search_for_best_move("T_x7_flat_2",tspin_double_testcase,18)
 from spins_funcions import try_place_piece
-test,a = try_place_piece(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',4,16],'spin_R')
+#test,a = try_place_piece(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',4,16],'spin_R')
 #place_piece_test = place_piece(PIECES_index["T"]['spin_R'],test[0],tspin_triple_testcase,test[2],test[3],test[1] )
 #print_board(place_piece_test[0])
 from board_operations.checking_valid_placements import can_place, find_lowest_y_for_piece, place_piece, sideways_movement_simulation, get_piece_height, get_piece_lowest_index_from_origin, get_piece_width, get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin
