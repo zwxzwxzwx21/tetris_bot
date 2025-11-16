@@ -85,7 +85,7 @@ def search_for_best_move(goal, board, best_move_y_pos):
             softdrop_tuple = tuple(softdrop_pos)
             
             if softdrop_tuple not in visited_positions:
-                queue_of_positions.append(softdrop_tuple)
+                queue_of_positions.append(softdrop_pos.copy())
                 if softdrop_tuple not in came_from:
                     came_from[softdrop_tuple] = (position_array_tuple, f"softdrop_to_y{new_ypos}")
                 if softdrop_pos == goal_as_pos_array:

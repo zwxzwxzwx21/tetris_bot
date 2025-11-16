@@ -102,10 +102,12 @@ o_testcase = [
     [' ',' ','x',' ',' ','x',' ',' ',' ',' '],
     [' ',' ','x',' ',' ','x',' ',' ',' ','x'],
     ]
-queue = ['T'] #  vro is alonje :sob: 
+queue = ['S'] #  vro is alonje :sob: 
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 #find_best_placement(tspin_double_testcase,queue,0,{}) 
-test = search_for_best_move("T_x7_flat_2",tspin_double_testcase,18)
+test = search_for_best_move("S_x4_spin_L",sspin_triple_testcase,18)
+
+#test = search_for_best_move("T_x7_flat_2",tspin_double_testcase,18)
 #test = search_for_best_move("T_x3_spin_R",tspin_triple_testcase,18)
 from spins_funcions import try_place_piece
 #test,a = try_place_piece(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',4,16],'spin_R')
