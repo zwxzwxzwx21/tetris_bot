@@ -11,7 +11,7 @@ def create_bag(bag_size=7, no_s_z_first_piece=False, custom_bag=False):
     """
 
     if custom_bag:
-        return ['I', 'O', 'T', 'S', 'Z', 'J', 'L'] # edit as needed, idk how it would work with smaller, bigger bags
+        return ['T', 'O', 'I', 'S', 'Z', 'J', 'L'] # edit as needed, idk how it would work with smaller, bigger bags
 
     if bag_size == 7: 
         bag = list(TETROMINOES)

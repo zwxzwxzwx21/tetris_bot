@@ -191,7 +191,7 @@ class TetrisGame:
                 move_history_ = find_best_placement(
                     self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
                 )
-            
+                print(f"move history from best placement: {move_history_}")
                 if not move_history_:
                     if config.PRINT_MODE:
                         logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
@@ -199,7 +199,7 @@ class TetrisGame:
                     self.game_over_signal[0] = True
                     break    
                 
-                move_history, best_move_str = move_history_            
+                move_history, best_move_str = move_history_
                 piece_type_placed = [0]
                 first_move = move_history[0]
                 piece_type, x_str, rotation = first_move.split("_")
@@ -211,7 +211,7 @@ class TetrisGame:
                     viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
 
                 #board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
-                
+                #board_after_drop =  
                 
                 # this has to be replaced with function like, solidify a piece rather than drop it, for more clarity
                 #board_with_piece = solidify_piece(board_before_piece_placement, piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))

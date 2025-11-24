@@ -4,7 +4,7 @@ CELL_SIZE = 28
 BOARD_WIDTH = 10
 BOARD_HEIGHT = 20
 SIDE_WIDTH = 170
-FPS = 30
+FPS = 60
 
 COLOR_BG = (0, 0, 0)
 COLOR_PANEL = (28, 28, 36)
@@ -30,7 +30,7 @@ class TetrisBoardViewer:
         self.surface = pygame.display.set_mode(
             (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
         )
-        pygame.display.set_caption("tewi bot :3")
+        pygame.display.set_caption("tewi bot 🐰")
         self.font = pygame.font.SysFont("orbitron", 16)
         self.clock = pygame.time.Clock()
         self.board = board_
