@@ -32,7 +32,7 @@ logging.basicConfig(
     format="%(levelname)s | %(filename)s -> %(lineno)d in %(funcName)s: %(message)s",
     level=logging.DEBUG,
 )
-from board_operations.board_operations import clear_lines
+from board_operations.board_operations import clear_lines, solidify_piece
 #from board_operations.checking_valid_placements import drop_piece
 from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
@@ -199,7 +199,8 @@ class TetrisGame:
                     self.game_over_signal[0] = True
                     break    
                 
-                move_history, best_move_str = move_history_
+                move_history, best_move_str,goal_y_pos = move_history_
+                print(f"best move str: {move_history}, full move history: {move_history_}")
                 piece_type_placed = [0]
                 first_move = move_history[0]
                 print(first_move)
@@ -214,11 +215,14 @@ class TetrisGame:
 
                 #board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
                 #board_after_drop =  
-                
+                # CHECK IF PATH EXIST
+                board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
                 # this has to be replaced with function like, solidify a piece rather than drop it, for more clarity
                 #board_with_piece = solidify_piece(board_before_piece_placement, piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))
                 #board_after_drop = solidify_piece(copy.deepcopy(self.board), piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))
                 # then move on as normal, so far it wont work fro a bit because i have other trhings to do but when im done it would be all fixed
+                print_board(board_after_drop)
+                
                 if self.slow_mode[0]:
                     if config.PRINT_MODE:
                         print_board(board_after_drop)

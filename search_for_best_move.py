@@ -28,7 +28,8 @@ def search_for_best_move(goal, board, best_move_y_pos):
     # idea for 180 spins: just replace indexes of X spin into the 180 variant of that one for exaple if you have spin_l s_piece with some indexes, just take indexes from spin_r s_piece, that should work just fine
     for rot in rotations:
         #print(f"checking rotation: {rot}")
-        
+        if piece == "O" and rot in ["spin_R", "spin_L","flat_2"]:
+            continue  # O piece has no spins
         for dx in range(PIECES_startpos_indexing_value[piece][rot], 11 - PIECES_xpos_indexing_value[piece][rot]):
             lowest_Y = find_lowest_y_for_piece(PIECES_index[piece][rot], board, dx, rot, piece=piece)
             # print("lowest y ",lowest_Y)

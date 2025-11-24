@@ -187,4 +187,4 @@ def find_best_placement(board, queue, combo, stats):
         return None
     assert move_history
     print(f"best move: {best_move} with loss: {best_loss}")
-    return move_history, best_move
+    return move_history, best_move,best_move_y_pos

@@ -35,9 +35,13 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
     try:
         rotated_piece = PIECES_index[info_array[0]][rotation_goal]
     except KeyError:
-        rotation_goal = rotation_goal[-1]
-        str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
-        rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
+        if info_array[0] == 'O':
+            str_piece_rotation_goal = 'flat_0'
+            rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
+        else:
+            rotation_goal = rotation_goal[-1]
+            str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
+            rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
     #print(rotated_piece)
     str_piece_rotation_goal = rotation_goal
     #print(str_piece_rotation_goal)
