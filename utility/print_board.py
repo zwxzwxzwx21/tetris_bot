@@ -1,10 +1,10 @@
-def print_board(board, compressed_mode=False, pro_mode=True):
+def print_board(board, compressed_mode=False, color=False, coords=True):
     print("===PRINTING BOARD===")
-    if not pro_mode:
+    if not color and not coords:
         for row in board:
             if any(cell != ' ' for cell in row) or not compressed_mode:
                 print(' '.join(row))
-    elif pro_mode:
+    elif color:
         color_dict = {
             ' ': '\033[0m.',
             '.': '\033[0m.',
@@ -30,6 +30,17 @@ def print_board(board, compressed_mode=False, pro_mode=True):
                 print(f"{y:2d} \033[0m█\033[0m", end='')
                 print('\033[0m█'.join(color_dict[cell] for cell in row) + '█\033[0m')
                 print("   " + "█" * 21)
-    print()
+        print()
+    elif coords:
+        print(" ", end='')
+        for x in range(1,11):
+            print(f" {x}", end='')
+        print()
+        y = 0
+        for row in board:
+            y += 1
+            if any(cell != ' ' for cell in row) or not compressed_mode:
+                print(f"{y:2d} " + ' '.join(row))
+    print()   
 
 board = [[' ' for _ in range(10)] for _ in range(20)]
