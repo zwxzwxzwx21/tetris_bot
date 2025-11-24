@@ -14,6 +14,9 @@ PIECES_lowest_point_from_origin = {
     # if there is or isnt any index to the left of origin
     'O': {
         'flat_0' : 0, 
+        'spin_L' : 0,
+        'flat_2' : 0,
+        'spin_R' : 0,
         },
 
     'I': {
@@ -63,6 +66,9 @@ PIECES_startpos_indexing_value = {
     # if there is or isnt any index to the left of origin
     'O': {
         'flat_0' : 1, 
+        'spin_L' : 1,
+        'flat_2' : 1,
+        'spin_R' : 1,
         },
 
     'I': {
@@ -110,6 +116,9 @@ PIECES_startpos_indexing_value = {
 PIECES_xpos_indexing_value = {
     'O': {
         'flat_0' : 2, 
+        'spin_L' : 2,
+        'flat_2' : 2,
+        'spin_R' : 2,
         },
 
     'I': {
@@ -157,6 +166,9 @@ PIECES_xpos_indexing_value = {
 PIECES_index = {
     'O': {
         'flat_0' : [(0,0),(-1,0),(0,-1),(-1,-1)], 
+        'spin_L' : [(0,0),(-1,0),(0,-1),(-1,-1)], 
+        'flat_2' : [(0,0),(-1,0),(0,-1),(-1,-1)], 
+        'spin_R' : [(0,0),(-1,0),(0,-1),(-1,-1)], 
         },
 
     'I': {
