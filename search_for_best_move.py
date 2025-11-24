@@ -128,5 +128,5 @@ def reconstruct_path(came_from, goal_tuple):
         current = parent
     path.reverse()  
     print("here is the path:", path)
-    time.sleep(989)
+    #time.sleep(989)
     return path

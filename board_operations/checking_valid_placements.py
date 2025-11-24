@@ -57,7 +57,7 @@ def soft_drop_simulation_returning_ypos(piece_index_array, board, col,rotate,pie
     
     return row
 def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
-    print("FINDING LOWEST Y FOR PIECE")
+    #print("FINDING LOWEST Y FOR PIECE")
     board_copy = [row.copy() for row in board]
     row = 0
     print(can_place(piece_index_array, board_copy, row + 1, col,rotation,piece,print_debug=False))
@@ -89,7 +89,7 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
     old_board = [row.copy() for row in board]
     #piece_tuple_array = PIECES_index[piece_pos_array[0]][piece_pos_array[1]]
     for (dx,dy) in piece_index_array:
-        print(f"all offsets = {piece_index_array} current offset dx:{dx} dy:{dy}")
+        #print(f"all offsets = {piece_index_array} current offset dx:{dx} dy:{dy}")
         if print_debug:
             print(x + dx, y + dy, "place piece", piece, "<-")
         #if  (x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20): 
@@ -103,8 +103,8 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
             if print_debug:
                 print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
             return old_board,False
-    if y > 15:
-        print_board(new_board)   
+    if y > 17:
+        print_board(new_board) 
     return new_board , True
 def can_place2(piece, board, xpos, ypos,side):
     """

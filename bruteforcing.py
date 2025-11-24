@@ -104,7 +104,9 @@ def find_best_placement(board, queue, combo, stats):
         #print("piece width:",piece_width)
         temp_array = []
         print((PIECES_startpos_indexing_value[current_piece][rotation_name],11-PIECES_xpos_indexing_value[current_piece][rotation_name]))
-        for start_x in range(PIECES_startpos_indexing_value[current_piece][rotation_name],11-PIECES_xpos_indexing_value[current_piece][rotation_name]):
+        start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
+        finish_x_pos = 11-PIECES_xpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 9
+        for start_x in range(start_x_pos,finish_x_pos):
             
             #for start_x in range(7,8):
             # TODO can do sth like this ^  
@@ -119,7 +121,7 @@ def find_best_placement(board, queue, combo, stats):
             #print("lowest y for piece at x:",start_x," is ",lowest_y)
             for y in range(lowest_y, 20):       
                 #print(lowest_y,"y:",y)
-                if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,print_debug=False):
+                if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,rotation_name,current_piece,print_debug=False):
                     #print("can place at x: ", start_x, " y: ", y)
                     arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
                     print("added piece info:",[current_piece, rotation_name, start_x, y])
@@ -136,7 +138,7 @@ def find_best_placement(board, queue, combo, stats):
     for position_info in arr_piece_info_array:
         
         #new_board = simulate_kicks(board, arr_piece_info_array)
-        new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], print_debug=False)
+        new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False)
         if not is_place_piece_successful:
             if config.PRINT_MODE:
                 print(f"GAMEOVER, score (best loss) : {best_loss} ")

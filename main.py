@@ -145,15 +145,15 @@ class TetrisGame:
     def game_loop(self, viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
         # i will change it i swear, just give me second
-        while not self.start_signal[0]:
-            time.sleep(0.1)
-            if self.game_over_signal[0]:
-                return
+            while not self.start_signal[0]:
+                time.sleep(0.1)
+                if self.game_over_signal[0]:
+                    return
 
-        pieces_placed = 0
-        actual_game_start_time = time.perf_counter()
+            pieces_placed = 0
+            actual_game_start_time = time.perf_counter()
 
-        try:
+            #try:
             if not self.queue:
                 if config.PRINT_MODE:
                     logging.debug("queue fill")
@@ -202,7 +202,9 @@ class TetrisGame:
                 move_history, best_move_str = move_history_
                 piece_type_placed = [0]
                 first_move = move_history[0]
-                piece_type, x_str, rotation = first_move.split("_")
+                print(first_move)
+                piece_type, x_str, rotation1,rotation2 = first_move.split("_")
+                rotation  = rotation1 + "_" + rotation2
                 x = int(x_str[1:])
                 piece_type_placed = self.queue[0]
                 piece_shape = PIECES[piece_type_placed][rotation]
@@ -324,11 +326,13 @@ class TetrisGame:
                     )
                 
                 self.pending_save = best_move_str  
-        finally:
-            
-            #logging.debug("game loop finished")
-            self.game_over_signal[0] = True
-            return pieces_placed
+        
+        
+            '''finally:
+                
+                #logging.debug("game loop finished")
+                self.game_over_signal[0] = True
+                return pieces_placed'''
 def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
                       attack_bonus, game_stats, seed, game_number):
         filepath = "bruteforcer_stats.xlsx"
