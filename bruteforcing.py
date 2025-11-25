@@ -100,44 +100,25 @@ def find_best_placement(board, queue, combo, stats):
     assert current_piece in PIECES_index
     for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
         
-        #piece_width = get_piece_width(PIECES_index[current_piece][rotation_name]) 
-        #print("piece width:",piece_width)
         temp_array = []
         print((PIECES_startpos_indexing_value[current_piece][rotation_name],11-PIECES_xpos_indexing_value[current_piece][rotation_name]))
         start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
         finish_x_pos = 11-PIECES_xpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 9
         for start_x in range(start_x_pos,finish_x_pos):
             
-            #for start_x in range(7,8):
-            # TODO can do sth like this ^  
-            # # TODO remove the lowest Y check, can do it so we keep track of piece heights, and when we place a piece on Y pos, we keep track of that
-            # from the beginning of the game,from the start lowest_y = 20, any piece will lower it and when we place piece on some Y, that makes the lowest_y lower
-            # we just overwrite lowest_y 
-            #print(rotation_name," at x pos ",start_x)
-            print("a")
             lowest_y = find_lowest_y_for_piece(PIECES_index[current_piece][rotation_name], board, start_x,rotation_name,current_piece)
-            print(lowest_y)
-            print("2")
-            #print("lowest y for piece at x:",start_x," is ",lowest_y)
+
             for y in range(lowest_y, 20):       
-                #print(lowest_y,"y:",y)
                 if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,rotation_name,current_piece,print_debug=False):
-                    #print("can place at x: ", start_x, " y: ", y)
+
                     arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
-                    print("added piece info:",[current_piece, rotation_name, start_x, y])
                     temp_array.append([current_piece, rotation_name, start_x, y])
-            #print(f"range: {PIECES_startpos_indexing_value[current_piece][rotation_name]} to {11-PIECES_xpos_indexing_value[current_piece][rotation_name]} for piece {current_piece} rotation {rotation_name}")
-            #time.sleep(0.1) 
-        #print(f"added {len(temp_array)} positions for rotation {rotation_name}")    
-        #.sleep(2)  
-    print("total positions to try:",len(arr_piece_info_array))
-    #time.sleep(1)
+
 
 
     
     for position_info in arr_piece_info_array:
         
-        #new_board = simulate_kicks(board, arr_piece_info_array)
         new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False)
         if not is_place_piece_successful:
             if config.PRINT_MODE:

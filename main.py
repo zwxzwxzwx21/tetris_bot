@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-# if someone is reading that, i may or may not have used some AI help for comments and such to make code more readable
-# half of them i didnt even read but i dont remove them because fucking higlighting puts them there as it feels and it was usefull
-# ^ update i have cleared some useless things up, yeah you can mby look them up in previous commits but what for
-# those dont even have any working code so i wouldnt bother
-# once!! so i wil lleave them, so like whateverr sorry algosith dont bother with them
-# got an issue with that? better not or i will cry.
-
 # to test the argparse better, try running it in console using:
 # python .\main.py --rule, rules will be listed lower, as they are wip
 import argparse  # testing it
@@ -153,190 +145,181 @@ class TetrisGame:
             pieces_placed = 0
             actual_game_start_time = time.perf_counter()
 
-            #try:
-            if not self.queue:
-                if config.PRINT_MODE:
-                    logging.debug("queue fill")
-                num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(self.queue)
-                if num_to_add > 0:
+            try:
+                if not self.queue:
+                    if config.PRINT_MODE:
+                        logging.debug("queue fill")
+                    num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(self.queue)
+                    if num_to_add > 0:
+                        self.queue, self.bag = add_piece_from_bag(
+                            self.queue,
+                            self.bag,
+                            num_pieces=num_to_add,
+                            no_s_z_first_piece=self.no_s_z_first_piece_signal[0],
+                        )
+                    if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
+                        if config.PRINT_MODE:
+                            logging.debug("failed to fill queue")
+                        return
+
+                if not self.history:
+                    self.save_game_state(move_str=None, board=self.board)
+
+                while True:
+                    if self.pending_save is not None:
+                        self.save_game_state(self.pending_save,board=self.board)
+                        self.pending_save = None
+
+                    if self.game_over_signal[0]:
+                        # leftover from board viewer, useless
+                        if config.PRINT_MODE:
+                            logging.debug("game loop finished by game_over_signal")
+                        break
+
+                    if config.PRINT_MODE:
+                        logging.debug("\n=== Current Queue ===")
+                        logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
+
+                    move_history_ = find_best_placement(
+                        self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
+                    )
+                    print(f"move history from best placement: {move_history_}")
+                    if not move_history_:
+                        if config.PRINT_MODE:
+                            logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
+                            logging.debug(f"piece that failed: {self.queue[0]}")
+                        self.game_over_signal[0] = True
+                        break    
+                    
+                    move_history, best_move_str,goal_y_pos = move_history_
+                    print(f"best move str: {move_history}, full move history: {move_history_}")
+                    piece_type_placed = [0]
+                    first_move = move_history[0]
+                    print(first_move)
+                    piece_type, x_str, rotation1,rotation2 = first_move.split("_")
+                    rotation  = rotation1 + "_" + rotation2
+                    x = int(x_str[1:])
+                    piece_type_placed = self.queue[0]
+                    piece_shape = PIECES[piece_type_placed][rotation]
+
+                    if viewer:
+                        viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
+
+                    # CHECK IF PATH EXIST
+                    board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
+                    
+                    if self.slow_mode[0]:
+                        if config.PRINT_MODE:
+                            print_board(board_after_drop)
+                        decision = input(
+                            f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...\n undo to move back, redo to redo if you have undone a move before "
+                        )
+                        if decision.lower() == "undo":
+                            if self.history_index > 0:
+                                self.load_game_state(self.history_index - 1, board=self.board)
+                            else:
+                                if config.PRINT_MODE:
+                                    print("no move to undo")    
+                            continue
+                        elif decision.lower() == "redo":
+                            if self.history_index < len(self.history) - 1:
+                                self.load_game_state(self.history_index + 1, board=self.board)
+                            else:
+                                if config.PRINT_MODE:
+                                    print("no move to redo")
+                            continue
+                    elif self.delay_mode[0] == True:
+                        self.delay = self.delay_mode[1]
+
+                    if self.delay > 0:
+                        time.sleep(self.delay)
+
+                    # its never none, usually its just first rotation and leftmost X, i think it would be good to change it
+                    # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
+                    # tho im not so sure, leaving it here just because of that
+                    if board_after_drop is None:
+                        if config.PRINT_MODE:
+                            logging.debug("cannot drop piece")
+                        break
+
+                    board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
+                    if config.PRINT_MODE:
+                        logging.debug(f"lines cleared: {lines_cleared_count}")
+                    attack, self.combo = count_lines_clear(
+                        lines_cleared_count, self.combo, board_after_clear
+                    )
+                    self.stats.total_attack += attack
+                    self.stats.combo = self.combo
+
+                    if lines_cleared_count == 1:
+                        self.stats.single += 1
+                    elif lines_cleared_count == 2:
+                        self.stats.double += 1
+                    elif lines_cleared_count == 3:
+                        self.stats.triple += 1
+                    elif lines_cleared_count == 4:
+                        self.stats.tetris += 1
+
+                    self.board[:] = board_after_clear
+                    if viewer:
+                        viewer.clear_preview()
+                        viewer.update_board(self.board)
+                    if config.PRINT_MODE:
+                        print_board(self.board)
+
+                    if self.queue:
+                        self.queue.pop(0)  # remove the used piece
+                    else:  # should never happen
+                        if config.PRINT_MODE:
+                            logging.debug(
+                            "error: tried to pop from empty queue after placement"
+                        )
+                        break
+
+                    # add one new piece to the queue
                     self.queue, self.bag = add_piece_from_bag(
                         self.queue,
                         self.bag,
-                        num_pieces=num_to_add,
+                        num_pieces=1,
                         no_s_z_first_piece=self.no_s_z_first_piece_signal[0],
                     )
-                if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
+
+                    pieces_placed += 1
+                    # i think after removing board viewer it doesnt work, but i also dont print it at all so that is something i will do later
+                    # im making those comments and changes cuz i wanna public code soon and then i will be so much more motivated to work on it lmao
+                    elapsed = time.perf_counter() - actual_game_start_time
+                    if len(self.stats.burst) < 10:
+                        self.stats.burst.append(elapsed)
+                    else:
+                        self.stats.burst.pop(0)
+                        self.stats.burst.append(elapsed)
                     if config.PRINT_MODE:
-                        logging.debug("failed to fill queue")
-                    return
-
-            if not self.history:
-                self.save_game_state(move_str=None, board=self.board)
-
-            while True:
-                if self.pending_save is not None:
-                    self.save_game_state(self.pending_save,board=self.board)
-                    self.pending_save = None
-
-                if self.game_over_signal[0]:
-                    # leftover from board viewer, useless
-                    if config.PRINT_MODE:
-                        logging.debug("game loop finished by game_over_signal")
-                    break
-
-                if config.PRINT_MODE:
-                    logging.debug("\n=== Current Queue ===")
-                    logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
-
-                move_history_ = find_best_placement(
-                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
-                )
-                print(f"move history from best placement: {move_history_}")
-                if not move_history_:
-                    if config.PRINT_MODE:
-                        logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
-                        logging.debug(f"piece that failed: {self.queue[0]}")
-                    self.game_over_signal[0] = True
-                    break    
-                
-                move_history, best_move_str,goal_y_pos = move_history_
-                print(f"best move str: {move_history}, full move history: {move_history_}")
-                piece_type_placed = [0]
-                first_move = move_history[0]
-                print(first_move)
-                piece_type, x_str, rotation1,rotation2 = first_move.split("_")
-                rotation  = rotation1 + "_" + rotation2
-                x = int(x_str[1:])
-                piece_type_placed = self.queue[0]
-                piece_shape = PIECES[piece_type_placed][rotation]
-
-                if viewer:
-                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
-
-                #board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
-                #board_after_drop =  
-                # CHECK IF PATH EXIST
-                board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
-                # this has to be replaced with function like, solidify a piece rather than drop it, for more clarity
-                #board_with_piece = solidify_piece(board_before_piece_placement, piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))
-                #board_after_drop = solidify_piece(copy.deepcopy(self.board), piece_info_array / (or instead of array can have:  piece, rotation, xpos,ypos))
-                # then move on as normal, so far it wont work fro a bit because i have other trhings to do but when im done it would be all fixed
-                print_board(board_after_drop)
-                
-                if self.slow_mode[0]:
-                    if config.PRINT_MODE:
-                        print_board(board_after_drop)
-                    decision = input(
-                        f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...\n undo to move back, redo to redo if you have undone a move before "
-                    )
-                    if decision.lower() == "undo":
-                        if self.history_index > 0:
-                            self.load_game_state(self.history_index - 1, board=self.board)
-                        else:
-                            if config.PRINT_MODE:
-                                print("no move to undo")    
-                        continue
-                    elif decision.lower() == "redo":
-                        if self.history_index < len(self.history) - 1:
-                            self.load_game_state(self.history_index + 1, board=self.board)
-                        else:
-                            if config.PRINT_MODE:
-                                print("no move to redo")
-                        continue
-                elif self.delay_mode[0] == True:
-                    self.delay = self.delay_mode[1]
-
-                if self.delay > 0:
-                    time.sleep(self.delay)
-
-                # its never none, usually its just first rotation and leftmost X, i think it would be good to change it
-                # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
-                # tho im not so sure, leaving it here just because of that
-                if board_after_drop is None:
-                    if config.PRINT_MODE:
-                        logging.debug("cannot drop piece")
-                    break
-
-                board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
-                if config.PRINT_MODE:
-                    logging.debug(f"lines cleared: {lines_cleared_count}")
-                attack, self.combo = count_lines_clear(
-                    lines_cleared_count, self.combo, board_after_clear
-                )
-                self.stats.total_attack += attack
-                self.stats.combo = self.combo
-
-                if lines_cleared_count == 1:
-                    self.stats.single += 1
-                elif lines_cleared_count == 2:
-                    self.stats.double += 1
-                elif lines_cleared_count == 3:
-                    self.stats.triple += 1
-                elif lines_cleared_count == 4:
-                    self.stats.tetris += 1
-
-                self.board[:] = board_after_clear
-                if viewer:
-                    viewer.clear_preview()
-                    viewer.update_board(self.board)
-                if config.PRINT_MODE:
-                    print_board(self.board)
-
-                if self.queue:
-                    self.queue.pop(0)  # remove the used piece
-                else:  # should never happen
-                    if config.PRINT_MODE:
-                        logging.debug(
-                        "error: tried to pop from empty queue after placement"
-                    )
-                    break
-
-                # add one new piece to the queue
-                self.queue, self.bag = add_piece_from_bag(
-                    self.queue,
-                    self.bag,
-                    num_pieces=1,
-                    no_s_z_first_piece=self.no_s_z_first_piece_signal[0],
-                )
-
-                pieces_placed += 1
-                # i think after removing board viewer it doesnt work, but i also dont print it at all so that is something i will do later
-                # im making those comments and changes cuz i wanna public code soon and then i will be so much more motivated to work on it lmao
-                elapsed = time.perf_counter() - actual_game_start_time
-                if len(self.stats.burst) < 10:
-                    self.stats.burst.append(elapsed)
-                else:
-                    self.stats.burst.pop(0)
-                    self.stats.burst.append(elapsed)
-                if config.PRINT_MODE:
-                    logging.debug(self.stats.burst)
-                if elapsed > 0:
-                    self.stats.APM = (self.stats.total_attack / elapsed) * 60
-                    self.stats.APP = (
-                        (self.stats.total_attack / pieces_placed)
-                        if pieces_placed > 0
-                        else 0
-                    )
-                    self.stats.pps = pieces_placed / elapsed
-                    self.stats.burst_pps = (
-                        (len(self.stats.burst) - 1)
-                        / (max(self.stats.burst) - min(self.stats.burst))
-                        if len(self.stats.burst) > 9
-                        else 0
-                    )
-                    if config.PRINT_MODE:
-                        logging.debug(
-                        f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps / 10}"
-                    )
-                
-                self.pending_save = best_move_str  
-        
-        
-            '''finally:
-                
-                #logging.debug("game loop finished")
+                        logging.debug(self.stats.burst)
+                    if elapsed > 0:
+                        self.stats.APM = (self.stats.total_attack / elapsed) * 60
+                        self.stats.APP = (
+                            (self.stats.total_attack / pieces_placed)
+                            if pieces_placed > 0
+                            else 0
+                        )
+                        self.stats.pps = pieces_placed / elapsed
+                        self.stats.burst_pps = (
+                            (len(self.stats.burst) - 1)
+                            / (max(self.stats.burst) - min(self.stats.burst))
+                            if len(self.stats.burst) > 9
+                            else 0
+                        )
+                        if config.PRINT_MODE:
+                            logging.debug(
+                            f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps / 10}"
+                        )
+                    
+                    self.pending_save = best_move_str  
+              
+            finally:
+                logging.debug("game loop finished")
                 self.game_over_signal[0] = True
-                return pieces_placed'''
+                return pieces_placed
 def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
                       attack_bonus, game_stats, seed, game_number):
         filepath = "bruteforcer_stats.xlsx"
@@ -371,7 +354,6 @@ def run_bruteforce_games(params,num_games=3):
     total_lines = 0
 
     for game_index in range(num_games):
-        #print(f"running game {game_index+1}/{num_games} with params {params}")
         uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = params["uneven_loss"], params["holes_punishment"], params["height_diff_punishment"], params["attack_bonus"], params["max_height_punishment"]
         import bruteforcing
         bruteforcing.uneven_loss = uneven_loss
@@ -392,7 +374,7 @@ def run_bruteforce_games(params,num_games=3):
         total_lines += lines_cleared
         print(f"lines cleared: {lines_cleared}")
     return total_lines/num_games
-# this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument("--seed", type=int, help="override RNG seed")
@@ -427,9 +409,6 @@ if __name__ == "__main__":
 
     game.start_signal[0] = True
 
-    #game.print_mode[0] = "print" in args.rules
-    #if config.PRINT_MODE:
-    #    logging.debug(f"using seed {seed}")
     game.no_s_z_first_piece_signal[0] = "nosz" in args.rules
 
     game.custom_bag[0] = "custom_bag" in args.rules
@@ -472,7 +451,7 @@ if __name__ == "__main__":
 # IMPORTANT:
 # - the game loop will stop if no valid placement is found
 # - stats.pps can be used in other modules (for display in the viewer).
-#
+# - if the best piece placeemnt path is not found, things may not be handled correctly                          !!!!!!!!!
 # TODO:
 # - add more advanced scoring/evaluation for moves.
 # - implement perfect clear solver/mode.
