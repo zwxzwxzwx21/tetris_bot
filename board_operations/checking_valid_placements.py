@@ -93,16 +93,16 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
         if print_debug:
             print(x + dx, y + dy, "place piece", piece, "<-")
         #if  (x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20): 
-        
-        if new_board[y + dy][x + dx] == ' ' and x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20:
+        print(f"y= {y} + {dy} = {y + dy} x= {x} + {dx} = {x + dx}")
+        if 0 <= x + dx < 10 and 0 <= y + dy < 20:   
+            if new_board[y + dy][x + dx] == ' ':
                 new_board[y + dy][x + dx] = piece
                 if print_debug:
                     print('placing piece at:', x + dx, y + dy)
                 
         else:
-            if print_debug:
-                print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
-            return old_board,False
+            return None, "out_of_bounds"
+        
     if y > 17:
         print_board(new_board) 
     return new_board , True

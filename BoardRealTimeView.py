@@ -62,7 +62,9 @@ class TetrisBoardViewer:
                         xxx = xpos + w
                         if yyy >= BOARD_HEIGHT:
                             return True
-                        if board_array[yyy][xxx] != " " and board_array[yyy][xxx] != 0:
+                        if xxx < 0 or xxx >= BOARD_WIDTH:
+                            return True
+                        if board_array[yyy][xxx] not in (" ", 0):
                             return True
             return False
 
