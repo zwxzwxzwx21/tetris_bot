@@ -8,7 +8,6 @@ from collections import deque
 PRINT_MODE = False
 def search_for_best_move(goal, board, best_move_y_pos):
     import time
-    # i tihnk the best way to approach it, is to work on a board and do: board  == goal_board
     '''this function would search for the best move to reach goal on board, goal is string like 'T_x4_flat_0'
     would return move history to reach that goal'''
     
@@ -19,29 +18,22 @@ def search_for_best_move(goal, board, best_move_y_pos):
     y_pos = best_move_y_pos
     came_from = {}
     goal_as_pos_array = [piece, rotation, x_pos, y_pos]
-    #print(f"piece : {piece}, x_pos: {x_pos}, rotation: {rotation}, y_pos: {y_pos}")
-
     rotations = ["flat_0", "spin_R", "flat_2", "spin_L"]
     queue_of_positions = deque()  # this array is like: if we have an X position and we rotate it, if the new position is already in the array, we skip it, otherwise we could have infinite loops
     
     # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
-    # idea for 180 spins: just replace indexes of X spin into the 180 variant of that one for exaple if you have spin_l s_piece with some indexes, just take indexes from spin_r s_piece, that should work just fine
     for rot in rotations:
-        #print(f"checking rotation: {rot}")
         if piece == "O" and rot in ["spin_R", "spin_L","flat_2"]:
             continue  # O piece has no spins
         for dx in range(PIECES_startpos_indexing_value[piece][rot], 11 - PIECES_xpos_indexing_value[piece][rot]):
             lowest_Y = find_lowest_y_for_piece(PIECES_index[piece][rot], board, dx, rot, piece=piece)
-            # print("lowest y ",lowest_Y)
             start_pos = [piece, rot, dx, lowest_Y]
             queue_of_positions.append(start_pos )  # apprends all the places available without tucking or spins/kicks
-            came_from[tuple(start_pos)] = (None, "harddrop")  # lub inny etykietujący tekst
-    visited_positions = set()  # to avoid processing the same position multiple times
-    
-    #print("already cheked possition array: ", "len:", len(queue_of_positions), queue_of_positions)
+            came_from[tuple(start_pos)] = (None, "harddrop") 
+    visited_positions = set() 
     
     while queue_of_positions:  # for every harddropped position, rotate it and see if we can reach new positions
-        #came_from[tuple([piece, rot, dx, lowest_Y])] = (None, "harddrop")
+
         position_array = queue_of_positions.popleft()
         position_array_tuple = tuple(position_array.copy())
         new_pos = position_array.copy()
@@ -63,7 +55,6 @@ def search_for_best_move(goal, board, best_move_y_pos):
         else:
             kick_table = SRS_rest_pieces_kick_table
 
-        #while applied_kicks_counter > 0:
         #=== ROTATIONS ===#      
         for rot_goal in rotations:  # trying to rotate to every possible rotation
        
@@ -97,7 +88,6 @@ def search_for_best_move(goal, board, best_move_y_pos):
         new_positions_from_sidewways_movement_arrays = sideways_movement_simulation(board_copy, piece, position_array[1], position_array[2], position_array[3], position_array)
         
         for new_position in new_positions_from_sidewways_movement_arrays:
-            #if len(new_positions_from_sidewways_movement_arrays) > 0:
                 
             position_array_new_tuple = tuple(new_position)
             if position_array_new_tuple not in visited_positions:
@@ -110,17 +100,10 @@ def search_for_best_move(goal, board, best_move_y_pos):
                     print(f"goal found! {new_position}")
                     return reconstruct_path(came_from, tuple(new_position))
 
-    # im feeling like omitting tucking pieces for now to save on calculations, can add it later
 
-    return None #reconstruct_path(came_from, tuple(position_array))
-
-
-# try to compare new positions with already discovered ones because you can achieve infinite loops with certain setups, so if you add them to soem sort of array and cmapre, it should stop after one loop
-
+    return None 
 
 def reconstruct_path(came_from, goal_tuple):
-    print("paus")
-    #time.sleep(1.5)
     path = []
     current = goal_tuple
     while current is not None:
@@ -129,5 +112,4 @@ def reconstruct_path(came_from, goal_tuple):
         current = parent
     path.reverse()  
     print("here is the path:", path)
-    #time.sleep(989)
     return path

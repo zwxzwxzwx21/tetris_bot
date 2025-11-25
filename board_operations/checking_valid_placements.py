@@ -27,7 +27,6 @@ def can_place(piece_pos_array, board, ypos, xpos,rotation, piece,print_debug=Fal
             return False
     brd,a = place_piece(piece_pos_array, piece, board, xpos, ypos, rotation ,print_debug=False)  
     if print_debug: print_board(brd) 
-    #print("can place piece:" , piece)
     return True
 def soft_drop_simulation(piece, board, col,print_ = False):
     """
@@ -43,6 +42,7 @@ def soft_drop_simulation(piece, board, col,print_ = False):
     board_copy = place_piece(piece, board_copy, row, col,print_)
     return board_copy
  # ^  this function doenst seem to do much so id remove it at some point when im done wtih spins ^ 
+ 
 def soft_drop_simulation_returning_ypos(piece_index_array, board, col,rotate,piece,print_ = False):
     """
     Simulates dropping a piece in the given column and returns a ypos of the piece after dropping.
@@ -57,7 +57,6 @@ def soft_drop_simulation_returning_ypos(piece_index_array, board, col,rotate,pie
     
     return row
 def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
-    #print("FINDING LOWEST Y FOR PIECE")
     board_copy = [row.copy() for row in board]
     row = 0
     print(can_place(piece_index_array, board_copy, row + 1, col,rotation,piece,print_debug=False))
@@ -70,9 +69,7 @@ def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
     return row
 from utility.pieces_index import PIECES_lowest_point_from_origin, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
 def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True):
-    #print_board(board)
-    
-    #time.sleep(0.1)
+
     """
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
@@ -87,12 +84,12 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
         return board,False
     new_board = [row.copy() for row in board]
     old_board = [row.copy() for row in board]
-    #piece_tuple_array = PIECES_index[piece_pos_array[0]][piece_pos_array[1]]
+
     for (dx,dy) in piece_index_array:
-        #print(f"all offsets = {piece_index_array} current offset dx:{dx} dy:{dy}")
+
         if print_debug:
             print(x + dx, y + dy, "place piece", piece, "<-")
-        #if  (x+dx>-1 and x+dx <10 and y+dy>-1 and y+dy<20): 
+
         print(f"y= {y} + {dy} = {y + dy} x= {x} + {dx} = {x + dx}")
         if 0 <= x + dx < 10 and 0 <= y + dy < 20:   
             if new_board[y + dy][x + dx] == ' ':
@@ -101,7 +98,9 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
                     print('placing piece at:', x + dx, y + dy)
                 
         else:
-            return None, "out_of_bounds"
+            if print_debug:
+                print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
+            return None ,False
         
     if y > 17:
         print_board(new_board) 
@@ -111,59 +110,39 @@ def can_place2(piece, board, xpos, ypos,side):
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
     """
-    #print(ypos)
+
     rows = len(board)
     cols = len(board[0])
     piece_leftmost_index = get_piece_leftmost_index_from_origin(piece)
     piece_rightmost_index = get_piece_rightmost_index_from_origin(piece)
     piece_h = get_piece_height(piece)
     piece_w = get_piece_width(piece)
-    
 
-    '''if side == "to_left":
-        if xpos+piece_leftmost_index < 0 or ypos < 0 or xpos + piece_rightmost_index > cols or ypos + piece_h > rows:
-            print("out of bounds check failed")
-            return False # ^ this can be replaces with assert'''
-        # collision 
-    '''elif side == "to_right":
-        if xpos+piece_rightmost_index > cols or ypos < 0 or xpos + piece_leftmost_index < 0 or ypos + piece_h > rows:
-            print("out of bounds check failed")
-            return False # ^ this can be replaces with assert'''
     for (dx,dy) in piece:
-            #("checking board pos:", f"x: {xpos} + {dx}", f"y: {ypos} + {dy}")
+
             try:
                 if board[ypos + dy][xpos + dx] != ' ':
                     return False
             except IndexError:
-                #print(f"IndexError at pos x:{xpos + dx} y:{ypos + dy}, out of bounds")
                 return False
     return True
 from utility.pieces_index import PIECES_index
 from utility.print_board import print_board
 from utility.pieces import *
 def sideways_movement_simulation(board, piece, rotation, x_pos, y_pos, piece_info_array):
-    #print("CALLING SIDEWAYS MOVEMENT SIMULATION")
     '''returns array'''
-    # if one position after softdrop unlocks every x pos (for example with a flat board)
-    # you can use formula 10- width of block, and if in one for loop, 10-width entries were added
-    # into piece_info_array, that means that we have a flat board and we DO NOT need to go through
-    # every single x position, just that one on the same y level
-    
-    #from utility.pieces import PIECES
-    piece_val  = piece# like 'T' or 'L' neede dlater
+
+    piece_val  = piece # like 'T' or 'L' needed later
     piece_index_array = PIECES_index[piece][rotation]
-    #print(piece)
-    piece_width = get_piece_width(piece_index_array)
-    #print(piece_width)
     piece_info_arrays_array = []
     col_x = x_pos
-    #print("side: ", side)
+
     while col_x + get_piece_leftmost_index_from_origin(piece_index_array) > 0:
         side = "to_left"
-        #print("checking can place at x:",col_x - 1," y:",y_pos)
+
         if not can_place2(piece_index_array, board, col_x - 1,y_pos, side):
             break
-        #print("can place at x:",col_x - 1," y:",y_pos)
+
         col_x -= 1
         entry = [piece_val, rotation, col_x, y_pos]
         if entry not in piece_info_arrays_array:
@@ -172,16 +151,14 @@ def sideways_movement_simulation(board, piece, rotation, x_pos, y_pos, piece_inf
     col_x = x_pos
     while col_x < 10 - get_piece_rightmost_index_from_origin(piece_index_array):
         side = "to_right"
-        #print("checking can place at x:",col_x + 1," y:",y_pos)
+
         if not can_place2(piece_index_array, board, col_x + 1, y_pos, side):
             break
-        #print("can place at x:",col_x + 1," y:",y_pos)
+
         col_x += 1
         entry = [piece_val, rotation, col_x, y_pos]
         if entry not in piece_info_arrays_array:
             piece_info_arrays_array.append(entry)
-    #print(piece_info_arrays_array)
-    #print("ENDING SIDEWAYS MOVEMENT SIMULATION", "added ", len(piece_info_arrays_array), " entries which are:", piece_info_arrays_array)
     return  piece_info_arrays_array
     # position array is array that has:
     # [rotation,y_pos], its with a purpose to keep track of branches and not run into infinite loops
