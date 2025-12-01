@@ -1,36 +1,25 @@
-def change_rotations(rotation):
-    # to be fair im not really sure if we need that function or if it would be better to rename things from the get go
-    # i dont wanna fuck around changing variables now so this is the only reason why i made that
-    rotation_map_no_180 = {
-        "0": "0",
-        "cw": "R",
-        "180": "2",
-        "ccw": "L",
-    }
-    rotation_map_T_180 = {
-        "0": "N",
-        "cw": "E",
-        "180": "S",
-        "ccw": "W",
-    }
-    if rotation in rotation_map_no_180:
-        return rotation_map_no_180[rotation]
-    elif rotation in rotation_map_T_180:
-        return rotation_map_T_180[rotation]
 from board_operations.checking_valid_placements import place_piece    
-from utility.pieces import PIECES
-from spins import SRS_I_piece_kick_table,SRS_rest_pieces_kick_table,SRS_Tpiece_180_kick_table
 from utility.pieces_index import PIECES_index
-from utility.print_board import print_board
+
+def is_valid_position(board, piece_coords, x, y):
+    """Fast check if piece can be placed at x, y without copying board"""
+    for dx, dy in piece_coords:
+        nx, ny = x + dx, y + dy
+        # Check boundaries (0-9 for x, 0-19 for y)
+        if not (0 <= nx < 10 and 0 <= ny < 20):
+            return False
+        # Check collision
+        if board[ny][nx] != ' ':
+            return False
+    return True
 
 def try_place_piece(board,kick_table,info_array,rotation_goal):
     # rename that function to ..._with_kick or sth 
-    """this function tries to place a piece by using a spin, if it fails, it tries puttinga  kick offset on it
+    """this function tries to place a piece by using a spin, if it fails, it tries putting a kick offset on it
     when fails completely,returns none"""
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
-    #str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
-    #print("info array:",info_array, "rotation goal", rotation_goal)
+
     rotation_goal_backup = rotation_goal
     try:
         rotated_piece = PIECES_index[info_array[0]][rotation_goal]
@@ -42,70 +31,24 @@ def try_place_piece(board,kick_table,info_array,rotation_goal):
             rotation_goal = rotation_goal[-1]
             str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
             rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
-    #print(rotated_piece)
     str_piece_rotation_goal = rotation_goal
-    #print(str_piece_rotation_goal)
     rotation_goal = rotation_goal[-1]
-    for offset in kick_table[info_array[1][-1]+'-'+rotation_goal]:
-        #print("trying offset:",offset)
-        #print(info_array[1][-1]+'-'+rotation_goal)
-        #print(kick_table[info_array[1][-1]+'-'+rotation_goal])
-        #print(offset,info_array[2] + int(offset[0]), info_array[3] + int(offset[1]))
-        if len(rotation_goal) == 1:
-            board_,result = place_piece(rotated_piece,info_array[0],board,info_array[2] + int(offset[0]),info_array[3] + int(offset[1]),rotation_goal_backup)
-        else:
-            board_,result = place_piece(rotated_piece,info_array[0],board,info_array[2] + int(offset[0]),info_array[3] + int(offset[1]),rotation_goal)
-        print([info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])])
-        #print("result(places piece):",result)
-        #print_board(board_)
-        if result:
-            # returning board makes no sense, ill return position array instead
-            #print("offset ", offset)
-            #print([info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])])
+    
+    # Pre-calculate key for kick table
+    kick_key = info_array[1][-1]+'-'+rotation_goal
+    
+    for offset in kick_table[kick_key]:
+        target_x = info_array[2] + int(offset[0])
+        target_y = info_array[3] + int(offset[1])
+        
+        # Use fast check instead of place_piece
+        if is_valid_position(board, rotated_piece, target_x, target_y):
             if offset == (0,0):
                 spin = False
             else:
                 spin = True
-            return [info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])],spin
+            return [info_array[0],str_piece_rotation_goal,target_x, target_y],spin
             #distinguishing spins would be easier than just making sure they work so spins dont do mpre than normal clears
-            
-            #return board_ # now continue on heuristic from this point
 
     return info_array, False
-def simulate_kicks(board,piece,rotation,x_pos,y_pos,piece_info_array):
-    # piece info array example [("T",'flat_0',x(fore xample 4),y(for example 15))]
-    possible_positions_array = []
-    # clockwise/counter clockwise
-    if piece != "I":
-        kick_table = SRS_rest_pieces_kick_table
-    elif piece == "I":
-        kick_table = SRS_I_piece_kick_table
-    rotation_goal = None
-    # here would we just cycle trhough rotation goals like R,2,L 
-    # if they can be placed, go on, if no, try next one
-    result = try_place_piece(board,kick_table,piece_info_array,rotation_goal)
-    if result is not None:
-        possible_positions_array.append(result)
-        # add all possible potitions and put them through heuristic
-    # IMPORTANT: there is a srs L/J kick i dont really have any data on as it seems to be tetrio thing, it uses 180 and can make a L/J piece be kicked using 180 spin  which is the only piece that can be kicked like that except T piece  
-    # 180
-    if piece == 'T':
-        kick_table = SRS_Tpiece_180_kick_table 
-        if piece_info_array[1] == "flat_0":
-            rotation_goal = "flat_2"
-        elif piece_info_array[1] == "flat_2":
-            rotation_goal = "flat_0"
-        elif piece_info_array[1] == "spin_R":
-            rotation_goal = "spin_L"
-        elif piece_info_array[1] == "spin_L":
-            rotation_goal = "spin_R"
-        result = try_place_piece(board,kick_table,piece_info_array,rotation_goal)
-        if result is not None:
-            possible_positions_array.append(result)
-    # if one position after softdrop unlocks every x pos (for example with a flat board)
-    # you can use formula 10- width of block, and if in one for loop, 10-width entries were added
-    # into piece_info_array, that means that we have a flat board and we DO NOT need to go through
-    # every single x position, just that one on the same y level
-    
-    return possible_positions_array
 

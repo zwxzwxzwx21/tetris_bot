@@ -1,3 +1,12 @@
+python .\main.py --rule 
+
+
+
+
+
+
+
+
 with new window that shows how algorythm work i would like to add some things that may improve the clarity of how things work:
 - have a small game window like, 360x640 for example, you have some modes on the left like:
      - "random" - which  just places pieces and clears lines, singles,doubles whatever currect algorythm has to offer

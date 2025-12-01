@@ -2,7 +2,7 @@ from board_operations.checking_valid_placements import find_lowest_y_for_piece, 
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 from utility.print_board import print_board
 from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
-from spins_funcions import simulate_kicks, try_place_piece
+from spins_funcions import try_place_piece
 import time
 from collections import deque
 PRINT_MODE = False
@@ -41,7 +41,6 @@ def search_for_best_move(goal, board, best_move_y_pos):
             continue
         visited_positions.add(position_array_tuple)
 
-        applied_kicks_counter = 3
         board_copy = [row.copy() for row in board]
         if position_array == goal_as_pos_array:
             print(f"goal found!! {position_array}")

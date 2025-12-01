@@ -8,12 +8,29 @@ import threading
 import time
 import pandas as pd
 import os
-from board_operations.stack_checking import find_highest_y
 import config
-from tetrio_parsing.calculate_attack import count_lines_clear
 import itertools
 
+from board_operations.stack_checking import find_highest_y
+from board_operations.board_operations import clear_lines, solidify_piece
+
+from tetrio_parsing.calculate_attack import count_lines_clear
+
+from dataclasses import dataclass
+
 from utility.pieces_index import PIECES_index 
+from utility.pieces import PIECES
+from utility.print_board import print_board
+
+from BoardRealTimeView import TetrisBoardViewer
+
+from bruteforcing import find_best_placement
+
+from GenerateBag import add_piece_from_bag, create_bag
+
+from tests.combo_attack_test import (
+    custom_board,  # probably stupid way to do that, idk better yet
+)
 
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(
@@ -24,23 +41,12 @@ logging.basicConfig(
     format="%(levelname)s | %(filename)s -> %(lineno)d in %(funcName)s: %(message)s",
     level=logging.DEBUG,
 )
-from board_operations.board_operations import clear_lines, solidify_piece
-#from board_operations.checking_valid_placements import drop_piece
-from BoardRealTimeView import TetrisBoardViewer
-from bruteforcing import find_best_placement
-from GenerateBag import add_piece_from_bag, create_bag
-from tests.combo_attack_test import (
-    custom_board,  # probably stupid way to do that, idk better yet
-)
-from utility.pieces import PIECES
-from utility.print_board import print_board
 
 if not PIECES:
     raise ImportError("PIECES dictionary could not be imported or is empty.")
 
 DESIRED_QUEUE_PREVIEW_LENGTH = 5
 
-from dataclasses import dataclass
 
 @dataclass
 class MoveHistory:
@@ -320,6 +326,7 @@ class TetrisGame:
                 logging.debug("game loop finished")
                 self.game_over_signal[0] = True
                 return pieces_placed
+            
 def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
                       attack_bonus, game_stats, seed, game_number):
         filepath = "bruteforcer_stats.xlsx"
@@ -350,6 +357,7 @@ def save_game_results(uneven_loss, holes_punishment, height_diff_punishment,
         updated_df.to_excel(filepath, index=False)
         
         return len(updated_df)
+    
 def run_bruteforce_games(params,num_games=3):
     total_lines = 0
 
