@@ -28,20 +28,6 @@ def can_place(piece_pos_array, board, ypos, xpos,rotation, piece,print_debug=Fal
     brd,a = place_piece(piece_pos_array, piece, board, xpos, ypos, rotation ,print_debug=False)  
     if print_debug: print_board(brd) 
     return True
-def soft_drop_simulation(piece, board, col,print_ = False):
-    """
-    Simulates dropping a piece in the given column and returns a new board.
-    Does not modify the original board.
-    """
-    board_copy = [row.copy() for row in board]  # deep copy
-    row = 0
-    while can_place(piece, board_copy, row + 1, col,print_):
-        row += 1
-    if row == 0: 
-        return 0
-    board_copy = place_piece(piece, board_copy, row, col,print_)
-    return board_copy
- # ^  this function doenst seem to do much so id remove it at some point when im done wtih spins ^ 
  
 def soft_drop_simulation_returning_ypos(piece_index_array, board, col,rotate,piece,print_ = False):
     """
@@ -110,13 +96,6 @@ def can_place2(piece, board, xpos, ypos,side):
     Places a piece on the board at the specified position.
     doesnt modify the board, needs to use returns now
     """
-
-    rows = len(board)
-    cols = len(board[0])
-    piece_leftmost_index = get_piece_leftmost_index_from_origin(piece)
-    piece_rightmost_index = get_piece_rightmost_index_from_origin(piece)
-    piece_h = get_piece_height(piece)
-    piece_w = get_piece_width(piece)
 
     for (dx,dy) in piece:
 

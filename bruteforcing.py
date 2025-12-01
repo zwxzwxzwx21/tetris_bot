@@ -2,8 +2,12 @@ import copy
 from logging import config
 from pprint import pp
 import time
+import random
+import pandas as pd
+import os
+import config
+
 from board_operations.board_operations import clear_lines
-from board_operations.checking_valid_placements import can_place, place_piece, soft_drop_simulation
 from board_operations.stack_checking import (
     check_holes2,
     get_heights,
@@ -14,10 +18,7 @@ from utility.print_board import print_board
 from utility.pieces import PIECES, PIECES_soft_drop
 from utility.pieces_index import PIECES_index, PIECES_xpos_indexing_value, PIECES_startpos_indexing_value
 
-from board_operations.checking_valid_placements import find_lowest_y_for_piece, soft_drop_simulation,get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin,get_piece_height,get_piece_lowest_index_from_origin,get_piece_width
-       
-import pandas as pd
-import os
+from board_operations.checking_valid_placements import find_lowest_y_for_piece, can_place, place_piece,get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin,get_piece_height,get_piece_lowest_index_from_origin,get_piece_width
 
 DEBUG = True
 
@@ -30,7 +31,7 @@ rotations = {
     "J": ["flat", "180", "cw", "ccw"],
     "T": ["flat", "180", "cw", "ccw"],
 }
-import random
+
 
 MOVES_DONE = 0
 MOVES_REMOVED = 0
@@ -38,13 +39,12 @@ TIME_LIMIT = 999
 UNEVEN_THRESHOLD = 1.1  
 MAX_HEIGHT_DIFF = 6 
 BRUTEFORCE_MODE = False
-import config
 values = {
-    "uneven_loss": {"default": 1.5035, "max": 100},
-    "holes_punishment": {"default": 1.411334, "max": 100},
-    "height_diff_punishment": {"default": 0.08169, "max": 100},
-    "attack_bonus": {"default": 2.313, "max": 100},
-    "max_height_punishment": {"default": 0.45217, "max": 100}
+    "uneven_loss": {"default": 1, "max": 100},
+    "holes_punishment": {"default": 2.5, "max": 100},
+    "height_diff_punishment": {"default": 3, "max": 100},
+    "attack_bonus": {"default": 0, "max": 100},
+    "max_height_punishment": {"default": 0.5, "max": 100}
     
 }
 
@@ -83,6 +83,14 @@ def find_best_placement(board, queue, combo, stats):
     total_lines = 0
     total_attack = 0
     feature = {
+        "uneven": 2,
+        "holes": 10,
+        #"height_diff": 0.08169,
+        "max_height": 0.1,
+        "different_heights": 1.2,
+        "attack": 1,
+    }
+    feature_backup = {
         "uneven": 1.5035,
         "holes": 1.411334,
         "height_diff": 0.08169,

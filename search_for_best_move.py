@@ -1,4 +1,4 @@
-from board_operations.checking_valid_placements import find_lowest_y_for_piece, sideways_movement_simulation, soft_drop_simulation, place_piece, soft_drop_simulation_returning_ypos
+from board_operations.checking_valid_placements import find_lowest_y_for_piece, sideways_movement_simulation, place_piece, soft_drop_simulation_returning_ypos
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 from utility.print_board import print_board
 from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
@@ -7,7 +7,7 @@ import time
 from collections import deque
 PRINT_MODE = False
 def search_for_best_move(goal, board, best_move_y_pos):
-    import time
+    
     '''this function would search for the best move to reach goal on board, goal is string like 'T_x4_flat_0'
     would return move history to reach that goal'''
     
