@@ -110,4 +110,6 @@ def reconstruct_path(came_from, goal_tuple):
         current = parent
     path.reverse()  
     print("here is the path:", path)
+    if len(path) < 1:
+        return None
     return path

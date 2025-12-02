@@ -123,17 +123,9 @@ def find_best_placement(board, queue, combo, stats):
 
                     arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
                     temp_array.append([current_piece, rotation_name, start_x, y])
-    
+    list_of_best_moves = []
     for position_info in arr_piece_info_array:
-        '''reachable_position = False
         
-        if search_for_best_move(position_info,board,best_move_y_pos) is not None:
-                print("verified best move found in search_for_best_move, {}".format(best_move))
-                reachable_position = True
-        else:
-            best_move = None  # reset best move if not found in search
-        if reachable_position == False:
-            continue'''
         new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False)
         if not is_place_piece_successful:
             if config.PRINT_MODE:
@@ -163,8 +155,8 @@ def find_best_placement(board, queue, combo, stats):
             total_attack += feature["attack"][0]
             total_lines += cleared_lines
             print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
-            
-            
+            list_of_best_moves.append((best_move, best_move_y_pos))
+        
     if config.PRINT_MODE:
         pp(best_feature)
     if config.PRINT_MODE:
@@ -182,4 +174,13 @@ def find_best_placement(board, queue, combo, stats):
         return None
     assert move_history
     print(f"best move: {best_move} with loss: {best_loss}")
-    return move_history, best_move,best_move_y_pos
+    print(list_of_best_moves)
+    for best_move_from_list, best_move_y_position in reversed(list_of_best_moves):
+        print(f"attempting to find sequence for best move: {best_move_from_list} at y pos {best_move_y_position}")
+        
+        if best_move_from_list is not None:
+            goal_string = best_move_from_list
+            sequence = search_for_best_move(goal_string, board, best_move_y_position)
+            if sequence is not None:
+                return move_history, best_move_from_list,best_move_y_position
+    return None

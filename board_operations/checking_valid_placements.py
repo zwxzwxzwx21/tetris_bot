@@ -42,6 +42,7 @@ def soft_drop_simulation_returning_ypos(piece_index_array, board, col,rotate,pie
         return 19
     
     return row
+
 def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
     board_copy = [row.copy() for row in board]
     row = 0
@@ -53,6 +54,7 @@ def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
     if row == 0: 
         return 0
     return row
+
 from utility.pieces_index import PIECES_lowest_point_from_origin, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
 def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True):
 
@@ -82,7 +84,10 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
                 new_board[y + dy][x + dx] = piece
                 if print_debug:
                     print('placing piece at:', x + dx, y + dy)
-                
+            else:
+                if print_debug:
+                    print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
+                return old_board ,False
         else:
             if print_debug:
                 print('returning old board cuz piece cant be placed, failed at :', x + dx, y + dy)
