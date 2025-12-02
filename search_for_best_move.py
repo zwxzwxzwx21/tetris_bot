@@ -99,7 +99,6 @@ def search_for_best_move(goal, board, best_move_y_pos):
                     print(f"goal found! {new_position}")
                     return reconstruct_path(came_from, tuple(new_position))
 
-
     return None 
 
 def reconstruct_path(came_from, goal_tuple):

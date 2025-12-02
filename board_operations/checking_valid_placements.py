@@ -76,7 +76,7 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=True
         if print_debug:
             print(x + dx, y + dy, "place piece", piece, "<-")
 
-        print(f"y= {y} + {dy} = {y + dy} x= {x} + {dx} = {x + dx}")
+        #print(f"y= {y} + {dy} = {y + dy} x= {x} + {dx} = {x + dx}")
         if 0 <= x + dx < 10 and 0 <= y + dy < 20:   
             if new_board[y + dy][x + dx] == ' ':
                 new_board[y + dy][x + dx] = piece

@@ -18,6 +18,8 @@ from utility.print_board import print_board
 from utility.pieces import PIECES, PIECES_soft_drop
 from utility.pieces_index import PIECES_index, PIECES_xpos_indexing_value, PIECES_startpos_indexing_value
 
+from search_for_best_move import search_for_best_move
+
 from board_operations.checking_valid_placements import find_lowest_y_for_piece, can_place, place_piece,get_piece_leftmost_index_from_origin,get_piece_rightmost_index_from_origin,get_piece_height,get_piece_lowest_index_from_origin,get_piece_width
 
 DEBUG = True
@@ -121,12 +123,17 @@ def find_best_placement(board, queue, combo, stats):
 
                     arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
                     temp_array.append([current_piece, rotation_name, start_x, y])
-
-
-
     
     for position_info in arr_piece_info_array:
+        '''reachable_position = False
         
+        if search_for_best_move(position_info,board,best_move_y_pos) is not None:
+                print("verified best move found in search_for_best_move, {}".format(best_move))
+                reachable_position = True
+        else:
+            best_move = None  # reset best move if not found in search
+        if reachable_position == False:
+            continue'''
         new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False)
         if not is_place_piece_successful:
             if config.PRINT_MODE:
@@ -156,8 +163,7 @@ def find_best_placement(board, queue, combo, stats):
             total_attack += feature["attack"][0]
             total_lines += cleared_lines
             print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
-    from search_for_best_move import search_for_best_move
-    sequence_of_moves = search_for_best_move(best_move,board,best_move_y_pos) # would probably need pieces for more than one move
+            
             
     if config.PRINT_MODE:
         pp(best_feature)
