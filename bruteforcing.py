@@ -42,11 +42,11 @@ UNEVEN_THRESHOLD = 1.1
 MAX_HEIGHT_DIFF = 6 
 BRUTEFORCE_MODE = False
 values = {
-    "uneven_loss": {"default": 1, "max": 100},
-    "holes_punishment": {"default": 2.5, "max": 100},
-    "height_diff_punishment": {"default": 3, "max": 100},
-    "attack_bonus": {"default": 0, "max": 100},
-    "max_height_punishment": {"default": 0.5, "max": 100}
+    "uneven_loss": {"default": 1.5035, "max": 100},
+    "holes_punishment": {"default": 1.411334, "max": 100},
+    "height_diff_punishment": {"default": 0.08169, "max": 100},
+    "attack_bonus": {"default": 2.313, "max": 100},
+    "max_height_punishment": {"default": 0.45217, "max": 100}
     
 }
 
@@ -85,12 +85,12 @@ def find_best_placement(board, queue, combo, stats):
     total_lines = 0
     total_attack = 0
     feature = {
-        "uneven": 2,
-        "holes": 10,
-        #"height_diff": 0.08169,
-        "max_height": 0.1,
-        "different_heights": 1.2,
-        "attack": 1,
+        "uneven": 1.5035,
+        "holes": 1.411334,
+        "height_diff": 0.08169,
+        "max_height": 0.45217,
+        "different_heights": 1,
+        "attack": 2.313,
     }
     feature_backup = {
         "uneven": 1.5035,
