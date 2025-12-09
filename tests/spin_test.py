@@ -6,6 +6,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from board_operations.board_operations import clear_lines
 from board_operations.checking_valid_placements import place_piece
 from search_for_best_move import search_for_best_move
 from board_operations.stack_checking import find_highest_y
@@ -80,6 +81,28 @@ sspin_triple_testcase = [
     ['x','x','x',' ',' ','x','x','x','x','x'],
     ['x','x','x','x',' ','x','x','x','x','x'],
     ]
+clean_lines_testcase = [
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],  
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
+    ['x','x','x','x','x','x','x','x','x','x'],
+    ['x','x','x',' ','x','x','x','x','x','x'],
+    ['x','x','x',' ','x','x','x','x','x','x'],
+    ['x','x','x',' ','x','x','x','x','x','x'],
+    ]
 o_testcase = [
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],
@@ -105,8 +128,12 @@ o_testcase = [
 queue = ['S'] #  vro is alonje :sob: 
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 #find_best_placement(tspin_double_testcase,queue,0,{}) 
-test = search_for_best_move("S_x4_spin_L",sspin_triple_testcase,18)
-
+#test = search_for_best_move("S_x4_spin_L",sspin_triple_testcase,18)
+from heuristic_test import clearedLines
+a = clearedLines(clean_lines_testcase)
+print(a)
+b,c = clear_lines(clean_lines_testcase) 
+print(c)
 #test = search_for_best_move("T_x7_flat_2",tspin_double_testcase,18)
 #test = search_for_best_move("T_x3_spin_R",tspin_triple_testcase,18)
 from spins_funcions import try_place_piece

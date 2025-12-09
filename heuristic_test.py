@@ -9,8 +9,8 @@ def aggregate(board):
                 
     return aggregateHeight/10
 
-def clearedLines(board):
-    clearedLines = 0
+def clearedLines(clearedLines):
+    '''clearedLines = 0
     for line in board: #cleared line until detects empty tile
         cleared = True
         for tile in line:
@@ -18,7 +18,7 @@ def clearedLines(board):
                 cleared = False
                 break
         if cleared:
-            clearedLines += 1
+            clearedLines += 1'''
             
     match clearedLines:
         case 4:
@@ -81,10 +81,10 @@ def iDependency(colHeights):
     if colHeights[2] - colHeights[1] >= 3:
         iDep += 1
 
-    return iDep
+    return iDep 
 
 
-def analyze(board):
+def analyze(board,cleared_lines):
     weights = [
     -1.030,   # aggregate
      0.760,   # increase tetris score after mvp
@@ -115,7 +115,7 @@ def analyze(board):
         columns.append([row[i] for row in board])
 
     varA = aggregate(board)
-    varB = clearedLines(board) 
+    varB = clearedLines(cleared_lines) 
     varC = bumpiness(colHeights)
     varD = blockade(columns)
     varE = tetrisSlot(board, columns[0])
@@ -124,7 +124,7 @@ def analyze(board):
     print(a*varA + b*varB + c*varC + d*varD + e*varE + f*varF)
     return a*varA + b*varB + c*varC + d*varD + e*varE + f*varF
 
-def analyze_main(board):
+def analyze_main(board,cleared_lines):
     # this one is for the board view printing
     weights = [
     -1.030,   # aggregate
@@ -156,7 +156,7 @@ def analyze_main(board):
         columns.append([row[i] for row in board])
 
     varA = aggregate(board)
-    varB = clearedLines(board) 
+    varB = cleared_lines
     varC = bumpiness(colHeights)
     varD = blockade(columns)
     varE = tetrisSlot(board, columns[0])

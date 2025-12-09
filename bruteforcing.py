@@ -58,9 +58,9 @@ if config.PRINT_MODE:
     f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}" # type: ignore
 )
 from heuristic_test import clearedLines, bumpiness, blockade, tetrisSlot, analyze
-def loss(board) -> float:
+def loss(board, cleared_lines) -> float:
    
-    return analyze(board)
+    return analyze(board,cleared_lines)
 
 def find_best_placement(board, queue, combo, stats):
     move_history = []
@@ -120,18 +120,19 @@ def find_best_placement(board, queue, combo, stats):
             GAMEOVER = True
             break
         board_after_clear, cleared_lines = clear_lines(new_board)
+        print("cleared lines:", cleared_lines)
         # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
         #print_board(board_after_clear)
         print(position_info)
         print_board(new_board)
         #time.sleep(1)
-        cur_loss = (current_loss := loss(new_board))
+        cur_loss = (current_loss := loss(new_board,cleared_lines))
         print(cur_loss)
         print(best_loss)
         #time.sleep(1)
         
         
-        if (current_loss := loss(new_board)) > best_loss:# type: ignore
+        if (current_loss := loss(new_board,cleared_lines)) > best_loss:# type: ignore
             #best_move = f"{current_piece}_x{start_x}_{rotation_name}"
             best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
             best_move_y_pos = position_info[3]

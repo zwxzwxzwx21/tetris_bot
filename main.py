@@ -270,13 +270,20 @@ class TetrisGame:
                     self.stats.tetris += 1
 
                 self.board[:] = board_after_clear
-                self.pieces_placed += 1
+                total_lines_cleared = (
+                    self.stats.single
+                    + 2 * self.stats.double
+                    + 3 * self.stats.triple
+                    + 4 * self.stats.tetris
+                )
                 if viewer:
                     viewer.clear_preview()
                     viewer.update_board(self.board)
-                    agg, cl, bump, block, ts, idep = analyze_main(self.board)
+                    agg, cl, bump, block, ts, idep = analyze_main(
+                        self.board, cleared_lines=lines_cleared_count
+                    )
+                    self.pieces_placed += 1
                     viewer.update_heuristics(agg, cl, bump, block, ts, idep)
-                    viewer.update_pieces(self.pieces_placed)
                 if config.PRINT_MODE:
                     print_board(self.board)
 
@@ -448,7 +455,7 @@ if __name__ == "__main__":
 
     use_gui = "gui" in args.rules
     from heuristic_test import analyze_main
-    game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency = analyze_main(game.board)
+    game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency = analyze_main(game.board,cleared_lines=0)
     
     if use_gui:
         viewer = TetrisBoardViewer(

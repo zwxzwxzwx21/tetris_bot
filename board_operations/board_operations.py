@@ -21,6 +21,7 @@ def clear_lines(board):
     for _ in range(lines_cleared):
         new_board.insert(0, [' ' for _ in range(10)])
     # doesn't have to return lines_cleared, it does so to count quads and other clears
+    print(f"Lines cleared: {lines_cleared}")
     return new_board, lines_cleared
 
 def solidify_piece(board, piece,piece_pos_array):
