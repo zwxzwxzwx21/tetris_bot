@@ -57,24 +57,10 @@ if config.PRINT_MODE:
     print(
     f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}" # type: ignore
 )
-
-def loss(feature: dict, uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment) -> float:
-    if config.PRINT_MODE:
-        print("feature in loss function:", feature)
-        print("feature values:", feature["uneven"], feature["holes"], feature["different_heights"], feature["attack"][0], feature["max_height"])
-        print("calculating loss with values:", "uneven_loss:", uneven_loss*feature["uneven"], "holes_punishment:", holes_punishment*feature["holes"], "height_diff_punishment:", height_diff_punishment*feature["different_heights"], "attack_bonus:", attack_bonus*feature["attack"][0], "max_height_punishment:", max_height_punishment*max(feature["max_height"] - 4, 0))
-        print("uneven_loss * feature[uneven] => ",uneven_loss," * " ,feature["uneven"]," ", uneven_loss * feature["uneven"])
-        print("holes_punishment * feature[holes] => ",holes_punishment," * " ,feature["holes"]," ", holes_punishment * feature["holes"])
-        print("height_diff_punishment * feature[different_heights] => ",height_diff_punishment," * " ,feature["different_heights"]," ", height_diff_punishment * feature["different_heights"])
-        print("max_height_punishment * max(feature[max_height] - 4, 0) => ",max_height_punishment," * " ,max(feature["max_height"] - 4, 0)," ", max_height_punishment * max(feature["max_height"] - 4, 0))
-        print("attack_bonus * feature[attack][0] => ",attack_bonus," * " ,feature["attack"][0]," ", attack_bonus * feature["attack"][0])
-    return (
-        uneven_loss * feature["uneven"]
-        + holes_punishment * feature["holes"]
-        + height_diff_punishment * feature["different_heights"]
-        + max_height_punishment * max(feature["max_height"] - 4, 0) 
-        - attack_bonus * feature["attack"][0]
-    )
+from heuristic_test import clearedLines, bumpiness, blockade, tetrisSlot, analyze
+def loss(board) -> float:
+   
+    return analyze(board)
 
 def find_best_placement(board, queue, combo, stats):
     move_history = []
@@ -86,6 +72,7 @@ def find_best_placement(board, queue, combo, stats):
     total_attack = 0
     feature = {
         "uneven": 1.5035,
+        "uneven_loss": 1.5035,
         "holes": 1.411334,
         "height_diff": 0.08169,
         "max_height": 0.45217,
@@ -102,7 +89,7 @@ def find_best_placement(board, queue, combo, stats):
     }
      
     best_feature = feature.copy()
-    best_loss = 10000
+    best_loss = -999999
 
     arr_piece_info_array = []
 
@@ -134,25 +121,22 @@ def find_best_placement(board, queue, combo, stats):
             break
         board_after_clear, cleared_lines = clear_lines(new_board)
         # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
-        heights = get_heights(board_after_clear)
-        feature["max_height"] = max(heights)
-        feature["uneven"] = int(uneven_stack_est(heights))
-        feature["holes"] = check_holes2(board_after_clear)
-        feature["different_heights"] = sum(
-            heights[x] != heights[x + 1] for x in range(len(heights) - 1)
-        )
-        feature["attack"] = count_lines_clear(cleared_lines, combo, board_after_clear)
-        print_board(board_after_clear)
+        #print_board(board_after_clear)
         print(position_info)
-        if (current_loss := loss(feature, uneven_loss, holes_punishment,  # type: ignore
-                                height_diff_punishment, attack_bonus, max_height_punishment)) < best_loss:# type: ignore
+        print_board(new_board)
+        #time.sleep(1)
+        cur_loss = (current_loss := loss(new_board))
+        print(cur_loss)
+        print(best_loss)
+        #time.sleep(1)
+        
+        
+        if (current_loss := loss(new_board)) > best_loss:# type: ignore
             #best_move = f"{current_piece}_x{start_x}_{rotation_name}"
             best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
             best_move_y_pos = position_info[3]
             move_history = [best_move]
             best_loss = current_loss
-            best_feature = feature
-            total_attack += feature["attack"][0]
             total_lines += cleared_lines
             print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
             list_of_best_moves.append((best_move, best_move_y_pos))
@@ -163,13 +147,7 @@ def find_best_placement(board, queue, combo, stats):
         print()
     if GAMEOVER:
         lines_cleared = (stats.single + stats.double + stats.triple + stats.tetris)
-        if config.PRINT_MODE:
-            print(
-            f"DATA: \n uneven_loss: {uneven_loss},\n holes_punishment: {holes_punishment},\n" # type: ignore
-            f"height_diff_punishment: {height_diff_punishment},\n attack_bonus: {attack_bonus},\n"# type: ignore
-            f"max_height_punishment: {max_height_punishment}\n cleared lines: {lines_cleared}\n"# type: ignore
-            f"total attack: {stats.total_attack}\n"
-        )
+        
             
         return None
     assert move_history
