@@ -129,14 +129,14 @@ queue = ['S'] #  vro is alonje :sob:
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 #find_best_placement(tspin_double_testcase,queue,0,{}) 
 #test = search_for_best_move("S_x4_spin_L",sspin_triple_testcase,18)
-from heuristic_test import clearedLines
+from heuristic import clearedLines
 a = clearedLines(clean_lines_testcase)
 print(a)
 b,c = clear_lines(clean_lines_testcase) 
 print(c)
 #test = search_for_best_move("T_x7_flat_2",tspin_double_testcase,18)
 #test = search_for_best_move("T_x3_spin_R",tspin_triple_testcase,18)
-from spins_funcions import try_place_piece
+from spins_funcions import try_place_piece_with_kick
 #test,a = try_place_piece(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',4,16],'spin_R')
 #place_piece_test = place_piece(PIECES_index["T"]['spin_R'],test[0],tspin_triple_testcase,test[2],test[3],test[1] )
 #print_board(place_piece_test[0])
@@ -151,14 +151,14 @@ time.sleep(2)
 #print(arr)
 
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
-from spins_funcions import try_place_piece
+from spins_funcions import try_place_piece_with_kick
 #print(PIECES["I"]['flat_0'])
 #x,y = 2,2
 #brd,a = place_piece(PIECES_index["I"]['flat_0'],"I",tspin_triple_testcase,x,y )
 ##print_board(brd)
 
 
-a=  try_place_piece(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',4,16],'spin_L')
+a=  try_place_piece_with_kick(tspin_triple_testcase,SRS_rest_pieces_kick_table, ['T','flat_0',4,16],'spin_L')
 print(a)
 '''place_piece_test = place_piece(PIECES_index["T"]['flat_0'],"T",tspin_triple_testcase,4,16,"flat_0" )
 print(place_piece_test)

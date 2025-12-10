@@ -10,15 +10,6 @@ def aggregate(board):
     return aggregateHeight/10
 
 def clearedLines(clearedLines):
-    '''clearedLines = 0
-    for line in board: #cleared line until detects empty tile
-        cleared = True
-        for tile in line:
-            if tile == " ":
-                cleared = False
-                break
-        if cleared:
-            clearedLines += 1'''
             
     match clearedLines:
         case 4:

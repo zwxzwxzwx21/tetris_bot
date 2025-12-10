@@ -15,7 +15,7 @@ import itertools
 from board_operations.stack_checking import find_highest_y
 from board_operations.board_operations import clear_lines, solidify_piece
 
-from heuristic_test import analyze
+from heuristic import analyze
 
 from tetrio_parsing.calculate_attack import count_lines_clear
 
@@ -276,14 +276,15 @@ class TetrisGame:
                     + 3 * self.stats.triple
                     + 4 * self.stats.tetris
                 )
+                self.pieces_placed += 1
                 if viewer:
                     viewer.clear_preview()
                     viewer.update_board(self.board)
                     agg, cl, bump, block, ts, idep = analyze_main(
-                        self.board, cleared_lines=lines_cleared_count
+                        self.board, cleared_lines=total_lines_cleared
                     )
-                    self.pieces_placed += 1
                     viewer.update_heuristics(agg, cl, bump, block, ts, idep)
+                    viewer.update_pieces(self.pieces_placed)
                 if config.PRINT_MODE:
                     print_board(self.board)
 
@@ -454,7 +455,7 @@ if __name__ == "__main__":
     game.gui_mode[0] = "gui" in args.rules
 
     use_gui = "gui" in args.rules
-    from heuristic_test import analyze_main
+    from heuristic import analyze_main
     game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency = analyze_main(game.board,cleared_lines=0)
     
     if use_gui:

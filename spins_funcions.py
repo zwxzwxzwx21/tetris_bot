@@ -11,14 +11,12 @@ def is_valid_position(board, piece_coords, x, y):
             return False
     return True
 
-def try_place_piece(board,kick_table,info_array,rotation_goal):
-    # rename that function to ..._with_kick or sth 
+def try_place_piece_with_kick(board,kick_table,info_array,rotation_goal):
     """this function tries to place a piece by using a spin, if it fails, it tries puttinga  kick offset on it
     when fails completely,returns none"""
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
-
-    rotation_goal_backup = rotation_goal
+    
     try:
         rotated_piece = PIECES_index[info_array[0]][rotation_goal]
     except KeyError:

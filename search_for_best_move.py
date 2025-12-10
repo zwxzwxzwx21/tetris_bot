@@ -2,7 +2,7 @@ from board_operations.checking_valid_placements import find_lowest_y_for_piece, 
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 from utility.print_board import print_board
 from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
-from spins_funcions import try_place_piece
+from spins_funcions import try_place_piece_with_kick
 import time
 from collections import deque
 PRINT_MODE = False
@@ -59,7 +59,7 @@ def search_for_best_move(goal, board, best_move_y_pos):
        
             if rot_goal == position_array[1]: continue  # no need to try rotate into the same rotation
             if (position_array[1], rot_goal) in [('flat_0','flat_2'), ('flat_2','flat_0'), ('spin_R','spin_L'), ('spin_L','spin_R')]: continue
-            rotated_position_array, spin = try_place_piece(board_copy, kick_table, position_array.copy(), rot_goal)
+            rotated_position_array, spin = try_place_piece_with_kick(board_copy, kick_table, position_array.copy(), rot_goal)
             if rotated_position_array is not None:
                 rotated_tuple = tuple(rotated_position_array.copy())
                 if  tuple(rotated_position_array) not in visited_positions: 

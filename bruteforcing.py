@@ -57,7 +57,7 @@ if config.PRINT_MODE:
     print(
     f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}" # type: ignore
 )
-from heuristic_test import clearedLines, bumpiness, blockade, tetrisSlot, analyze
+from heuristic import clearedLines, bumpiness, blockade, tetrisSlot, analyze
 def loss(board, cleared_lines) -> float:
    
     return analyze(board,cleared_lines)
