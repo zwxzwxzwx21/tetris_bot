@@ -42,7 +42,7 @@ def pick_neighbour(params,step_size=0.3):
     return new_params
 
 from main import run_bruteforce_games
-def E(params, games=10):
+def E(params, games=1):
     print(f"uneven: {params["uneven_loss"]}, holes: {params["holes_punishment"]}, height diff: {params["height_diff_punishment"]}, attack: {params["attack_bonus"]}, max height: {params["max_height_punishment"]}")
     total_lines = 0
     for i in range(games):

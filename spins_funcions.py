@@ -16,7 +16,7 @@ def try_place_piece_with_kick(board,kick_table,info_array,rotation_goal):
     when fails completely,returns none"""
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
-    
+
     try:
         rotated_piece = PIECES_index[info_array[0]][rotation_goal]
     except KeyError:

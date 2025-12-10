@@ -62,7 +62,7 @@ def tetrisSlot(board, well):
 def iDependency(colHeights):
     iDep = 0
 
-    for i in range(0, 9):
+    for i in range(2, 8):
         c, l, r = colHeights[i], colHeights[i-1], colHeights[i+1] #heights of current and adjacent columns
         if l - c >= 3 and r - c >= 3:
             iDep += 1
