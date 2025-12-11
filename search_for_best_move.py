@@ -32,6 +32,7 @@ def search_for_best_move(goal, board, best_move_y_pos):
             came_from[tuple(start_pos)] = (None, "harddrop") 
     visited_positions = set() 
     
+    board_copy = [row.copy() for row in board]
     while queue_of_positions:  # for every harddropped position, rotate it and see if we can reach new positions
 
         position_array = queue_of_positions.popleft()
@@ -41,7 +42,6 @@ def search_for_best_move(goal, board, best_move_y_pos):
             continue
         visited_positions.add(position_array_tuple)
 
-        board_copy = [row.copy() for row in board]
         if position_array == goal_as_pos_array:
             print(f"goal found!! {position_array}")
             return reconstruct_path(came_from, position_array_tuple)

@@ -12,31 +12,31 @@ def is_valid_position(board, piece_coords, x, y):
             return False
     return True
 
-def try_place_piece_with_kick(board,kick_table,info_array,rotation_goal):
+def try_place_piece_with_kick(board,kick_table,position_array,rotation_goal):
     """this function tries to place a piece by using a spin, if it fails, it tries puttinga  kick offset on it
     when fails completely,returns none"""
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
 
     
-    rotated_piece = PIECES_index[info_array[0]][rotation_goal]
+    rotated_piece = PIECES_index[position_array[0]][rotation_goal]
     
     str_piece_rotation_goal = rotation_goal
     rotation_goal = rotation_goal[-1]
     
-    kick_key = info_array[1][-1]+'-'+rotation_goal
+    kick_key = position_array[1][-1]+'-'+rotation_goal
     
     for offset in kick_table[kick_key]:
-        target_x = info_array[2] + int(offset[0])
-        target_y = info_array[3] + int(offset[1])
+        target_x = position_array[2] + int(offset[0])
+        target_y = position_array[3] + int(offset[1])
         
         if is_valid_position(board, rotated_piece, target_x, target_y):
             if offset == (0,0):
                 spin = False
             else:
                 spin = True
-            return [info_array[0],str_piece_rotation_goal,info_array[2] + int(offset[0]), info_array[3] + int(offset[1])],spin
+            return [position_array[0],str_piece_rotation_goal,position_array[2] + int(offset[0]), position_array[3] + int(offset[1])],spin
             #distinguishing spins would be easier than just making sure they work so spins dont do mpre than normal clears
 
-    return info_array, False
+    return position_array, False
 
