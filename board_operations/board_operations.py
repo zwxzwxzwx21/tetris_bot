@@ -1,5 +1,6 @@
 # all the functions that directly manipulate the board 
 # this file deserve a namechange
+from config import PRINT_MODE
 
 from utility.pieces_index import PIECES_index
 
@@ -21,7 +22,8 @@ def clear_lines(board):
     for _ in range(lines_cleared):
         new_board.insert(0, [' ' for _ in range(10)])
     # doesn't have to return lines_cleared, it does so to count quads and other clears
-    print(f"Lines cleared: {lines_cleared}")
+    if PRINT_MODE:
+        print(f"Lines cleared: {lines_cleared}")
     return new_board, lines_cleared
 
 def solidify_piece(board, piece,piece_pos_array):
@@ -29,7 +31,8 @@ def solidify_piece(board, piece,piece_pos_array):
     Places a piece on the board at the specified position.
     """
     new_board = [row.copy() for row in board]
-    print(piece_pos_array)
+    if PRINT_MODE:
+        print(piece_pos_array)
     for (dx, dy) in PIECES_index[piece][piece_pos_array[1]]:
         
         if 0 <= dx+piece_pos_array[2] < 10 and 0 <= dy+piece_pos_array[3] < 20:

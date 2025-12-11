@@ -3,6 +3,7 @@ from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 from utility.print_board import print_board
 from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
 from spins_funcions import try_place_piece_with_kick
+from config import PRINT_MODE
 import time
 from collections import deque
 PRINT_MODE = False
@@ -43,7 +44,8 @@ def search_for_best_move(goal, board, best_move_y_pos):
         visited_positions.add(position_array_tuple)
 
         if position_array == goal_as_pos_array:
-            print(f"goal found!! {position_array}")
+            if PRINT_MODE:
+                print(f"goal found!! {position_array}")
             return reconstruct_path(came_from, position_array_tuple)
         '''if new_pos == goal_as_pos_array:
             print(f"goal found!! {position_array}")
@@ -80,7 +82,8 @@ def search_for_best_move(goal, board, best_move_y_pos):
                 if softdrop_tuple not in came_from:
                     came_from[softdrop_tuple] = (position_array_tuple, f"softdrop_to_y{new_ypos}")
                 if softdrop_pos == goal_as_pos_array:
-                    print(f"goal found! {softdrop_pos}")
+                    if PRINT_MODE:
+                        print(f"goal found! {softdrop_pos}")
                     return reconstruct_path(came_from, softdrop_tuple)
         #=== SIDEWAYS ===#
         
@@ -96,7 +99,8 @@ def search_for_best_move(goal, board, best_move_y_pos):
                     came_from[position_array_new_tuple] = (position_array_tuple, f"sideways_move_to_x{new_position[2]}_y{new_position[3]}")
                 
                 if new_position == goal_as_pos_array:
-                    print(f"goal found! {new_position}")
+                    if PRINT_MODE:
+                        print(f"goal found! {new_position}")
                     return reconstruct_path(came_from, tuple(new_position))
 
     return None 
@@ -109,7 +113,8 @@ def reconstruct_path(came_from, goal_tuple):
         path.append((action,list(current)))
         current = parent
     path.reverse()  
-    print("here is the path:", path)
+    if PRINT_MODE:
+        print("here is the path:", path)
     if len(path) < 1:
         return None
     return path

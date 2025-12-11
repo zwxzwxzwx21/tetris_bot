@@ -11,6 +11,7 @@ import os
 import config
 import itertools
 
+from config import PRINT_MODE
 
 from board_operations.stack_checking import find_highest_y
 from board_operations.board_operations import clear_lines, solidify_piece
@@ -193,7 +194,8 @@ class TetrisGame:
                 move_history_ = find_best_placement(
                     self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
                 )
-                print(f"move history from best placement: {move_history_}")
+                if config.PRINT_MODE:
+                    print(f"move history from best placement: {move_history_}")
                 if not move_history_:
                     if config.PRINT_MODE:
                         logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
@@ -202,10 +204,12 @@ class TetrisGame:
                     break    
                 
                 move_history, best_move_str,goal_y_pos = move_history_
-                print(f"best move str: {move_history}, full move history: {move_history_}, goal y pos: {goal_y_pos}")
+                if config.PRINT_MODE:
+                    print(f"best move str: {move_history}, full move history: {move_history_}, goal y pos: {goal_y_pos}")
                 piece_type_placed = [0]
                 first_move = best_move_str
-                print(first_move)
+                if config.PRINT_MODE:
+                    print(first_move)
                 piece_type, x_str, rotation1,rotation2 = first_move.split("_")
                 rotation  = rotation1 + "_" + rotation2
                 x = int(x_str[1:])
@@ -391,11 +395,13 @@ def run_bruteforce_games(params,num_games=3):
         
         game.start_signal[0] = True
         pieces = game.game_loop(None)
-        print(f"pieces: {pieces}")
+        if config.PRINT_MODE:
+            print(f"pieces: {pieces}")
 
         lines_cleared= game.stats.single + game.stats.double*2 + game.stats.triple*3 + game.stats.tetris*4
         total_lines += lines_cleared
-        print(f"lines cleared: {lines_cleared}")
+        if config.PRINT_MODE:
+            print(f"lines cleared: {lines_cleared}")
     return total_lines/num_games
 
 def parse_args():

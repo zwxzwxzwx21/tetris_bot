@@ -111,8 +111,9 @@ def analyze(board,cleared_lines):
     varD = blockade(columns)
     varE = tetrisSlot(board, columns[0])
     varF = iDependency(colHeights)
-    print(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}")
-    print(a*varA + b*varB + c*varC + d*varD + e*varE + f*varF)
+    
+    #print(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}")
+    #print(a*varA + b*varB + c*varC + d*varD + e*varE + f*varF)
     return a*varA + b*varB + c*varC + d*varD + e*varE + f*varF
 
 def analyze_main(board,cleared_lines):

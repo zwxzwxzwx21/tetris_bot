@@ -77,7 +77,7 @@ def find_best_placement(board, queue, combo, stats):
     for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
         
         temp_array = []
-        print((PIECES_startpos_indexing_value[current_piece][rotation_name],11-PIECES_xpos_indexing_value[current_piece][rotation_name]))
+        #print((PIECES_startpos_indexing_value[current_piece][rotation_name],11-PIECES_xpos_indexing_value[current_piece][rotation_name]))
         start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
         finish_x_pos = 11-PIECES_xpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 9
         for start_x in range(start_x_pos,finish_x_pos):
@@ -99,7 +99,8 @@ def find_best_placement(board, queue, combo, stats):
             GAMEOVER = True
             break
         board_after_clear, cleared_lines = clear_lines(new_board)
-        print("cleared lines:", cleared_lines)
+        if config.PRINT_MODE:
+            print("cleared lines:", cleared_lines)
         # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
         
         if (current_loss := loss(new_board,cleared_lines)) > best_loss:
@@ -108,7 +109,8 @@ def find_best_placement(board, queue, combo, stats):
             move_history = [best_move]
             best_loss = current_loss
             total_lines += cleared_lines
-            print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
+            if config.PRINT_MODE:
+                print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
             list_of_best_moves.append((best_move, best_move_y_pos))
         
     
@@ -120,10 +122,12 @@ def find_best_placement(board, queue, combo, stats):
             
         return None
     assert move_history
-    print(f"best move: {best_move} with loss: {best_loss}")
-    print(list_of_best_moves)
+    if config.PRINT_MODE:
+        print(f"best move: {best_move} with loss: {best_loss}")
+        print(list_of_best_moves)
     for best_move_from_list, best_move_y_position in reversed(list_of_best_moves):
-        print(f"attempting to find sequence for best move: {best_move_from_list} at y pos {best_move_y_position}")
+        if config.PRINT_MODE:
+            print(f"attempting to find sequence for best move: {best_move_from_list} at y pos {best_move_y_position}")
         
         if best_move_from_list is not None:
             goal_string = best_move_from_list
