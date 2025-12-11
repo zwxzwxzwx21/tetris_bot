@@ -1,3 +1,4 @@
+
 from board_operations.checking_valid_placements import place_piece    
 from utility.pieces_index import PIECES_index
 
@@ -17,16 +18,9 @@ def try_place_piece_with_kick(board,kick_table,info_array,rotation_goal):
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
 
-    try:
-        rotated_piece = PIECES_index[info_array[0]][rotation_goal]
-    except KeyError:
-        if info_array[0] == 'O':
-            str_piece_rotation_goal = 'flat_0'
-            rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
-        else:
-            rotation_goal = rotation_goal[-1]
-            str_piece_rotation_goal = 'spin_'+rotation_goal if info_array[1] in ['flat_0','flat_2'] else 'flat_'+rotation_goal # change it to table
-            rotated_piece = PIECES_index[info_array[0]][str_piece_rotation_goal]
+    
+    rotated_piece = PIECES_index[info_array[0]][rotation_goal]
+    
     str_piece_rotation_goal = rotation_goal
     rotation_goal = rotation_goal[-1]
     

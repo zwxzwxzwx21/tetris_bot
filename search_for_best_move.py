@@ -45,9 +45,9 @@ def search_for_best_move(goal, board, best_move_y_pos):
         if position_array == goal_as_pos_array:
             print(f"goal found!! {position_array}")
             return reconstruct_path(came_from, position_array_tuple)
-        if new_pos == goal_as_pos_array:
+        '''if new_pos == goal_as_pos_array:
             print(f"goal found!! {position_array}")
-            return reconstruct_path(came_from, position_array_tuple)
+            return reconstruct_path(came_from, position_array_tuple)'''
 
         if piece == "I":
             kick_table = SRS_I_piece_kick_table
