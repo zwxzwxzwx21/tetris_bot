@@ -78,7 +78,12 @@ def find_best_placement(board, queue, combo, stats):
     current_piece = queue[0]
     assert current_piece in PIECES
 
-    for rotation_name, piece_shape in PIECES[current_piece].items():
+    # Use rotations dictionary to determine valid rotations for the piece
+    # This optimizes pieces like O that have only one rotation (flat)
+    piece_rotations = rotations.get(current_piece, list(PIECES[current_piece].keys()))
+    rotations_to_check = [(rot, PIECES[current_piece][rot]) for rot in piece_rotations]
+
+    for rotation_name, piece_shape in rotations_to_check:
         max_x = 10 - len(piece_shape[0])
         for x in range(max_x + 1):
             new_board = drop_piece(piece_shape, copy.deepcopy(board), x)
