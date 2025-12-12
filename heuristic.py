@@ -15,7 +15,7 @@ def clearedLines(clearedLines):
         case 4:
             clearedLines *= 10 #tetris gucci af
         case 3:
-            clearedLines *= 0.75 #triple are horrible value
+            clearedLines *= 3.75 #triple are horrible value
         case 2:
             clearedLines *= 1.5 #doubles are ok
         case 1:
@@ -32,7 +32,7 @@ def bumpiness(colHeights):
         prevH = colHeights[h]
         
     return bumpiness * 4
-
+    
 def blockade(columns):
     blockade = 0
 
