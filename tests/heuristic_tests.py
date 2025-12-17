@@ -244,7 +244,7 @@ sum4 = analyze(heuristic_test_board2,0)
 sum5 = analyze(heuristic_test_board5,0)
 print("total heuristic value testcase 5: " +  str(sum5))
 sum6 = analyze(heuristic_test_board6,0)
-print("total heuristic value testcase 6: " +  str(sum6))
+#print("total heuristic value testcase 6: " +  str(sum6))
 piece = "I"
 rotation = "flat_0"
 xpos = 5

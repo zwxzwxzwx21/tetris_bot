@@ -143,6 +143,8 @@ def analyze(board,cleared_lines):
     #this is literally -> high stack = bad, no matter how bad it really is 
     # i think its okay to not put much weight into it, so low numbers are good because we will have more space for pieces, 
     varB = clearedLines(cleared_lines) 
+    # DOESNT WORK AS INTENDED, VALUE DOENST RESET TO 0
+    
     # this one returns from 0.75 to 10
     # often just doesnt do anything because the board has to have cleared lines for this to work
     # i dont see this one as being usefull, but it basically can replace attack, so having this high may work,we wanna max it out, but maybe punish triples?
@@ -177,9 +179,10 @@ def analyze(board,cleared_lines):
     # - iDependency: we want this low
     # - holes: we want this low
     
-    print(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}")
+    #print(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}")
+    varB = 0
     #print(a*varA + b*varB + c*varC + d*varD + e*varE + f*varF)
-    return -varA + varB - varC - varD + varE - varF - varG*5
+    return -varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10
 
 def analyze_main(board,cleared_lines):
     # this one is for the board view printing
