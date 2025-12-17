@@ -4,7 +4,7 @@ CELL_SIZE = 28
 BOARD_WIDTH = 10
 BOARD_HEIGHT = 20
 SIDE_WIDTH = 170
-FPS = 30
+FPS = 60
 
 COLOR_BG = (0, 0, 0)
 COLOR_PANEL = (28, 28, 36)
@@ -25,12 +25,12 @@ PIECE_COLORS = {
 
 
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed):
+    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed,aggregate, clearedLines, bumpiness, blockade, tetrisSlot,iDependency,holes, pieces):
         pygame.init()
         self.surface = pygame.display.set_mode(
             (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
         )
-        pygame.display.set_caption("tewi bot :3")
+        pygame.display.set_caption("tewi bot 🐰")
         self.font = pygame.font.SysFont("orbitron", 16)
         self.clock = pygame.time.Clock()
         self.board = board_
@@ -42,9 +42,31 @@ class TetrisBoardViewer:
         self.draw = True
         self.start_button = True
         self.preview = None
+        self.aggregate = aggregate
+        self.clearedLines = clearedLines
+        self.bumpiness = bumpiness
+        self.blockade = blockade
+        self.tetrisSlot = tetrisSlot
+        self.iDependency = iDependency
+        self.holes = holes
+        self.pieces = pieces
 
     def update_board(self, new_board):
         self.board = new_board
+        self.draw = True
+
+    def update_heuristics(self, aggregate, clearedLines, bumpiness, blockade, tetrisSlot, iDependency,holes):
+        self.aggregate = aggregate
+        self.clearedLines = clearedLines
+        self.bumpiness = bumpiness
+        self.blockade = blockade
+        self.tetrisSlot = tetrisSlot
+        self.iDependency = iDependency
+        self.holes = holes
+        self.draw = True
+
+    def update_pieces(self, pieces_placed):
+        self.pieces = pieces_placed
         self.draw = True
 
     def set_preview(self, piece, shape, xpos, board_array):
@@ -62,7 +84,9 @@ class TetrisBoardViewer:
                         xxx = xpos + w
                         if yyy >= BOARD_HEIGHT:
                             return True
-                        if board_array[yyy][xxx] != " " and board_array[yyy][xxx] != 0:
+                        if xxx < 0 or xxx >= BOARD_WIDTH:
+                            return True
+                        if board_array[yyy][xxx] not in (" ", 0):
                             return True
             return False
 
@@ -151,6 +175,18 @@ class TetrisBoardViewer:
         y += 6
         line("seed:")
         line(f"{self.stats.seed}")
+        y += 6
+        line("heuristic:")
+        line(f"aggregate: {self.aggregate:.2f}")
+        line(f"clearedLines: {self.clearedLines:.2f}")
+        line(f"bumpiness: {self.bumpiness:.2f}")
+        line(f"blockade: {self.blockade:.2f}")
+        line(f"tetrisSlot: {self.tetrisSlot:.2f}")
+        line(f"iDependency: {self.iDependency:.2f}")
+        line(f"holes: {self.holes:.2f}")
+        y += 6
+        line("pieces placed:")
+        line(f"{self.pieces}")
 
     def _draw(self):
         self.surface.fill(COLOR_BG)

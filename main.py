@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-# if someone is reading that, i may or may not have used some AI help for comments and such to make code more readable
-# half of them i didnt even read but i dont remove them because fucking higlighting puts them there as it feels and it was usefull
-# ^ update i have cleared some useless things up, yeah you can mby look them up in previous commits but what for
-# those dont even have any working code so i wouldnt bother
-# once!! so i wil lleave them, so like whateverr sorry algosith dont bother with them
-# got an issue with that? better not or i will cry.
-
 # to test the argparse better, try running it in console using:
 # python .\main.py --rule, rules will be listed lower, as they are wip
 import argparse  # testing it
@@ -17,8 +9,32 @@ import time
 import pandas as pd
 import os
 import config
+import itertools
+
+from config import PRINT_MODE
+
+from board_operations.stack_checking import find_highest_y
+from board_operations.board_operations import clear_lines, solidify_piece
+
+from heuristic import analyze
+
 from tetrio_parsing.calculate_attack import count_lines_clear
-import itertools 
+
+from dataclasses import dataclass
+
+from utility.pieces_index import PIECES_index 
+from utility.pieces import PIECES
+from utility.print_board import print_board
+
+from BoardRealTimeView import TetrisBoardViewer
+
+from bruteforcing import find_best_placement
+
+from GenerateBag import add_piece_from_bag, create_bag
+
+from tests.combo_attack_test import (
+    custom_board,  # probably stupid way to do that, idk better yet
+)
 
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(
@@ -29,23 +45,12 @@ logging.basicConfig(
     format="%(levelname)s | %(filename)s -> %(lineno)d in %(funcName)s: %(message)s",
     level=logging.DEBUG,
 )
-from board_operations.board_operations import clear_lines
-from board_operations.checking_valid_placements import drop_piece
-from BoardRealTimeView import TetrisBoardViewer
-from bruteforcing import find_best_placement
-from GenerateBag import add_piece_from_bag, create_bag
-from tests.combo_attack_test import (
-    custom_board,  # probably stupid way to do that, idk better yet
-)
-from utility.pieces import PIECES
-from utility.print_board import print_board
 
 if not PIECES:
     raise ImportError("PIECES dictionary could not be imported or is empty.")
 
 DESIRED_QUEUE_PREVIEW_LENGTH = 5
 
-from dataclasses import dataclass
 
 @dataclass
 class MoveHistory:
@@ -93,6 +98,7 @@ class TetrisGame:
         self.pending_save = None # the clogger 
         self.seed = seed
         random.seed(self.seed)
+        self.pieces_placed = 0
 
     def save_game_state(self,move_str,board):
         if config.PRINT_MODE:
@@ -142,15 +148,15 @@ class TetrisGame:
     def game_loop(self, viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
         # i will change it i swear, just give me second
-        while not self.start_signal[0]:
-            time.sleep(0.1)
-            if self.game_over_signal[0]:
-                return
+            while not self.start_signal[0]:
+                time.sleep(0.1)
+                if self.game_over_signal[0]:
+                    return
 
-        pieces_placed = 0
-        actual_game_start_time = time.perf_counter()
+            pieces_placed = 0
+            actual_game_start_time = time.perf_counter()
 
-        try:
+        #try:
             if not self.queue:
                 if config.PRINT_MODE:
                     logging.debug("queue fill")
@@ -185,14 +191,11 @@ class TetrisGame:
                     logging.debug("\n=== Current Queue ===")
                     logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
-
-                
                 move_history_ = find_best_placement(
                     self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
                 )
-                
-                
-
+                if config.PRINT_MODE:
+                    print(f"move history from best placement: {move_history_}")
                 if not move_history_:
                     if config.PRINT_MODE:
                         logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
@@ -200,19 +203,24 @@ class TetrisGame:
                     self.game_over_signal[0] = True
                     break    
                 
-                move_history, best_move_str = move_history_            
+                move_history, best_move_str,goal_y_pos = move_history_
+                if config.PRINT_MODE:
+                    print(f"best move str: {move_history}, full move history: {move_history_}, goal y pos: {goal_y_pos}")
                 piece_type_placed = [0]
-                first_move = move_history[0]
-                piece_type, x_str, rotation = first_move.split("_")
+                first_move = best_move_str
+                if config.PRINT_MODE:
+                    print(first_move)
+                piece_type, x_str, rotation1,rotation2 = first_move.split("_")
+                rotation  = rotation1 + "_" + rotation2
                 x = int(x_str[1:])
                 piece_type_placed = self.queue[0]
                 piece_shape = PIECES[piece_type_placed][rotation]
 
                 if viewer:
                     viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
- 
-                board_after_drop = drop_piece(piece_shape, copy.deepcopy(self.board), x)
 
+                board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
+                
                 if self.slow_mode[0]:
                     if config.PRINT_MODE:
                         print_board(board_after_drop)
@@ -266,9 +274,21 @@ class TetrisGame:
                     self.stats.tetris += 1
 
                 self.board[:] = board_after_clear
+                total_lines_cleared = (
+                    self.stats.single
+                    + 2 * self.stats.double
+                    + 3 * self.stats.triple
+                    + 4 * self.stats.tetris
+                )
+                self.pieces_placed += 1
                 if viewer:
                     viewer.clear_preview()
                     viewer.update_board(self.board)
+                    agg, cl, bump, block, ts, idep, hol = analyze_main(
+                        self.board, cleared_lines=total_lines_cleared
+                    )
+                    viewer.update_heuristics(agg, cl, bump, block, ts, idep,hol)
+                    viewer.update_pieces(self.pieces_placed)
                 if config.PRINT_MODE:
                     print_board(self.board)
 
@@ -320,11 +340,12 @@ class TetrisGame:
                     )
                 
                 self.pending_save = best_move_str  
-        finally:
             
-            #logging.debug("game loop finished")
+        #finally:
+            logging.debug("game loop finished")
             self.game_over_signal[0] = True
             return pieces_placed
+            
 def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
                       attack_bonus, game_stats, seed, game_number):
         filepath = "bruteforcer_stats.xlsx"
@@ -355,11 +376,11 @@ def save_game_results(uneven_loss, holes_punishment, height_diff_punishment,
         updated_df.to_excel(filepath, index=False)
         
         return len(updated_df)
+    
 def run_bruteforce_games(params,num_games=3):
     total_lines = 0
 
     for game_index in range(num_games):
-        #print(f"running game {game_index+1}/{num_games} with params {params}")
         uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = params["uneven_loss"], params["holes_punishment"], params["height_diff_punishment"], params["attack_bonus"], params["max_height_punishment"]
         import bruteforcing
         bruteforcing.uneven_loss = uneven_loss
@@ -374,13 +395,15 @@ def run_bruteforce_games(params,num_games=3):
         
         game.start_signal[0] = True
         pieces = game.game_loop(None)
-        print(f"pieces: {pieces}")
+        if config.PRINT_MODE:
+            print(f"pieces: {pieces}")
 
         lines_cleared= game.stats.single + game.stats.double*2 + game.stats.triple*3 + game.stats.tetris*4
         total_lines += lines_cleared
-        print(f"lines cleared: {lines_cleared}")
+        if config.PRINT_MODE:
+            print(f"lines cleared: {lines_cleared}")
     return total_lines/num_games
-# this one is cool im proud of it cuz i learned something new! (ik its not useful lol)
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument("--seed", type=int, help="override RNG seed")
@@ -415,9 +438,6 @@ if __name__ == "__main__":
 
     game.start_signal[0] = True
 
-    game.print_mode[0] = "print" in args.rules
-    if config.PRINT_MODE:
-        logging.debug(f"using seed {seed}")
     game.no_s_z_first_piece_signal[0] = "nosz" in args.rules
 
     game.custom_bag[0] = "custom_bag" in args.rules
@@ -441,6 +461,9 @@ if __name__ == "__main__":
     game.gui_mode[0] = "gui" in args.rules
 
     use_gui = "gui" in args.rules
+    from heuristic import analyze_main
+    game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency,game.holes = analyze_main(game.board,cleared_lines=0)
+    
     if use_gui:
         viewer = TetrisBoardViewer(
             game.board,
@@ -449,6 +472,9 @@ if __name__ == "__main__":
             game.no_s_z_first_piece_signal,
             game.slow_mode,
             game.seed,
+            game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency, game.holes,
+            game.pieces_placed,
+            
         )
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
         t.start()
@@ -460,7 +486,7 @@ if __name__ == "__main__":
 # IMPORTANT:
 # - the game loop will stop if no valid placement is found
 # - stats.pps can be used in other modules (for display in the viewer).
-#
+# - if the best piece placeemnt path is not found, things may not be handled correctly                          !!!!!!!!!
 # TODO:
 # - add more advanced scoring/evaluation for moves.
 # - implement perfect clear solver/mode.
