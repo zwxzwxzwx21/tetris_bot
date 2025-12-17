@@ -284,10 +284,10 @@ class TetrisGame:
                 if viewer:
                     viewer.clear_preview()
                     viewer.update_board(self.board)
-                    agg, cl, bump, block, ts, idep = analyze_main(
+                    agg, cl, bump, block, ts, idep, hol = analyze_main(
                         self.board, cleared_lines=total_lines_cleared
                     )
-                    viewer.update_heuristics(agg, cl, bump, block, ts, idep)
+                    viewer.update_heuristics(agg, cl, bump, block, ts, idep,hol)
                     viewer.update_pieces(self.pieces_placed)
                 if config.PRINT_MODE:
                     print_board(self.board)
@@ -462,7 +462,7 @@ if __name__ == "__main__":
 
     use_gui = "gui" in args.rules
     from heuristic import analyze_main
-    game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency = analyze_main(game.board,cleared_lines=0)
+    game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency,game.holes = analyze_main(game.board,cleared_lines=0)
     
     if use_gui:
         viewer = TetrisBoardViewer(
@@ -472,7 +472,7 @@ if __name__ == "__main__":
             game.no_s_z_first_piece_signal,
             game.slow_mode,
             game.seed,
-            game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency,
+            game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency, game.holes,
             game.pieces_placed,
             
         )

@@ -57,7 +57,7 @@ if config.PRINT_MODE:
     print(
     f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}" # type: ignore
 )'''
-from heuristic import clearedLines, bumpiness, blockade, tetrisSlot, analyze
+from heuristic import analyze
 def loss(board, cleared_lines) -> float:
     return analyze(board,cleared_lines)
 
@@ -92,7 +92,7 @@ def find_best_placement(board, queue, combo, stats):
     list_of_best_moves = []
     for position_info in arr_piece_info_array:
         
-        new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False)
+        new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
         if not is_place_piece_successful:
             if config.PRINT_MODE:
                 print(f"GAMEOVER, score (best loss) : {best_loss} ")
@@ -103,7 +103,8 @@ def find_best_placement(board, queue, combo, stats):
             print("cleared lines:", cleared_lines)
         # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
         
-        if (current_loss := loss(new_board,cleared_lines)) > best_loss:
+        # FIXED: evaluate board_after_clear, not new_board!
+        if (current_loss := loss(board_after_clear, cleared_lines)) > best_loss:
             best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
             best_move_y_pos = position_info[3]
             move_history = [best_move]

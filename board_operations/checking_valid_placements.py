@@ -25,7 +25,7 @@ def can_place(piece_pos_array, board, ypos, xpos,rotation, piece,print_debug=Fal
         x, y = xpos + dx, ypos + dy
         if y >= len(board) or x < 0 or x >= len(board[0]) or board[y][x] != ' ':
             return False
-    brd,a = place_piece(piece_pos_array, piece, board, xpos, ypos, rotation ,print_debug=False)  
+    brd,a = place_piece(piece_pos_array, piece, board, xpos, ypos, rotation ,print_debug=False,where_called_from="can_place in checking valid placements")  
     if print_debug: print_board(brd) 
     return True
  
@@ -57,7 +57,7 @@ def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
     return row
 
 from utility.pieces_index import PIECES_lowest_point_from_origin, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
-def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=False):
+def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=False,where_called_from=""):
 
     """
     Places a piece on the board at the specified position.
@@ -66,10 +66,13 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=Fals
     """
     
     if PIECES_startpos_indexing_value[piece][rotation] > x or x > len(board[0])-1-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation]):
-        print(f"x out of bounds {x} max available:{len(board[0])-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation])}")
+        #print(f"x out of bounds {x} max available:{len(board[0])-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation])}")
+        #print("if1 args causing error: ",piece_index_array, piece, x, y,rotation, where_called_from)
+        
         return board,False
     if 0 > y or y > len(board) - PIECES_lowest_point_from_origin[piece][rotation]:
-        print(f"y out of bounds {y} max available:{len(board)-get_piece_height(piece_index_array)+1}")
+        #print(f"y out of bounds {y} max available:{len(board)-get_piece_height(piece_index_array)+1}")
+        #print("if2 args causing error: ",piece_index_array, piece, board, x, y,rotation)
         return board,False
     new_board = [row.copy() for row in board]
     old_board = [row.copy() for row in board]

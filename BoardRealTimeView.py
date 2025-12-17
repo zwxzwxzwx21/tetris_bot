@@ -25,7 +25,7 @@ PIECE_COLORS = {
 
 
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed,aggregate, clearedLines, bumpiness, blockade, tetrisSlot,iDependency, pieces):
+    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed,aggregate, clearedLines, bumpiness, blockade, tetrisSlot,iDependency,holes, pieces):
         pygame.init()
         self.surface = pygame.display.set_mode(
             (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
@@ -48,19 +48,21 @@ class TetrisBoardViewer:
         self.blockade = blockade
         self.tetrisSlot = tetrisSlot
         self.iDependency = iDependency
+        self.holes = holes
         self.pieces = pieces
 
     def update_board(self, new_board):
         self.board = new_board
         self.draw = True
 
-    def update_heuristics(self, aggregate, clearedLines, bumpiness, blockade, tetrisSlot, iDependency):
+    def update_heuristics(self, aggregate, clearedLines, bumpiness, blockade, tetrisSlot, iDependency,holes):
         self.aggregate = aggregate
         self.clearedLines = clearedLines
         self.bumpiness = bumpiness
         self.blockade = blockade
         self.tetrisSlot = tetrisSlot
         self.iDependency = iDependency
+        self.holes = holes
         self.draw = True
 
     def update_pieces(self, pieces_placed):
@@ -181,6 +183,7 @@ class TetrisBoardViewer:
         line(f"blockade: {self.blockade:.2f}")
         line(f"tetrisSlot: {self.tetrisSlot:.2f}")
         line(f"iDependency: {self.iDependency:.2f}")
+        line(f"holes: {self.holes:.2f}")
         y += 6
         line("pieces placed:")
         line(f"{self.pieces}")
