@@ -217,7 +217,7 @@ class TetrisGame:
                 piece_shape = PIECES[piece_type_placed][rotation]
 
                 if viewer:
-                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board)
+                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation)
 
                 board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
                 
@@ -412,7 +412,7 @@ def parse_args():
     
     parser.add_argument(
         "--rules",
-        choices=["custom_bag", "nosz", "custom_board", "slow", "gui", "delay","seed"],
+        choices=["custom_bag", "nosz", "custom_board", "slow", "gui", "delay","seed","game"],
         nargs="+",
         default=[],
         help="unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world",

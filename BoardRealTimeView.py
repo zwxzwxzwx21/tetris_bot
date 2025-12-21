@@ -1,4 +1,5 @@
 import pygame
+from utility.pieces_index import PIECES_index
 
 CELL_SIZE = 28
 BOARD_WIDTH = 10
@@ -69,31 +70,28 @@ class TetrisBoardViewer:
         self.pieces = pieces_placed
         self.draw = True
 
-    def set_preview(self, piece, shape, xpos, board_array):
-        height = len(shape)
-        width = len(shape[0])
+    def set_preview(self, piece, shape, xpos, board_array,rotation):
+        pieces_cords = PIECES_index[piece][rotation]
 
-        def occupied(cell):
-            return cell not in (" ", 0)
+        def occupied(dx,dy):
+            return True
 
         def collides(ypos):
-            for h in range(height):
-                for w in range(width):
-                    if occupied(shape[h][w]):
-                        yyy = ypos + h
-                        xxx = xpos + w
-                        if yyy >= BOARD_HEIGHT:
-                            return True
-                        if xxx < 0 or xxx >= BOARD_WIDTH:
-                            return True
-                        if board_array[yyy][xxx] not in (" ", 0):
-                            return True
+            for (dx, dy) in pieces_cords:
+                yyy = ypos + dy
+                xxx = xpos + dx
+                if yyy >= BOARD_HEIGHT:
+                    return True
+                if xxx < 0 or xxx >= BOARD_WIDTH:
+                    return True
+                if board_array[yyy][xxx] not in (" ", 0):
+                    return True
             return False
 
         y = 0
         while not collides(y + 1):
             y += 1
-        self.preview = (piece, shape, xpos, y)
+        self.preview = (piece, pieces_cords, xpos, y)
         self.draw = True
 
     def clear_preview(self):
@@ -112,24 +110,20 @@ class TetrisBoardViewer:
                 pygame.draw.rect(
                     self.surface, COLOR_GRID, (xx, yy, CELL_SIZE, CELL_SIZE), 1
                 )
-
+ 
         if self.preview:
-            piece, shape, xpos, ypos = self.preview
+            piece, pieces_cords, xpos, ypos = self.preview
             base = PIECE_COLORS.get(piece, (180, 180, 180))
             duszek = tuple(wawa // 2 for wawa in base)
-            height = len(shape)
-            width = len(shape[0])
-            for h in range(height):
-                for w in range(width):
-                    if shape[h][w] not in (" ", 0):
-                        xx = (xpos + w) * CELL_SIZE
-                        yy = (ypos + h) * CELL_SIZE
-                        pygame.draw.rect(
-                            self.surface, duszek, (xx, yy, CELL_SIZE, CELL_SIZE)
-                        )
-                        pygame.draw.rect(
-                            self.surface, base, (xx, yy, CELL_SIZE, CELL_SIZE), 1
-                        )
+            for (dx,dy) in pieces_cords:
+                xx = (xpos + dx) * CELL_SIZE
+                yy = (ypos + dy) * CELL_SIZE
+                pygame.draw.rect(
+                    self.surface, duszek, (xx, yy, CELL_SIZE, CELL_SIZE)
+                )
+                pygame.draw.rect(
+                    self.surface, base, (xx, yy, CELL_SIZE, CELL_SIZE), 1
+                )
 
     def _draw_panel(self):
         xpos = BOARD_WIDTH * CELL_SIZE
