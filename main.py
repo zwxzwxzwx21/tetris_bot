@@ -221,18 +221,15 @@ class TetrisGame:
                         piece_type_placed = self.queue[0]
                         piece_shape = PIECES[piece_type_placed][rotation]
                         print(piece_type_placed, piece_shape, x,rotation)
-                        
                         viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation)
-            
                         viewer.update_board(self.board)
                         key_pressed  = viewer.get_key_pressed()
                         from simluate_game_movement import simulate_move
-                        #board_copy = copy.deepcopy(self.board)
                         
                         self.board,best_move_str,goal_y_pos,last_key  = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed, up_y_movement = True)
                         import pygame
-                        print(f"last key pressed: {last_key}")
-                        print(pygame.K_SPACE)
+                        if last_key == pygame.K_SPACE:
+                            break_loop = True
                         
                         time.sleep(0.016)
                     else: 
