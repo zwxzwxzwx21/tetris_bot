@@ -1,7 +1,6 @@
 # i DO NOT like the naming system at all when it goes like 0-R N-S, preferably i would use something else but for now i will leave it as it is
 
-#only for 180 t piece
-SRS_Tpiece_180_kick_table = { # N - North E - East S - South W - West
+SRS_180_kick_table = { # N - North E - East S - South W - West
     "N-S": [(0, 0),(0,-1),(1,-1),(-1,-1),(1,0),(-1,0)],
     "S-N": [(0, 0),(0, 1),(-1, 1),(1, 1),(-1,0),(1,0)],
     "E-W": [(0, 0),(1,0),(1,-2),(1,-1),(0,-2),(0,-1)],

@@ -99,6 +99,7 @@ class TetrisGame:
         self.seed = seed
         random.seed(self.seed)
         self.pieces_placed = 0
+        self.control_mode = [False] 
 
     def save_game_state(self,move_str,board):
         if config.PRINT_MODE:
@@ -194,6 +195,9 @@ class TetrisGame:
                 move_history_ = find_best_placement(
                     self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
                 )
+
+                
+
                 if config.PRINT_MODE:
                     print(f"move history from best placement: {move_history_}")
                 if not move_history_:
@@ -204,6 +208,36 @@ class TetrisGame:
                     break    
                 
                 move_history, best_move_str,goal_y_pos = move_history_
+
+
+                break_loop = False
+                while self.control_mode[0] and break_loop == False:
+
+                    if viewer:
+                        piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
+                        rotation  = rotation1 + "_" + rotation2
+                        print(x_str)
+                        x = int(x_str[1:])
+                        piece_type_placed = self.queue[0]
+                        piece_shape = PIECES[piece_type_placed][rotation]
+                        viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation)
+                        viewer.clear_preview()
+                        viewer.update_board(self.board)
+                        key_pressed  = viewer.get_key_pressed()
+                        from simluate_game_movement import simulate_move
+                        #board_copy = copy.deepcopy(self.board)
+                        
+                        self.board,best_move_str,goal_y_pos,last_key  = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed, up_y_movement = True)
+                        import pygame
+                        print(f"last key pressed: {last_key}")
+                        print(pygame.K_SPACE)
+                        
+                        time.sleep(0.016)
+                    else: 
+                        break
+
+
+
                 if config.PRINT_MODE:
                     print(f"best move str: {move_history}, full move history: {move_history_}, goal y pos: {goal_y_pos}")
                 piece_type_placed = [0]
@@ -412,7 +446,7 @@ def parse_args():
     
     parser.add_argument(
         "--rules",
-        choices=["custom_bag", "nosz", "custom_board", "slow", "gui", "delay","seed","game"],
+        choices=["custom_bag", "nosz", "custom_board", "slow", "gui", "delay","seed","control_mode"],
         nargs="+",
         default=[],
         help="unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world",
@@ -459,9 +493,19 @@ if __name__ == "__main__":
             logging.debug("slow mode enabled, press enter to place each piece")
 
     game.gui_mode[0] = "gui" in args.rules
-
     use_gui = "gui" in args.rules
+
+    game.control_mode[0] = "control_mode" in args.rules                      ##################
+    
+    if game.control_mode[0] == True:
+        print("control mode requires gui mode to be enabled, enabling gui mode")
+        game.gui_mode[0] = True
+        use_gui = True
+
+    print(use_gui)
+    
     from heuristic import analyze_main
+    
     game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency,game.holes = analyze_main(game.board,cleared_lines=0)
     
     if use_gui:
@@ -474,6 +518,7 @@ if __name__ == "__main__":
             game.seed,
             game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency, game.holes,
             game.pieces_placed,
+            game.control_mode,
             
         )
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)

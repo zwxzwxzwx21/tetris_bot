@@ -26,7 +26,7 @@ PIECE_COLORS = {
 
 
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed,aggregate, clearedLines, bumpiness, blockade, tetrisSlot,iDependency,holes, pieces):
+    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed,aggregate, clearedLines, bumpiness, blockade, tetrisSlot,iDependency,holes, pieces, control_mode):
         pygame.init()
         self.surface = pygame.display.set_mode(
             (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
@@ -51,6 +51,8 @@ class TetrisBoardViewer:
         self.iDependency = iDependency
         self.holes = holes
         self.pieces = pieces
+        self.control_mode = control_mode
+        self.last_key_pressed = None
 
     def update_board(self, new_board):
         self.board = new_board
@@ -163,10 +165,6 @@ class TetrisBoardViewer:
         line(f"triple: {self.stats.triple}")
         line(f"tetris: {self.stats.tetris}")
         y += 6
-        line("rules:")
-        line(f"nosz: {self.no_s_z_first_piece_signal[0]}")
-        line(f"slow mode: {self.slow_mode[0]}")
-        y += 6
         line("seed:")
         line(f"{self.stats.seed}")
         y += 6
@@ -193,6 +191,9 @@ class TetrisBoardViewer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                elif event.type == pygame.KEYDOWN:
+                    # Store the last key pressed
+                    self.last_key_pressed = event.key
             if self.draw:
                 self.draw = False
                 self._draw()
@@ -200,3 +201,10 @@ class TetrisBoardViewer:
             
         pygame.quit()
         # buttons dont appear anymore (somehow?) and also i wanna make so you have button that just acts as pressing enter in slow mode
+
+    def get_key_pressed(self):
+        """Returns the last key pressed and clears it"""
+        key = self.last_key_pressed
+        self.last_key_pressed = None
+        return key
+

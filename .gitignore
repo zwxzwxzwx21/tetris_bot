@@ -7,24 +7,9 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv/
-venv/
-env/
+.venv
 
 .vscode
 
 *.xlsx
 *.csv
-
-# Test and coverage caches
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Type checker caches
-.mypy_cache/
-.pytype/
-
-# OS junk
-.DS_Store
-Thumbs.db

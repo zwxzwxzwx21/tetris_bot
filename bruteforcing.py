@@ -41,22 +41,7 @@ TIME_LIMIT = 999
 UNEVEN_THRESHOLD = 1.1  
 MAX_HEIGHT_DIFF = 6 
 BRUTEFORCE_MODE = False
-'''values = {
-    "uneven_loss": {"default": 1.5035, "max": 100},
-    "holes_punishment": {"default": 1.411334, "max": 100},
-    "height_diff_punishment": {"default": 0.08169, "max": 100},
-    "attack_bonus": {"default": 2.313, "max": 100},
-    "max_height_punishment": {"default": 0.45217, "max": 100}
-    
-}
 
-for vals, configs in values.items():
-    value = random.uniform(0, configs["max"]) if BRUTEFORCE_MODE else configs["default"]
-    globals()[vals] = value
-if config.PRINT_MODE:
-    print(
-    f"uneven_loss: {uneven_loss}, holes_punishment: {holes_punishment}, height_diff_punishment: {height_diff_punishment}, attack_bonus: {attack_bonus}" # type: ignore
-)'''
 from heuristic import analyze
 def loss(board, cleared_lines) -> float:
     return analyze(board,cleared_lines)
