@@ -221,7 +221,7 @@ class TetrisGame:
                         piece_type_placed = self.queue[0]
                         piece_shape = PIECES[piece_type_placed][rotation]
                         print(piece_type_placed, piece_shape, x,rotation)
-                        viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation)
+                        viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,yvalue=goal_y_pos,control_mode=self.control_mode)
                         viewer.update_board(self.board)
                         key_pressed  = viewer.get_key_pressed()
                         from simluate_game_movement import simulate_move
@@ -250,7 +250,7 @@ class TetrisGame:
                 piece_shape = PIECES[piece_type_placed][rotation]
 
                 if viewer:
-                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation)
+                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,yvalue=goal_y_pos,control_mode=self.control_mode)
 
                 board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
                 

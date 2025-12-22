@@ -72,12 +72,16 @@ class TetrisBoardViewer:
         self.pieces = pieces_placed
         self.draw = True
 
-    def set_preview(self, piece, shape, xpos, board_array,rotation):
+    def set_preview(self, piece, shape, xpos, board_array,rotation,yvalue,control_mode):
+        print(f"##### {yvalue} #####")
         pieces_cords = PIECES_index[piece][rotation]
         # ghost piece being drawn
         def collides(ypos):
             for (dx, dy) in pieces_cords:
-                yyy = ypos + dy
+                yyy = ypos + dy 
+                
+                if yvalue == 0:
+                    yyy = yvalue + dy
                 xxx = xpos + dx
                 if yyy >= BOARD_HEIGHT:
                     return True
@@ -86,10 +90,13 @@ class TetrisBoardViewer:
                 if board_array[yyy][xxx] not in (" ", 0):
                     return True
             return False
-
+        # this is just harddrop, doesnt reflect it that well due to that,
         y = 0
-        while not collides(y + 1):
-            y += 1
+        if yvalue != 0:
+            y = yvalue
+        if not control_mode[0]:
+            while not collides(y + 1):
+                y += 1
         self.preview = (piece, pieces_cords, xpos, y)
         self.draw = True
 
