@@ -220,8 +220,10 @@ class TetrisGame:
                         x = int(x_str[1:])
                         piece_type_placed = self.queue[0]
                         piece_shape = PIECES[piece_type_placed][rotation]
+                        print(piece_type_placed, piece_shape, x,rotation)
+                        
                         viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation)
-                        viewer.clear_preview()
+            
                         viewer.update_board(self.board)
                         key_pressed  = viewer.get_key_pressed()
                         from simluate_game_movement import simulate_move
@@ -501,8 +503,6 @@ if __name__ == "__main__":
         print("control mode requires gui mode to be enabled, enabling gui mode")
         game.gui_mode[0] = True
         use_gui = True
-
-    print(use_gui)
     
     from heuristic import analyze_main
     
