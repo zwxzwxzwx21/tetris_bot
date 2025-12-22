@@ -1,7 +1,7 @@
 import pygame
 import time
 from utility.pieces_index import PIECES_index
-
+from board_operations.checking_valid_placements import get_piece_rightmost_index_from_origin, get_piece_leftmost_index_from_origin
 def best_move_string_combiner(piece, xpos, rotation):
     return f"{piece}_x{xpos}_{rotation}" # XD
 
@@ -15,10 +15,10 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
     pieces_cords = PIECES_index[piece][rotation]
     if key_pressed == pygame.K_RIGHT:
         print("Simulate move: Move piece right")
-        if int(x) < 9:  # Assuming board width is 10
-            xpos = str(int(x) + 1)
+        if int(x) < 9-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation]):  # Assuming board width is 10
+            x = str(int(x) + 1)
     elif key_pressed == pygame.K_LEFT:
-        if int(x) > 0:
+        if int(x) > get_piece_leftmost_index_from_origin(PIECES_index[piece][rotation])+2:
             x = str(int(x) - 1)
         print("Simulate move: Move piece left")
     elif key_pressed == pygame.K_UP:
