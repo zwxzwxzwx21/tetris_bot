@@ -117,7 +117,10 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
         #print("Simulate move: 180 rotate piece")
         #new_position_array = rotate_180(rotation, board, piece, x, y_pos)
         #pieces_cords = PIECES_index[piece][rotation]
-
+    elif key_pressed == pygame.K_r:
+        board = [[' ' for _ in range(10)] for _ in range(20)]
+        print("Simulate move: Reset board")
+        
     best_move_string = best_move_string_combiner(piece, x,rotation)
     if isinstance(new_position_array, tuple) or isinstance(new_position_array, list):
         x = new_position_array[2]
