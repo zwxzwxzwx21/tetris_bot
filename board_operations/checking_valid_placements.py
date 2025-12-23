@@ -181,3 +181,21 @@ def get_piece_rightmost_index_from_origin(piece):
     '''this function returns the rightmost X from the origin of piece (0,0), [1,1]'''
     max_x = max(dx for dx, dy in piece)  
     return max_x
+
+def get_piece_lowest_index_from_origin_abs(piece):
+    '''this function returns the lowest Y from the origin of piece (0,0), [1,1]'''
+    min_y = max(dy for dx, dy in piece)  
+    
+    return min_y
+
+def get_piece_leftmost_index_from_origin_abs(piece):
+    '''this function returns the leftmost X from the origin of piece (0,0), [1,1]'''
+    min_x = min(dx for dx, dy in piece)  
+    
+    return min_x
+
+def get_piece_rightmost_index_from_origin_abs(piece):
+    '''this function returns the rightmost X from the origin of piece (0,0), [1,1]'''
+    max_x = max(dx for dx, dy in piece)  
+    
+    return max_x

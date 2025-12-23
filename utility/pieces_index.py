@@ -213,6 +213,107 @@ PIECES_index = {
         'spin_R': [(0,0),(1,0),(1,-1),(0,1)],
         }
 }
+
+PIECES_index_sim_game_left = {
+    'O': {
+        'flat_0' : 1, 
+        'flat_2': 1,
+        'spin_L': 1,
+        'spin_R': 1,
+        },
+
+    'I': {
+        'flat_0' : 1,
+        'spin_L' : 0,
+        'flat_2' : 1,
+        'spin_R' : -1,
+        }, 
+
+    'T': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_R': 0,
+        'spin_L': 1
+        },
+
+    'L': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_R': 0,
+        'spin_L': 1,
+        },
+
+    'J': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_R': 0,
+        'spin_L': 1,
+        },
+
+    'S': {
+        'flat_0': 1,
+        'spin_R': 0,
+        'flat_2': 1,
+        'spin_L': 1,
+        },
+
+    'Z': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_L': 1,
+        'spin_R': 0,
+        }
+}
+PIECES_index_sim_game_right = {
+    'O': {
+        'flat_0' : 0, 
+        'flat_2': 0,
+        'spin_L': 0,
+        'spin_R': 0,
+        },
+
+    'I': {
+        'flat_0' : 2,
+        'spin_L' : 0,
+        'flat_2' : 2,
+        'spin_R' : 1,
+        }, 
+
+    'T': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_R': 1,
+        'spin_L': 0,
+        },
+
+    'L': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_R': 1,
+        'spin_L': 0,
+        },
+
+    'J': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_R': 1,
+        'spin_L': 0,
+        },
+
+    'S': {
+        'flat_0': 1,
+        'spin_R': 1,
+        'flat_2': 1,
+        'spin_L': 0,
+        },
+
+    'Z': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_L': 0,
+        'spin_R': 1,
+        }
+}
 PIECES_soft_drop_index = { # pieces without rotations, basically 0
     'O': {
         'flat_0' : [(0,0),(-1,0),(0,-1),(-1,-1)]

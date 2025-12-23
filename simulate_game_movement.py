@@ -1,9 +1,9 @@
 import pygame
 import time
-from utility.pieces_index import PIECES_index
+from utility.pieces_index import PIECES_index,PIECES_index_sim_game_left,PIECES_index_sim_game_right
 from spins_funcions import try_place_piece_with_kick    
 from spins import SRS_I_piece_kick_table, SRS_rest_pieces_kick_table, SRS_180_kick_table
-from board_operations.checking_valid_placements import get_piece_rightmost_index_from_origin, get_piece_leftmost_index_from_origin,get_piece_lowest_index_from_origin
+from board_operations.checking_valid_placements import get_piece_rightmost_index_from_origin, get_piece_leftmost_index_from_origin,get_piece_lowest_index_from_origin,get_piece_rightmost_index_from_origin_abs, get_piece_leftmost_index_from_origin_abs,get_piece_lowest_index_from_origin_abs
 def best_move_string_combiner(piece, xpos, rotation):
     return f"{piece}_x{xpos}_{rotation}" # XD
 
@@ -70,15 +70,17 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
     piece, xpos, rotation1, rotation2 = move.split('_')
     x = int(xpos[1:])
     rotation = rotation1 + "_" + rotation2
-    pieces_cords = PIECES_index[piece][rotation]
-    
+    if piece != "O":
+        pieces_cords = PIECES_index[piece][rotation]
+        #print(f"{pieces_cords }, rotation={rotation}")
+        print(f"9- rightmost: {9-PIECES_index_sim_game_right[piece][rotation]}, rightmost: {PIECES_index_sim_game_right[piece][rotation]}, leftmost: {PIECES_index_sim_game_left[piece][rotation]}, rotation: {rotation}, lowest: {get_piece_lowest_index_from_origin_abs(pieces_cords)}")
     if key_pressed == pygame.K_RIGHT:
         print("Simulate move: Move piece right")
-        if int(x) < 9-get_piece_rightmost_index_from_origin(pieces_cords):  # Assuming board width is 10
+        if int(x) < 9-PIECES_index_sim_game_right[piece][rotation]:  # Assuming board width is 10
             x = str(int(x) + 1)
     
     elif key_pressed == pygame.K_LEFT:
-        if int(x) > get_piece_leftmost_index_from_origin(pieces_cords)+2:
+        if int(x) > PIECES_index_sim_game_left[piece][rotation]:
             x = str(int(x) - 1)
         print("Simulate move: Move piece left")
     
@@ -88,6 +90,9 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
         print("Simulate move: Rotate piece")
     
     elif key_pressed == pygame.K_DOWN:
+        if piece == "O":
+            if y_pos < 19-1:
+                y_pos += 1
         if y_pos < 19-get_piece_lowest_index_from_origin(pieces_cords):
             y_pos += 1
         print("Simulate move: Soft drop")
@@ -108,7 +113,7 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
 
     elif key_pressed == pygame.K_b and piece != "O":
         pass# error i cba solving xd
-        
+        # problem is that keys are being incorrect and insetad of having rotation flat_0 for example, its 0-2 etc
         #print("Simulate move: 180 rotate piece")
         #new_position_array = rotate_180(rotation, board, piece, x, y_pos)
         #pieces_cords = PIECES_index[piece][rotation]

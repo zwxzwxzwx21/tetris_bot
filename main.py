@@ -224,7 +224,7 @@ class TetrisGame:
                         viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,yvalue=goal_y_pos,control_mode=self.control_mode)
                         viewer.update_board(self.board)
                         key_pressed  = viewer.get_key_pressed()
-                        from simluate_game_movement import simulate_move
+                        from simulate_game_movement import simulate_move
                         
                         self.board,best_move_str,goal_y_pos,last_key  = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed, up_y_movement = True)
                         import pygame
