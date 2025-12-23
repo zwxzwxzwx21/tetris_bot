@@ -216,11 +216,11 @@ class TetrisGame:
                     if viewer:
                         piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
                         rotation  = rotation1 + "_" + rotation2
-                        print(x_str)
+                        #print(x_str)
                         x = int(x_str[1:])
                         piece_type_placed = self.queue[0]
                         piece_shape = PIECES[piece_type_placed][rotation]
-                        print(piece_type_placed, piece_shape, x,rotation)
+                        #print(piece_type_placed, piece_shape, x,rotation)
                         viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,yvalue=goal_y_pos,control_mode=self.control_mode)
                         viewer.update_board(self.board)
                         key_pressed  = viewer.get_key_pressed()

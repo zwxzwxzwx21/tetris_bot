@@ -73,7 +73,6 @@ class TetrisBoardViewer:
         self.draw = True
 
     def set_preview(self, piece, shape, xpos, board_array,rotation,yvalue,control_mode):
-        print(f"##### {yvalue} #####")
         pieces_cords = PIECES_index[piece][rotation]
         # ghost piece being drawn
         def collides(ypos):
