@@ -136,8 +136,6 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
 # fix the X position limit on pieces, rotations allow the piece to go out of bounds
 # on top of that, some pieces just cant move left or right enough due to starting position being off
 
-
-
 # pygame.K_LEFT - Left arrow key
 # pygame.K_RIGHT - Right arrow key  
 # pygame.K_UP - Up arrow key
