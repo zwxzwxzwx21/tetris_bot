@@ -18,7 +18,7 @@ def try_place_piece_with_kick(board,kick_table,position_array,rotation_goal,prin
     # rotation goal is either left right or 180, determines what offset to set 
     # this one makes the data sets like work, because you need same data twice which is different for some reason lol, i should fix it at some point
 
-    print(f"Trying to place piece with kick: {position_array} aiming for rotation {rotation_goal}")
+    #print(f"Trying to place piece with kick: {position_array} aiming for rotation {rotation_goal}")
     rotated_piece = PIECES_index[position_array[0]][rotation_goal]
     
     str_piece_rotation_goal = rotation_goal

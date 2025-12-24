@@ -232,6 +232,12 @@ class TetrisGame:
                             break_loop = True
                         
                         time.sleep(0.016)
+
+                        # heuristic checks
+                        
+                        from heuristic import aggregate,bumpiness,blockade,tetrisSlot,check_holes2,iDependency,analyze
+                        #analyze(self.board,0)
+
                     else: 
                         break
 

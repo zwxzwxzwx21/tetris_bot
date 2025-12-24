@@ -1,9 +1,12 @@
+import copy
 import pygame
 import time
 from utility.pieces_index import PIECES_index,PIECES_index_sim_game_left,PIECES_index_sim_game_right
 from spins_funcions import try_place_piece_with_kick    
+from heuristic import aggregate,bumpiness,blockade,tetrisSlot,check_holes2,iDependency,analyze
+
 from spins import SRS_I_piece_kick_table, SRS_rest_pieces_kick_table, SRS_180_kick_table
-from board_operations.checking_valid_placements import get_piece_rightmost_index_from_origin, get_piece_leftmost_index_from_origin,get_piece_lowest_index_from_origin,get_piece_rightmost_index_from_origin_abs, get_piece_leftmost_index_from_origin_abs,get_piece_lowest_index_from_origin_abs
+from board_operations.checking_valid_placements import get_piece_rightmost_index_from_origin, get_piece_leftmost_index_from_origin,get_piece_lowest_index_from_origin,get_piece_rightmost_index_from_origin_abs, get_piece_leftmost_index_from_origin_abs,get_piece_lowest_index_from_origin_abs, place_piece
 def best_move_string_combiner(piece, xpos, rotation):
     return f"{piece}_x{xpos}_{rotation}" # XD
 
@@ -93,15 +96,14 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
     
     elif key_pressed == pygame.K_DOWN:
         if piece == "O":
-            if y_pos < 19-1:
+            if y_pos < 19:
                 y_pos += 1
         elif y_pos < 19-get_piece_lowest_index_from_origin(pieces_cords):
             y_pos += 1
         print("Simulate move: Soft drop")
 
     elif key_pressed == pygame.K_SPACE:
-        print("Simulate move: Hard drop")
-
+        print("Simulate move: Hard drop")    
 
     elif key_pressed == pygame.K_c and piece != "O":
         print("Simulate move: Rotate piece counter-clockwise")
@@ -123,6 +125,10 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
         board = [[' ' for _ in range(10)] for _ in range(20)]
         print("Simulate move: Reset board")
 
+    # make it so it will encount ghost piece instead of already placed piece
+    board_analyze = copy.deepcopy(board)
+    board_analyze = place_piece(PIECES_index[piece][rotation], piece, board_analyze, int(x), y_pos, rotation)[0]
+
     best_move_string = best_move_string_combiner(piece, x,rotation)
     if isinstance(new_position_array, tuple) or isinstance(new_position_array, list):
         x = new_position_array[2]
@@ -133,6 +139,9 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
         print(f"New simulated move: {best_move_string} at y position {y_pos}")
 
         print("\n")
+
+        analyze(board_analyze,0)
+
     return board, best_move_string,y_pos, key_pressed
 
 # TODO TOMORROW
