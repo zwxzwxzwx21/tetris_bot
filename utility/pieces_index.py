@@ -21,9 +21,9 @@ PIECES_lowest_point_from_origin = {
 
     'I': {
         'flat_0' : 1,
-        'spin_L' : 2,
-        'flat_2' : 1,
-        'spin_R' : 2,
+        'spin_L' : 3,
+        'flat_2' : 2,
+        'spin_R' : 3,
         }, 
 
     'T': {
@@ -72,10 +72,10 @@ PIECES_startpos_indexing_value = {
         },
 
     'I': {
-        'flat_0' : 1,
+        'flat_0' : 0,
         'spin_L' : 0,
-        'flat_2' : 1,
-        'spin_R' : -1,
+        'flat_2' : 0,
+        'spin_R' : 0,
         }, 
 
     'T': {
@@ -125,7 +125,7 @@ PIECES_xpos_indexing_value = {
         'flat_0' : 4,
         'spin_L' : 2,
         'flat_2' : 4,
-        'spin_R' : 2,
+        'spin_R' : 3,
         }, 
 
     'T': {
@@ -172,10 +172,10 @@ PIECES_index = {
         },
 
     'I': {
-        'flat_0' : [(0,1),(-1,1),(1,1),(2,1)],
-        'spin_L' : [(0,0),(0,-1),(0,1),(0,2)],
-        'flat_2' : [(0,0),(-1,0),(1,0),(2,0)],
-        'spin_R' : [(1,0),(1,-1),(1,1),(1,2)],
+        'flat_0' : [(0,1),(1,1),(2,1),(3,1)],
+        'spin_L' : [(1,0),(1,1),(1,2),(1,3)],
+        'flat_2' : [(0,2),(1,2),(2,2),(3,2)],
+        'spin_R' : [(2,0),(2,1),(2,2),(2,3)],
         }, 
 
     'T': {
@@ -223,10 +223,10 @@ PIECES_index_sim_game_left = {
         },
 
     'I': {
-        'flat_0' : 1,
-        'spin_L' : 0,
-        'flat_2' : 1,
-        'spin_R' : -1,
+        'flat_0' : 0,
+        'spin_L' : -1,
+        'flat_2' : 0,
+        'spin_R' : -2,
         }, 
 
     'T': {
@@ -273,10 +273,10 @@ PIECES_index_sim_game_right = {
         },
 
     'I': {
-        'flat_0' : 2,
-        'spin_L' : 0,
-        'flat_2' : 2,
-        'spin_R' : 1,
+        'flat_0' : 3,
+        'spin_L' : 1,
+        'flat_2' : 3,
+        'spin_R' : 2,
         }, 
 
     'T': {
@@ -319,7 +319,7 @@ PIECES_soft_drop_index = { # pieces without rotations, basically 0
         'flat_0' : [(0,0),(-1,0),(0,-1),(-1,-1)]
     },
     'I': {
-        'flat_0' : [(0,1),(-1,1),(1,1),(2,1)],
+        'flat_0' : [(0,1),(1,1),(2,1),(3,1)],
     },    
     'T': {
         'flat_0': [(0,0),(-1,0),(1,0),(0,-1)],

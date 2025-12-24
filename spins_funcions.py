@@ -12,7 +12,7 @@ def is_valid_position(board, piece_coords, x, y):
             return False
     return True
 
-def try_place_piece_with_kick(board,kick_table,position_array,rotation_goal):
+def try_place_piece_with_kick(board,kick_table,position_array,rotation_goal,print_offset=False):
     """this function tries to place a piece by using a spin, if it fails, it tries puttinga  kick offset on it
     when fails completely,returns none"""
     # rotation goal is either left right or 180, determines what offset to set 
@@ -31,6 +31,8 @@ def try_place_piece_with_kick(board,kick_table,position_array,rotation_goal):
         target_y = position_array[3] + int(offset[1])
         
         if is_valid_position(board, rotated_piece, target_x, target_y):
+            if print_offset:
+                print(f"Piece placed with offset {offset}")
             if offset == (0,0):
                 spin = False
             else:

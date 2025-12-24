@@ -20,10 +20,11 @@ def rotate_left(rotation,board,piece,xpos,ypos):
         rotation_goal = "flat_0"
     if piece == "I":
         kick_table = SRS_I_piece_kick_table
+        print("I piece rotation left")
     else:
         kick_table = SRS_rest_pieces_kick_table
     position_array = [piece, rotation, xpos, ypos]
-    new_position_array,spin=try_place_piece_with_kick(board, kick_table, position_array, rotation_goal)
+    new_position_array,spin=try_place_piece_with_kick(board, kick_table, position_array, rotation_goal,print_offset=True)
     return new_position_array
 
 def rotate_right(rotation,board,piece,xpos,ypos):
@@ -38,10 +39,11 @@ def rotate_right(rotation,board,piece,xpos,ypos):
         rotation_goal = "flat_0"
     if piece == "I":
         kick_table = SRS_I_piece_kick_table
+        print("I piece rotation right")
     else:
         kick_table = SRS_rest_pieces_kick_table
     position_array = [piece, rotation, xpos, ypos]
-    new_position_array,spin= try_place_piece_with_kick(board, kick_table, position_array, rotation_goal)
+    new_position_array,spin= try_place_piece_with_kick(board, kick_table, position_array, rotation_goal,print_offset=True)
     return new_position_array
 
 def rotate_180(rotation,board,piece,xpos,ypos):
@@ -56,7 +58,7 @@ def rotate_180(rotation,board,piece,xpos,ypos):
         rotation_goal = "spin_R"
     kick_table = SRS_180_kick_table
     position_array = [piece, rotation, xpos, ypos]
-    new_position_array,spin = try_place_piece_with_kick(board, kick_table, position_array, rotation_goal)
+    new_position_array,spin = try_place_piece_with_kick(board, kick_table, position_array, rotation_goal,print_offset=True)
     return new_position_array
 
 def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
@@ -73,7 +75,7 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
     if piece != "O":
         pieces_cords = PIECES_index[piece][rotation]
         #print(f"{pieces_cords }, rotation={rotation}")
-        print(f"9- rightmost: {9-PIECES_index_sim_game_right[piece][rotation]}, rightmost: {PIECES_index_sim_game_right[piece][rotation]}, leftmost: {PIECES_index_sim_game_left[piece][rotation]}, rotation: {rotation}, lowest: {get_piece_lowest_index_from_origin_abs(pieces_cords)}")
+        #print(f"9- rightmost: {9-PIECES_index_sim_game_right[piece][rotation]}, rightmost: {PIECES_index_sim_game_right[piece][rotation]}, leftmost: {PIECES_index_sim_game_left[piece][rotation]}, rotation: {rotation}, lowest: {get_piece_lowest_index_from_origin_abs(pieces_cords)}")
     if key_pressed == pygame.K_RIGHT:
         print("Simulate move: Move piece right")
         if int(x) < 9-PIECES_index_sim_game_right[piece][rotation]:  # Assuming board width is 10
@@ -93,7 +95,7 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
         if piece == "O":
             if y_pos < 19-1:
                 y_pos += 1
-        if y_pos < 19-get_piece_lowest_index_from_origin(pieces_cords):
+        elif y_pos < 19-get_piece_lowest_index_from_origin(pieces_cords):
             y_pos += 1
         print("Simulate move: Soft drop")
 
@@ -101,12 +103,12 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
         print("Simulate move: Hard drop")
 
 
-    elif key_pressed == pygame.K_v and piece != "O":
+    elif key_pressed == pygame.K_c and piece != "O":
         print("Simulate move: Rotate piece counter-clockwise")
         new_position_array = rotate_left(rotation, board, piece, x, y_pos)
         pieces_cords = PIECES_index[piece][rotation]
 
-    elif key_pressed == pygame.K_c and piece != "O":
+    elif key_pressed == pygame.K_v and piece != "O":
         print("Simulate move: Rotate piece clockwise")
         new_position_array = rotate_right(rotation, board, piece, x, y_pos)
         pieces_cords = PIECES_index[piece][rotation]
@@ -120,7 +122,7 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
     elif key_pressed == pygame.K_r:
         board = [[' ' for _ in range(10)] for _ in range(20)]
         print("Simulate move: Reset board")
-        
+
     best_move_string = best_move_string_combiner(piece, x,rotation)
     if isinstance(new_position_array, tuple) or isinstance(new_position_array, list):
         x = new_position_array[2]
