@@ -26,7 +26,7 @@ PIECE_COLORS = {
 
 
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed,aggregate, clearedLines, bumpiness, blockade, tetrisSlot,iDependency,holes, pieces, control_mode):
+    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed,aggregate, clearedLines, bumpiness, blockade, tetrisSlot,iDependency,holes, pieces, control_mode,held_piece):
         pygame.init()
         self.surface = pygame.display.set_mode(
             (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
@@ -53,6 +53,7 @@ class TetrisBoardViewer:
         self.pieces = pieces
         self.control_mode = control_mode
         self.last_key_pressed = None
+        self.held_piece = held_piece    
 
     def update_board(self, new_board):
         self.board = new_board
@@ -72,8 +73,9 @@ class TetrisBoardViewer:
         self.pieces = pieces_placed
         self.draw = True
 
-    def set_preview(self, piece, shape, xpos, board_array,rotation,yvalue,control_mode):
+    def set_preview(self, piece, shape, xpos, board_array,rotation,held_piece,yvalue,control_mode):
         pieces_cords = PIECES_index[piece][rotation]
+        self.held_piece = held_piece
         # ghost piece being drawn
         def collides(ypos):
             for (dx, dy) in pieces_cords:
@@ -146,6 +148,7 @@ class TetrisBoardViewer:
         queue_ = list(self.queue)[:5]
         line("queue:")
         line(" ".join(queue_) if queue_ else "-")
+        line(f"HOLD: {self.held_piece if self.held_piece else 'None'}")
         y += 6
         line("stats:")
         lines_total = (

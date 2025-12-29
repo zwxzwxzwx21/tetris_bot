@@ -77,6 +77,8 @@ class GameStats:
         self.APP = 0.0
         self.seed = seed
         self.pieces_placed = 0 
+        self.held_piece = None # should be string i guess
+
 class TetrisGame:
     def __init__(self,seed):
         self.board = [[" " for _ in range(10)] for _ in range(20)]
@@ -100,6 +102,7 @@ class TetrisGame:
         random.seed(self.seed)
         self.pieces_placed = 0
         self.control_mode = [False] 
+        self.held_piece = None # should be string i guess
 
     def save_game_state(self,move_str,board):
         if config.PRINT_MODE:
@@ -193,7 +196,7 @@ class TetrisGame:
                     logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
                 move_history_ = find_best_placement(
-                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats
+                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats, self.stats.held_piece
                 )
 
                 
@@ -204,30 +207,55 @@ class TetrisGame:
                     if config.PRINT_MODE:
                         logging.info("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
                         logging.debug(f"piece that failed: {self.queue[0]}")
-                    self.game_over_signal[0] = True
+                    self.game_over_signal[0] = True 
                     break    
                 
                 move_history, best_move_str,goal_y_pos = move_history_
 
 
                 break_loop = False
+                first_held_piece = True
                 while self.control_mode[0] and break_loop == False:
+                    # we dont really need bruteforcer to work in control_mode, only to display heuristic on given piece, so im not making it efficient
 
                     if viewer:
+                        self.held_piece = None if self.held_piece is None else self.held_piece
+                        change_held_piece_flag = False
                         piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
                         rotation  = rotation1 + "_" + rotation2
                         #print(x_str)
                         x = int(x_str[1:])
                         piece_type_placed = self.queue[0]
+                        
                         piece_shape = PIECES[piece_type_placed][rotation]
                         #print(piece_type_placed, piece_shape, x,rotation)
-                        viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,yvalue=goal_y_pos,control_mode=self.control_mode)
-                        viewer.update_board(self.board)
+                        import pygame
                         key_pressed  = viewer.get_key_pressed()
+                        if key_pressed == pygame.K_RSHIFT:
+                            print("hold pressed in control mode")
                         from simulate_game_movement import simulate_move
                         
-                        self.board,best_move_str,goal_y_pos,last_key  = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed, up_y_movement = True)
-                        import pygame
+                        self.board, best_move_str, goal_y_pos, last_key, a, change_held_piece_flag  = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed,self.held_piece, up_y_movement = True)
+                        if change_held_piece_flag:
+                            print(f"flag: {change_held_piece_flag}")
+                        if change_held_piece_flag:
+                            print(f"changed held piece to: {self.held_piece}")
+                            if self.held_piece is None:
+                                self.held_piece = self.queue[0]
+                                self.queue.pop(0)
+                                print(f"held piece was none, now holding: {self.held_piece}")
+                            else:
+                                temp_hold_piece = self.held_piece
+                                self.held_piece = self.queue[0]
+                                self.queue[0] = temp_hold_piece
+                                print(f"swapped held piece, now holding: {self.held_piece}, queue[0]: {self.queue[0]}")
+                            print(f"piece shape after hold: {piece_shape}, piece_type_placed: {piece_type_placed}")
+                            change_held_piece_flag = False
+                        # piece_shape arg is not even used
+                        viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
+                        viewer.update_board(self.board)
+                       
+
                         if last_key == pygame.K_SPACE:
                             break_loop = True
                         
@@ -256,7 +284,7 @@ class TetrisGame:
                 piece_shape = PIECES[piece_type_placed][rotation]
 
                 if viewer:
-                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,yvalue=goal_y_pos,control_mode=self.control_mode)
+                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
 
                 board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
                 
@@ -522,7 +550,7 @@ if __name__ == "__main__":
             game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency, game.holes,
             game.pieces_placed,
             game.control_mode,
-            
+            game.held_piece,
         )
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
         t.start()

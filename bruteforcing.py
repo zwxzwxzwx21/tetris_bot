@@ -46,7 +46,7 @@ from heuristic import analyze
 def loss(board, cleared_lines) -> float:
     return analyze(board,cleared_lines)
 
-def find_best_placement(board, queue, combo, stats):
+def find_best_placement(board, queue, combo, stats,held_piece):
     move_history = []
     GAMEOVER = False
     spin = False
@@ -72,8 +72,8 @@ def find_best_placement(board, queue, combo, stats):
             for y in range(lowest_y, 20):       
                 if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,rotation_name,current_piece,print_debug=False):
 
-                    arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
-                    temp_array.append([current_piece, rotation_name, start_x, y])
+                        arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
+                        temp_array.append([current_piece, rotation_name, start_x, y])
     list_of_best_moves = []
     for position_info in arr_piece_info_array:
         

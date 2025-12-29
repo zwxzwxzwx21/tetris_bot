@@ -64,7 +64,7 @@ def rotate_180(rotation,board,piece,xpos,ypos):
     new_position_array,spin = try_place_piece_with_kick(board, kick_table, position_array, rotation_goal,print_offset=True)
     return new_position_array
 
-def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
+def simulate_move(board, move, y_pos,key_pressed, held_piece, up_y_movement=True):
 
     new_position_array = None
 
@@ -74,6 +74,7 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
     #time.sleep(811.1)  # Simulate a short delay for the move
     piece, xpos, rotation1, rotation2 = move.split('_')
     x = int(xpos[1:])
+    change_held_piece_flag = False
     rotation = rotation1 + "_" + rotation2
     if piece != "O":
         pieces_cords = PIECES_index[piece][rotation]
@@ -121,14 +122,26 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
         #print("Simulate move: 180 rotate piece")
         #new_position_array = rotate_180(rotation, board, piece, x, y_pos)
         #pieces_cords = PIECES_index[piece][rotation]
+    
     elif key_pressed == pygame.K_r:
         board = [[' ' for _ in range(10)] for _ in range(20)]
         print("Simulate move: Reset board")
+    
+    elif key_pressed == pygame.K_RSHIFT:
+            
+        rotation = "flat_0" # doesnt matter, can be changed by a user
+        x = 4
+        y_pos = 4
+        change_held_piece_flag = True
+
+        print(f"piece: {piece}, held_piece: {held_piece}, queue: ")    
+        print("Simulate move: Hold piece")
 
     # make it so it will encount ghost piece instead of already placed piece
     board_analyze = copy.deepcopy(board)
     board_analyze = place_piece(PIECES_index[piece][rotation], piece, board_analyze, int(x), y_pos, rotation)[0]
 
+    #print(f"creating best move string from new position array: piece={piece}, x={x}, rotation={rotation}")
     best_move_string = best_move_string_combiner(piece, x,rotation)
     if isinstance(new_position_array, tuple) or isinstance(new_position_array, list):
         x = new_position_array[2]
@@ -141,8 +154,8 @@ def simulate_move(board, move, y_pos,key_pressed,up_y_movement=True):
         print("\n")
 
         analyze(board_analyze,0)
-
-    return board, best_move_string,y_pos, key_pressed
+   # print(f"returning best move string: {best_move_string}")
+    return board, best_move_string,y_pos, key_pressed, held_piece ,change_held_piece_flag
 
 # TODO TOMORROW
 # fix the kick table of pieces, i piece is broken 100%
