@@ -69,7 +69,7 @@ def find_best_placement(board, queue, combo, stats,held_piece):
             
             lowest_y = find_lowest_y_for_piece(PIECES_index[current_piece][rotation_name], board, start_x,rotation_name,current_piece)
 
-            for y in range(lowest_y, 20):       
+            for y in range(lowest_y+1, 21):  
                 if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,rotation_name,current_piece,print_debug=False):
 
                         arr_piece_info_array.append([current_piece, rotation_name, start_x, y])

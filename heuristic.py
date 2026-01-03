@@ -179,7 +179,7 @@ def analyze(board,cleared_lines):
     # - iDependency: we want this low
     # - holes: we want this low
     
-    print(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}")
+    print(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}, TOTAL: {-varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10}")
     varB = 0
     #print(a*varA + b*varB + c*varC + d*varD + e*varE + f*varF)
     return -varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10
