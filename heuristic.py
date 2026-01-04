@@ -178,11 +178,11 @@ def analyze(board,cleared_lines):
     # - tetrisSlot: we want this high ?
     # - iDependency: we want this low
     # - holes: we want this low
-    
-    print(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}, TOTAL: {-varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10}")
+    PCbonus = 100 if all(colHeight == 0 for colHeight in colHeights) else 0
+    print(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}, PCbonus {PCbonus} TOTAL: {-varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10 + PCbonus}")
     varB = 0
     #print(a*varA + b*varB + c*varC + d*varD + e*varE + f*varF)
-    return -varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10
+    return -varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10 + PCbonus + cleared_lines*3
 
 def analyze_main(board,cleared_lines):
     # this one is for the board view printing
