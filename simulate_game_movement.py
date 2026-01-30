@@ -1,5 +1,5 @@
 import copy
-import pygame
+import pygame # type: ignore
 import time
 from utility.pieces_index import PIECES_index,PIECES_index_sim_game_left,PIECES_index_sim_game_right
 from spins_funcions import try_place_piece_with_kick    
@@ -23,7 +23,6 @@ def rotate_left(rotation,board,piece,xpos,ypos):
         rotation_goal = "flat_0"
     if piece == "I":
         kick_table = SRS_I_piece_kick_table
-        print("I piece rotation left")
     else:
         kick_table = SRS_rest_pieces_kick_table
     position_array = [piece, rotation, xpos, ypos]
@@ -42,7 +41,6 @@ def rotate_right(rotation,board,piece,xpos,ypos):
         rotation_goal = "flat_0"
     if piece == "I":
         kick_table = SRS_I_piece_kick_table
-        print("I piece rotation right")
     else:
         kick_table = SRS_rest_pieces_kick_table
     position_array = [piece, rotation, xpos, ypos]
@@ -64,8 +62,11 @@ def rotate_180(rotation,board,piece,xpos,ypos):
     new_position_array,spin = try_place_piece_with_kick(board, kick_table, position_array, rotation_goal,print_offset=True)
     return new_position_array
 
-def simulate_move(board, move, y_pos,key_pressed, held_piece, up_y_movement=True):
-
+def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, up_y_movement=True):
+    """
+    das_info: dict with {'left': bool, 'right': bool} - True means DAS is charged and ARR triggered
+    """
+    
     new_position_array = None
 
     if key_pressed is not None:
@@ -80,43 +81,50 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, up_y_movement=True
         pieces_cords = PIECES_index[piece][rotation]
         #print(f"{pieces_cords }, rotation={rotation}")
         #print(f"9- rightmost: {9-PIECES_index_sim_game_right[piece][rotation]}, rightmost: {PIECES_index_sim_game_right[piece][rotation]}, leftmost: {PIECES_index_sim_game_left[piece][rotation]}, rotation: {rotation}, lowest: {get_piece_lowest_index_from_origin_abs(pieces_cords)}")
-    if key_pressed == pygame.K_RIGHT:
-        print("Simulate move: Move piece right")
-        if int(x) < 9-PIECES_index_sim_game_right[piece][rotation]:  # Assuming board width is 10
-            x = str(int(x) + 1)
     
+    # handle DAS moves
+    if das_info.get('right', False):
+        if int(x) < 9-PIECES_index_sim_game_right[piece][rotation]:
+            x = int(x) + 1
+    elif das_info.get('left', False):
+        if int(x) > PIECES_index_sim_game_left[piece][rotation]:
+            x = int(x) - 1
+    elif das_info.get('down', False):
+        if piece == "O":
+            if y_pos < 19:
+                y_pos += 1
+        elif y_pos < 19-get_piece_lowest_index_from_origin(pieces_cords):
+            y_pos += 1
+    
+    # initial tap
+    if key_pressed == pygame.K_RIGHT:
+        if int(x) < 9-PIECES_index_sim_game_right[piece][rotation]:
+            x = int(x) + 1
+            
     elif key_pressed == pygame.K_LEFT:
         if int(x) > PIECES_index_sim_game_left[piece][rotation]:
-            x = str(int(x) - 1)
-        print("Simulate move: Move piece left")
+            x = int(x) - 1
     
-    elif key_pressed == pygame.K_UP:
+    elif key_pressed == pygame.K_RSHIFT or key_pressed == pygame.K_LSHIFT:
         if y_pos > 0 and up_y_movement:
             y_pos -= 1
-        print("Simulate move: Rotate piece")
     
     elif key_pressed == pygame.K_DOWN:
         if piece == "O":
             if y_pos < 19:
                 y_pos += 1
         elif y_pos < 19-get_piece_lowest_index_from_origin(pieces_cords):
-            y_pos += 1
-        print("Simulate move: Soft drop")
-
-    elif key_pressed == pygame.K_SPACE:
-        print("Simulate move: Hard drop")    
+            y_pos += 1  
 
     elif key_pressed == pygame.K_c and piece != "O":
-        print("Simulate move: Rotate piece counter-clockwise")
         new_position_array = rotate_left(rotation, board, piece, x, y_pos)
         pieces_cords = PIECES_index[piece][rotation]
 
     elif key_pressed == pygame.K_v and piece != "O":
-        print("Simulate move: Rotate piece clockwise")
         new_position_array = rotate_right(rotation, board, piece, x, y_pos)
         pieces_cords = PIECES_index[piece][rotation]
 
-    elif key_pressed == pygame.K_b and piece != "O":
+    elif key_pressed == pygame.K_x and piece != "O":
         pass# error i cba solving xd
         # problem is that keys are being incorrect and insetad of having rotation flat_0 for example, its 0-2 etc
         #print("Simulate move: 180 rotate piece")
@@ -125,9 +133,8 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, up_y_movement=True
     
     elif key_pressed == pygame.K_r:
         board = [[' ' for _ in range(10)] for _ in range(20)]
-        print("Simulate move: Reset board")
     
-    elif key_pressed == pygame.K_RSHIFT:
+    elif key_pressed == pygame.K_UP:
             
         rotation = "flat_0" # doesnt matter, can be changed by a user
         x = 4
@@ -135,7 +142,6 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, up_y_movement=True
         change_held_piece_flag = True
 
         print(f"piece: {piece}, held_piece: {held_piece}, queue: ")    
-        print("Simulate move: Hold piece")
 
     # make it so it will encount ghost piece instead of already placed piece
     board_analyze = copy.deepcopy(board)
@@ -157,7 +163,7 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, up_y_movement=True
    # print(f"returning best move string: {best_move_string}")
     return board, best_move_string,y_pos, key_pressed, held_piece ,change_held_piece_flag
 
-# TODO TOMORROW
+# TODO 
 # fix the kick table of pieces, i piece is broken 100%
 
 # fix the X position limit on pieces, rotations allow the piece to go out of bounds

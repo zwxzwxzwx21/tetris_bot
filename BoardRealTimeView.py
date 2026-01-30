@@ -1,4 +1,4 @@
-import pygame
+import pygame  # type: ignore
 from utility.pieces_index import PIECES_index
 
 CELL_SIZE = 28
@@ -213,4 +213,32 @@ class TetrisBoardViewer:
         key = self.last_key_pressed
         self.last_key_pressed = None
         return key
+    
+    def get_key_held(self):
+        """Returns the currently held movement key (prioritizes left/right for DAS)"""
+        keys = pygame.key.get_pressed()
+        
+        if keys[pygame.K_LEFT]:
+            return pygame.K_LEFT
+        if keys[pygame.K_RIGHT]:
+            return pygame.K_RIGHT
+        
+        if keys[pygame.K_DOWN]:
+            return pygame.K_DOWN
+        if keys[pygame.K_UP]:
+            return pygame.K_UP
+        if keys[pygame.K_SPACE]:
+            return pygame.K_SPACE
+        if keys[pygame.K_c]:
+            return pygame.K_c
+        if keys[pygame.K_v]:
+            return pygame.K_v
+        if keys[pygame.K_b]:
+            return pygame.K_b
+        if keys[pygame.K_r]:
+            return pygame.K_r
+        if keys[pygame.K_RSHIFT]:
+            return pygame.K_RSHIFT
+            
+        return None
 

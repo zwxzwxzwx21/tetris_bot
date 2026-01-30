@@ -1,13 +1,18 @@
 # to test the argparse better, try running it in console using:
 # python .\main.py --rule, rules will be listed lower, as they are wip
+#  python .\tetris_bot\main.py --rule control_mode
 import argparse  # testing it
 import copy
 import logging
 import random
 import threading
 import time
-import pandas as pd
+import pandas as pd # type: ignore
 import os
+
+import pygame # type: ignore
+
+from pyparsing import deque # type: ignore
 import config
 import itertools
 
@@ -215,6 +220,16 @@ class TetrisGame:
 
                 break_loop = False
                 first_held_piece = True
+                
+                das_delay = 10  # 0.16s before repeat starts
+                arr_delay = 0   # 0s between moves after DAS activates
+                
+                das_state = {
+                    'left': {'held_frames': 0, 'arr_counter': 0, 'charged': False},
+                    'down': {'held_frames': 0, 'arr_counter': 0, 'charged': False},
+                    'right': {'held_frames': 0, 'arr_counter': 0, 'charged': False}
+                }
+                
                 while self.control_mode[0] and break_loop == False:
                     # we dont really need bruteforcer to work in control_mode, only to display heuristic on given piece, so im not making it efficient
 
@@ -229,27 +244,84 @@ class TetrisGame:
                         
                         piece_shape = PIECES[piece_type_placed][rotation]
                         #print(piece_type_placed, piece_shape, x,rotation)
-                        import pygame
                         key_pressed  = viewer.get_key_pressed()
-                        if key_pressed == pygame.K_RSHIFT:
-                            print("hold pressed in control mode")
+                        key_held = viewer.get_key_held()
+
                         from simulate_game_movement import simulate_move
                         
-                        self.board, best_move_str, goal_y_pos, last_key, a, change_held_piece_flag  = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed,self.held_piece, up_y_movement = True)
+                        left_held = key_held == pygame.K_LEFT
+                        right_held = key_held == pygame.K_RIGHT
+                        down_held = key_held == pygame.K_DOWN
+                        
+                        if left_held:
+                            das_state['left']['held_frames'] += 1
+                            pass
+                            if das_state['left']['held_frames'] >= das_delay:
+                                das_state['left']['charged'] = True
+                                pass
+                        else:
+                            if das_state['left']['held_frames'] > 0:
+                                pass
+                            das_state['left'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
+                        
+                        if down_held:
+                            das_state['down']['held_frames'] += 1
+                            pass
+                            if das_state['down']['held_frames'] >= das_delay:
+                                das_state['down']['charged'] = True
+                                pass
+                        else:
+                            if das_state['down']['held_frames'] > 0:
+                                pass
+                            das_state['down'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
+                        
+                        if right_held:
+                            das_state['right']['held_frames'] += 1
+                            if das_state['right']['held_frames'] >= das_delay:
+                                das_state['right']['charged'] = True
+                                
+                        else:
+                            if das_state['right']['held_frames'] > 0:
+                                pass
+                            das_state['right'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
+                        
+                        das_move_left = False
+                        das_move_right = False
+                        das_move_down = False
+                        
+                        if das_state['left']['charged']:
+                            das_state['left']['arr_counter'] += 1
+                            if das_state['left']['arr_counter'] >= arr_delay:
+                                das_move_left = True
+                                das_state['left']['arr_counter'] = 0
+                                
+                        if das_state['right']['charged']:
+                            das_state['right']['arr_counter'] += 1
+                            if das_state['right']['arr_counter'] >= arr_delay:
+                                das_move_right = True
+                                das_state['right']['arr_counter'] = 0
+                                
+                        if down_held and das_state['down']['charged']:
+                            das_state['down']['arr_counter'] += 1
+                            if das_state['down']['arr_counter'] >= arr_delay:
+                                das_move_down = True
+                                das_state['down']['arr_counter'] = 0
+                                
+                        das_info = {'left': das_move_left, 'right': das_move_right, 'down': das_move_down}
+                        
+                        self.board, best_move_str, goal_y_pos, last_key, a, change_held_piece_flag = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed,self.held_piece, das_info, up_y_movement = True)
                         if change_held_piece_flag:
-                            print(f"flag: {change_held_piece_flag}")
+                            pass
                         if change_held_piece_flag:
-                            print(f"changed held piece to: {self.held_piece}")
+                            
                             if self.held_piece is None:
                                 self.held_piece = self.queue[0]
                                 self.queue.pop(0)
-                                print(f"held piece was none, now holding: {self.held_piece}")
+                                
                             else:
                                 temp_hold_piece = self.held_piece
                                 self.held_piece = self.queue[0]
                                 self.queue[0] = temp_hold_piece
-                                print(f"swapped held piece, now holding: {self.held_piece}, queue[0]: {self.queue[0]}")
-                            print(f"piece shape after hold: {piece_shape}, piece_type_placed: {piece_type_placed}")
                             change_held_piece_flag = False
                         # piece_shape arg is not even used
                         viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
