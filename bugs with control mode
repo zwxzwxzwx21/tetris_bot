@@ -1,0 +1,5 @@
+rotating O piece crashes the bot 
+all pieces after holding go too deep into the right wall and its unrotateable
+left movement takes control over right movement, in tetrio last move takes over 
+
+there is a thing that if you hold left or right, movement doesnt update until you PRESS the button, which is meh but doesnt change much since you wanna play slow while testing
