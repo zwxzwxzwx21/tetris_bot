@@ -120,7 +120,7 @@ from utility.print_board import print_board
 from utility.pieces import *
 def sideways_movement_simulation(board, piece, rotation, x_pos, y_pos, piece_info_array):
     '''returns array'''
-
+    #this shit broken as hell wuuh
     piece_val  = piece # like 'T' or 'L' needed later
     piece_index_array = PIECES_index[piece][rotation]
     piece_info_arrays_array = []

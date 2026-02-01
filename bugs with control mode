@@ -1,0 +1,12 @@
+rotating O piece crashes the bot 
+all pieces after holding go too deep into the right wall and its unrotateable
+left movement takes control over right movement, in tetrio last move takes over 
+
+there is a thing that if you hold left or right, movement doesnt update until you PRESS the button, which is meh but doesnt change much since you wanna play slow while testing
+
+while O piece is held, if you press L piece while holding right, and then old the O piece, the O piece will have weird bounds, allowing it to go to x = -1 and its maximum x will be 7, not allowing you to place the block on 3 places on the right ?????
+basically pressing space while holding a key breaks stuff, for example hold down and press block, then change to I piece if you hold it and it can go to y=20 which is oob!!!!!?????
+
+reason: piece is not being swapped correctyly, ghost piece updates, piece doesnt XD
+
+pressing shift (upbutton) too many times crashes the game

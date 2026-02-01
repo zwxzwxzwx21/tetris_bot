@@ -1,6 +1,7 @@
 # to test the argparse better, try running it in console using:
 # python .\main.py --rule, rules will be listed lower, as they are wip
-#  python .\tetris_bot\main.py --rule control_mode
+#  python .\main.py --rule control_mode
+# c:\Users\alexx\tewibot\.venv\Scripts\Activate.ps1
 import argparse  # testing it
 import copy
 import logging
@@ -255,24 +256,20 @@ class TetrisGame:
                         
                         if left_held:
                             das_state['left']['held_frames'] += 1
-                            pass
+                            
                             if das_state['left']['held_frames'] >= das_delay:
                                 das_state['left']['charged'] = True
-                                pass
+                                
                         else:
-                            if das_state['left']['held_frames'] > 0:
-                                pass
                             das_state['left'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
                         
                         if down_held:
                             das_state['down']['held_frames'] += 1
-                            pass
+                            
                             if das_state['down']['held_frames'] >= das_delay:
                                 das_state['down']['charged'] = True
-                                pass
+                                
                         else:
-                            if das_state['down']['held_frames'] > 0:
-                                pass
                             das_state['down'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
                         
                         if right_held:
@@ -281,8 +278,6 @@ class TetrisGame:
                                 das_state['right']['charged'] = True
                                 
                         else:
-                            if das_state['right']['held_frames'] > 0:
-                                pass
                             das_state['right'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
                         
                         das_move_left = False
@@ -309,9 +304,8 @@ class TetrisGame:
                                 
                         das_info = {'left': das_move_left, 'right': das_move_right, 'down': das_move_down}
                         
-                        self.board, best_move_str, goal_y_pos, last_key, a, change_held_piece_flag = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed,self.held_piece, das_info, up_y_movement = True)
-                        if change_held_piece_flag:
-                            pass
+                        self.board, best_move_str, goal_y_pos, last_key, a, change_held_piece_flag = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed,self.held_piece, das_info, self.queue,up_y_movement = True)
+                        
                         if change_held_piece_flag:
                             
                             if self.held_piece is None:

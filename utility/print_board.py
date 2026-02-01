@@ -44,3 +44,13 @@ def print_board(board, compressed_mode=False, color=False, coords=True):
     print()   
 
 board = [[' ' for _ in range(10)] for _ in range(20)]
+
+
+def printred(s):
+    print("\033[91m" + s + "\033[0m")
+
+def printgreen(s):
+    print("\033[92m" + s + "\033[0m")
+
+def printyellow(s):
+    print("\033[93m" + s + "\033[0m")
