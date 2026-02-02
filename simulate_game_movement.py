@@ -68,6 +68,11 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, u
     """
     das_info: dict with {'left': bool, 'right': bool} - True means DAS is charged and ARR triggered
     """
+
+    no_calculation_mode = True 
+    # disables heuristic  - not done yet
+    # makes the piece spawn at set placement (y=0,x=4)due to thing above  - not done yet
+    # removes ghost pieces going into illegal places - not done yet
     
     new_position_array = None
 

@@ -1,6 +1,11 @@
-rotating O piece crashes the bot 
-all pieces after holding go too deep into the right wall and its unrotateable
-left movement takes control over right movement, in tetrio last move takes over 
+
 
 there is a thing that if you hold left or right, movement doesnt update until you PRESS the button, which is meh but doesnt change much since you wanna play slow while testing
+
+things to make control mode work like somewhat - normal tetris game
+- left movement takes control over right movement, in tetrio last move takes over 
+- ghost pieces are places where the bot thinks the best movement is, option is needed to disable calculating and make the botjust place pieces on y=1 x=4 without rotations, so that the player does the job
+- ghost pieces can go into other pieces, becaues collition is only checked with walls, which makes softdrop kinda useless and awkward
+
+idc about clutch clears or whatever
 
