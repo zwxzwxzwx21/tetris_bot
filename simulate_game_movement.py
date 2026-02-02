@@ -1,7 +1,7 @@
 import copy
 import pygame # type: ignore
 import time
-from utility.pieces_index import PIECES_index,PIECES_index_sim_game_left,PIECES_index_sim_game_right
+from utility.pieces_index import PIECES_index,PIECES_index_sim_game_left,PIECES_index_sim_game_right,highest_piece_y_position_gui
 from spins_funcions import try_place_piece_with_kick    
 from heuristic import aggregate,bumpiness,blockade,tetrisSlot,check_holes2,iDependency,analyze
 
@@ -113,7 +113,7 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, u
             printred(f"Cannot move left anymore, current x: {x}, leftmost allowed: {PIECES_index_sim_game_left[piece][rotation]}")
     
     elif key_pressed == pygame.K_RSHIFT or key_pressed == pygame.K_LSHIFT:
-        if y_pos > 0 and up_y_movement:
+        if up_y_movement and y_pos > highest_piece_y_position_gui[piece][rotation]:
             y_pos -= 1
     
     elif key_pressed == pygame.K_DOWN:

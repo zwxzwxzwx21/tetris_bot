@@ -350,7 +350,56 @@ testprint("T",'flat_2')
 testprint("T",'spin_R')
 testprint("T",'spin_L')'''
 
+highest_piece_y_position_gui = {
+    'O': {
+        'flat_0' : 1, 
+        'flat_2': 1,
+        'spin_L': 1,
+        'spin_R': 1,
+        },
 
+    'I': {
+        'flat_0' : -1,
+        'spin_L' : 0,
+        'flat_2' : -2,
+        'spin_R' : 0,
+        }, 
+
+    'T': {
+        'flat_0': 1,
+        'flat_2': 0,
+        'spin_R': 1,
+        'spin_L': 1,
+        },
+
+    'L': {
+        'flat_0': 1,
+        'flat_2': 0,
+        'spin_R': 1,
+        'spin_L': 1,
+        },
+
+    'J': {
+        'flat_0': 1,
+        'flat_2': 1,
+        'spin_R': 1,
+        'spin_L': 0,
+        },
+
+    'S': {
+        'flat_0': 1,
+        'spin_R': 1,
+        'flat_2': 0,
+        'spin_L': 1,
+        },
+
+    'Z': {
+        'flat_0': 1,
+        'flat_2': 0,
+        'spin_L': 1,
+        'spin_R': 1,
+        }
+}   
 # pieces - RGB : (amount of possible placementes)
 # j - (25, 131, 191) poss moves: 8+8+9+9 (34)
 # l - (239, 149, 53) 8+8+9+9 (34)
