@@ -64,12 +64,11 @@ def rotate_180(rotation,board,piece,xpos,ypos):
     new_position_array,spin = try_place_piece_with_kick(board, kick_table, position_array, rotation_goal,print_offset=True)
     return new_position_array
 
-def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, up_y_movement=True):
+def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, no_calculation_mode, up_y_movement=True):
     """
     das_info: dict with {'left': bool, 'right': bool} - True means DAS is charged and ARR triggered
     """
 
-    no_calculation_mode = True 
     # disables heuristic  - not done yet
     # makes the piece spawn at set placement (y=0,x=4)due to thing above  - not done yet
     # removes ghost pieces going into illegal places - not done yet
@@ -81,7 +80,10 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, u
     # Simulating move: S_x1_flat_0 at y position 19
     #time.sleep(811.1)  # Simulate a short delay for the move
     piece, xpos, rotation1, rotation2 = move.split('_')
-    x = int(xpos[1:])
+    try:
+        x = int(xpos[1:])
+    except ValueError:
+        x = int(xpos)
     change_held_piece_flag = False
     rotation = rotation1 + "_" + rotation2
     if piece != "O":
@@ -104,6 +106,11 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, u
             #check_loop_bounds(0,y_pos, f"{19}-{get_piece_lowest_index_from_origin(pieces_cords)} ({19-get_piece_lowest_index_from_origin(pieces_cords)})","simulate_game_movement.py line 202")
             y_pos += 1
     
+    if key_pressed is pygame.K_q:
+        no_calculation_mode = not no_calculation_mode
+        printyellow(f"No calculation mode set to: {no_calculation_mode}")
+
+
     # initial tap
     if key_pressed == pygame.K_RIGHT:
         if x < 9-PIECES_index_sim_game_right[piece][rotation]:
@@ -166,24 +173,31 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, u
         printyellow(f"piece: {piece}, held_piece: {held_piece}, queue: ")    
     elif key_pressed == pygame.K_SPACE:
         pass
-    # make it so it will encount ghost piece instead of already placed piece
-    board_analyze = copy.deepcopy(board)
-    board_analyze = place_piece(PIECES_index[piece][rotation], piece, board_analyze, int(x), y_pos, rotation)[0]
 
-    #print(f"creating best move string from new position array: piece={piece}, x={x}, rotation={rotation}")
-    best_move_string = best_move_string_combiner(piece, x,rotation)
-    if isinstance(new_position_array, tuple) or isinstance(new_position_array, list):
-        x = new_position_array[2]
-        y_pos = new_position_array[3]
-        rotation = new_position_array[1]
+    if no_calculation_mode:
+        #x = 4
+        #y_pos = 1
+        rotation = "flat_0"
         best_move_string = best_move_string_combiner(piece, x,rotation)
-    if key_pressed is not None:    
-        print(f"New simulated move: {best_move_string} at y position {y_pos}")
+    else:
+        # make it so it will encount ghost piece instead of already placed piece
+        board_analyze = copy.deepcopy(board)
+        board_analyze = place_piece(PIECES_index[piece][rotation], piece, board_analyze, int(x), y_pos, rotation)[0]
 
-        print("\n")
+        #print(f"creating best move string from new position array: piece={piece}, x={x}, rotation={rotation}")
+        best_move_string = best_move_string_combiner(piece, x,rotation)
+        if isinstance(new_position_array, tuple) or isinstance(new_position_array, list):
+            x = new_position_array[2]
+            y_pos = new_position_array[3]
+            rotation = new_position_array[1]
+            best_move_string = best_move_string_combiner(piece, x,rotation)
+        if key_pressed is not None:    
+            print(f"New simulated move: {best_move_string} at y position {y_pos}")
 
-        analyze(board_analyze,0)
-    return board, best_move_string,y_pos, key_pressed, held_piece ,change_held_piece_flag
+            print("\n")
+
+            analyze(board_analyze,0)
+    return board, best_move_string,y_pos, key_pressed, held_piece ,change_held_piece_flag, no_calculation_mode
 
 # TODO 
 # fix the kick table of pieces, i piece is broken 100%

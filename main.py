@@ -109,6 +109,7 @@ class TetrisGame:
         self.pieces_placed = 0
         self.control_mode = [False] 
         self.held_piece = None # should be string i guess
+        self.no_calculation_mode = True # disables heuristic  - not done yet
 
     def save_game_state(self,move_str,board):
         if config.PRINT_MODE:
@@ -217,12 +218,15 @@ class TetrisGame:
                     break    
                 
                 move_history, best_move_str,goal_y_pos = move_history_
-
+                if self.no_calculation_mode:
+                    piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
+                    best_move_str = f"{piece_type}_4_flat_0"
+                    goal_y_pos = 1
 
                 break_loop = False
                 first_held_piece = True
                 
-                das_delay = 10  # 0.16s before repeat starts
+                das_delay = 8  # 0.16s before repeat starts
                 arr_delay = 0   # 0s between moves after DAS activates
                 
                 das_state = {
@@ -231,18 +235,26 @@ class TetrisGame:
                     'right': {'held_frames': 0, 'arr_counter': 0, 'charged': False}
                 }
                 
+                
+
                 while self.control_mode[0] and break_loop == False:
                     # we dont really need bruteforcer to work in control_mode, only to display heuristic on given piece, so im not making it efficient
 
                     if viewer:
+                        from utility.print_board import printred
+                        #printred(best_move_str)
                         self.held_piece = None if self.held_piece is None else self.held_piece
                         change_held_piece_flag = False
                         piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
+                        #printred(f"{piece_type}, {x_str}, {rotation1},{rotation2}")
                         rotation  = rotation1 + "_" + rotation2
                         #print(x_str)
-                        x = int(x_str[1:])
+                        try:
+                            x = int(x_str[1:])
+                        except ValueError:
+                            x = int(x_str)
                         piece_type_placed = self.queue[0]
-                        
+
                         piece_shape = PIECES[piece_type_placed][rotation]
                         #print(piece_type_placed, piece_shape, x,rotation)
                         key_pressed  = viewer.get_key_pressed()
@@ -303,8 +315,8 @@ class TetrisGame:
                                 das_state['down']['arr_counter'] = 0
                                 
                         das_info = {'left': das_move_left, 'right': das_move_right, 'down': das_move_down}
-                        
-                        self.board, best_move_str, goal_y_pos, last_key, a, change_held_piece_flag = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed,self.held_piece, das_info, self.queue,up_y_movement = True)
+
+                        self.board, best_move_str, goal_y_pos, last_key, a, change_held_piece_flag, self.no_calculation_mode = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed,self.held_piece, das_info, self.queue, self.no_calculation_mode, up_y_movement = True)
                         
                         if change_held_piece_flag:
                             
