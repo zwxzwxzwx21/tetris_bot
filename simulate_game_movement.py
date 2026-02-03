@@ -106,29 +106,23 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, n
         elif y_pos < 19-get_piece_lowest_index_from_origin(pieces_cords):
             #check_loop_bounds(0,y_pos, f"{19}-{get_piece_lowest_index_from_origin(pieces_cords)} ({19-get_piece_lowest_index_from_origin(pieces_cords)})","simulate_game_movement.py line 202")
             y_pos += 1
-    
     if key_pressed is pygame.K_q:
         no_calculation_mode = not no_calculation_mode
         printyellow(f"No calculation mode set to: {no_calculation_mode}")
-
-
     # initial tap
     if key_pressed == pygame.K_RIGHT:
         if x < 9-PIECES_index_sim_game_right[piece][rotation]:
             x = x + 1
         else:
-            printred(f"Cannot move right anymore, current x: {x}, rightmost allowed: {9-PIECES_index_sim_game_right[piece][rotation]}")
-            
+            printred(f"Cannot move right anymore, current x: {x}, rightmost allowed: {9-PIECES_index_sim_game_right[piece][rotation]}")        
     elif key_pressed == pygame.K_LEFT:
         if x > PIECES_index_sim_game_left[piece][rotation]:
             x = x - 1
         else:
             printred(f"Cannot move left anymore, current x: {x}, leftmost allowed: {PIECES_index_sim_game_left[piece][rotation]}")
-    
     elif key_pressed == pygame.K_RSHIFT or key_pressed == pygame.K_LSHIFT:
         if up_y_movement and y_pos > highest_piece_y_position_gui[piece][rotation]:
             y_pos -= 1
-    
     elif key_pressed == pygame.K_DOWN:
         if piece == "O":
             if y_pos < 19:
@@ -140,8 +134,6 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, n
                 y_pos += 1  
             else:
                 printred(f"Cannot move down anymore, current y: {y_pos}, max allowed: {19-get_piece_lowest_index_from_origin(pieces_cords)}")
-
-
     elif key_pressed == pygame.K_c and piece != "O":
         printgreen("curretn rotation: " + rotation)
         new_position_array = rotate_left(rotation, board, piece, x, y_pos)
@@ -158,10 +150,8 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, n
         #print("Simulate move: 180 rotate piece")
         #new_position_array = rotate_180(rotation, board, piece, x, y_pos)
         #pieces_cords = PIECES_index[piece][rotation]
-    
     elif key_pressed == pygame.K_r:
         board = [[' ' for _ in range(10)] for _ in range(20)]
-
     elif key_pressed == pygame.K_UP:
             
         rotation = "flat_0" # doesnt matter, can be changed by a user

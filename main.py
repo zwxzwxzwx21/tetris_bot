@@ -333,7 +333,6 @@ class TetrisGame:
                         viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
                         viewer.update_board(self.board)
                        
-
                         if last_key == pygame.K_SPACE:
                             break_loop = True
                         
@@ -342,7 +341,7 @@ class TetrisGame:
                         # heuristic checks
                         
                         from heuristic import aggregate,bumpiness,blockade,tetrisSlot,check_holes2,iDependency,analyze
-                        #analyze(self.board,0)
+                        
 
                     else: 
                         break

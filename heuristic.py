@@ -1,5 +1,5 @@
 import random
-from matplotlib.pylab import rand
+#from matplotlib.pylab import rand
 
 
 def aggregate(board):
