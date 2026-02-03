@@ -86,6 +86,7 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, n
         x = int(xpos)
     change_held_piece_flag = False
     rotation = rotation1 + "_" + rotation2
+    #printgreen(f"Simulating move: piece={piece}, x={x}, rotation={rotation}, y_pos={y_pos}")
     if piece != "O":
         pieces_cords = PIECES_index[piece][rotation]
         #print(f"{pieces_cords }, rotation={rotation}")
@@ -142,13 +143,15 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, n
 
 
     elif key_pressed == pygame.K_c and piece != "O":
+        printgreen("curretn rotation: " + rotation)
         new_position_array = rotate_left(rotation, board, piece, x, y_pos)
         pieces_cords = PIECES_index[piece][rotation]
-
+        printgreen("new rotation: " + new_position_array[1])
     elif key_pressed == pygame.K_v and piece != "O":
+        printgreen("curretn rotation: " + rotation)
         new_position_array = rotate_right(rotation, board, piece, x, y_pos)
         pieces_cords = PIECES_index[piece][rotation]
-
+        printgreen("new rotation: " + new_position_array[1])
     elif key_pressed == pygame.K_x and piece != "O":
         pass# error i cba solving xd
         # problem is that keys are being incorrect and insetad of having rotation flat_0 for example, its 0-2 etc
@@ -175,10 +178,11 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, n
         pass
 
     if no_calculation_mode:
-        #x = 4
-        #y_pos = 1
-        rotation = "flat_0"
+        
+        if isinstance(new_position_array, tuple) or isinstance(new_position_array, list):
+            rotation = new_position_array[1]
         best_move_string = best_move_string_combiner(piece, x,rotation)
+        #printyellow(f"No calculation mode active, setting best move string to: {best_move_string} with rotation {rotation} at x position {x} and y position {y_pos}")
     else:
         # make it so it will encount ghost piece instead of already placed piece
         board_analyze = copy.deepcopy(board)
@@ -197,6 +201,8 @@ def simulate_move(board, move, y_pos,key_pressed, held_piece, das_info, queue, n
             print("\n")
 
             analyze(board_analyze,0)
+        #printyellow(f"Best move string after simulation: {best_move_string} with rotation {rotation} at x position {x} and y position {y_pos}")
+    #printred("returning rotation: " + rotation)
     return board, best_move_string,y_pos, key_pressed, held_piece ,change_held_piece_flag, no_calculation_mode
 
 # TODO 
