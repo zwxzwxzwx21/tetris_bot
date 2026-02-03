@@ -218,6 +218,7 @@ class TetrisGame:
                     break    
                 
                 move_history, best_move_str,goal_y_pos = move_history_
+                best_move_str_original = best_move_str
                 if self.no_calculation_mode:
                     piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
                     best_move_str = f"{piece_type}_4_flat_0"
@@ -335,7 +336,25 @@ class TetrisGame:
                        
                         if last_key == pygame.K_SPACE:
                             break_loop = True
-                        
+                        elif last_key == pygame.K_q:
+
+                            move_history_ = find_best_placement(
+                                self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats, self.stats.held_piece
+                            )
+                            move_history, best_move_str,goal_y_pos = move_history_
+                            
+                            best_move_str = best_move_str_original if not self.no_calculation_mode else f"{piece_type}_4_flat_0"
+                            goal_y_pos = 1 if self.no_calculation_mode else goal_y_pos
+                            piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
+                            rotation  = rotation1 + "_" + rotation2
+                            try:
+                                x = int(x_str[1:])
+                            except ValueError:
+                                x = int(x_str)
+                            viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
+                            viewer.update_board(self.board)
+
+                            
                         time.sleep(0.016)
 
                         # heuristic checks
