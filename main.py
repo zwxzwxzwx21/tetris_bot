@@ -11,7 +11,7 @@ import time
 import pandas as pd # type: ignore
 import os
 
-from utility.print_board import *
+from utility.print_board import printgreen, printyellow,printred, print_board
 
 import pygame # type: ignore
 
@@ -246,9 +246,10 @@ class TetrisGame:
                     if viewer:
                         from utility.print_board import printred
                         #printred(best_move_str)
+                        
                         self.held_piece = None if self.held_piece is None else self.held_piece
                         change_held_piece_flag = False
-                        printgreen(f"best move str: {best_move_str}")
+                        #printgreen(f"best move str: {best_move_str}")
                         piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
                         #printred(f"{piece_type}, {x_str}, {rotation1},{rotation2}")
                         rotation  = rotation1 + "_" + rotation2
@@ -340,16 +341,24 @@ class TetrisGame:
                         if last_key == pygame.K_SPACE:
                             break_loop = True
                         elif last_key == pygame.K_q:
-                            printyellow(f'queue: {self.queue} current peice : {self.queue[0]}')
+                            #printyellow(f'queue: {self.queue} current peice : {self.queue[0]}')
+
                             move_history_ = find_best_placement(
                                 self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats, self.stats.held_piece
                             )
+                            
                             move_history, best_move_str,goal_y_pos = move_history_
-                            printyellow(f'new best move: {best_move_str} at y pos {goal_y_pos}')
-                            best_move_str = best_move_str_original if not self.no_calculation_mode else f"{self.queue[0]}_4_flat_0"
-                            goal_y_pos = 1 if self.no_calculation_mode else goal_y_pos
-                            piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
-                            rotation  = rotation1 + "_" + rotation2
+                            best_move_str_original = best_move_str
+                            #printyellow(f'new best move: {best_move_str} at y pos {goal_y_pos}')
+                            #best_move_str = f"{self.queue[0]}_4_flat_0"
+                            if self.no_calculation_mode:
+                                best_move_str = f"{self.queue[0]}_4_flat_0"
+                                goal_y_pos = 1
+
+                            else:
+                                best_move_str = best_move_str_original
+                            #goal_y_pos = 1 if self.no_calculation_mode else goal_y_pos
+                            
                             try:
                                 x = int(x_str[1:])
                             except ValueError:
