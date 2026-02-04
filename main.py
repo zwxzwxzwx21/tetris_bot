@@ -111,7 +111,7 @@ class TetrisGame:
         self.pieces_placed = 0
         self.control_mode = [False] 
         self.held_piece = None # should be string i guess
-        self.no_calculation_mode = True # disables heuristic  - not done yet
+        self.no_calculation_mode = False # disables heuristic  - not done yet
 
     def save_game_state(self,move_str,board):
         if config.PRINT_MODE:
@@ -387,7 +387,10 @@ class TetrisGame:
                     print(first_move)
                 piece_type, x_str, rotation1,rotation2 = first_move.split("_")
                 rotation  = rotation1 + "_" + rotation2
-                x = int(x_str[1:])
+                try:
+                    x = int(x_str[1:])
+                except ValueError:
+                    x = int(x_str)
                 piece_type_placed = self.queue[0]
                 piece_shape = PIECES[piece_type_placed][rotation]
 
