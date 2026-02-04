@@ -1,6 +1,6 @@
 # to test the argparse better, try running it in console using:
 # python .\main.py --rule, rules will be listed lower, as they are wip
-#  python .\main.py --rule control_mode
+# python .\main.py --rule control_mode
 # c:\Users\alexx\tewibot\.venv\Scripts\Activate.ps1
 import argparse  # testing it
 import copy
