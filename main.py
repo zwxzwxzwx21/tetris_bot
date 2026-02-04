@@ -59,7 +59,6 @@ if not PIECES:
 
 DESIRED_QUEUE_PREVIEW_LENGTH = 5
 
-
 @dataclass
 class MoveHistory:
     board: list
