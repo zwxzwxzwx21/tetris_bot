@@ -2,6 +2,7 @@
 # python .\main.py --rule, rules will be listed lower, as they are wip
 # python .\main.py --rule control_mode
 # c:\Users\alexx\tewibot\.venv\Scripts\Activate.ps1
+
 import argparse  # testing it
 import copy
 import logging
