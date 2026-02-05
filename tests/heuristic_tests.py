@@ -16,7 +16,7 @@ def a(board):
     return colHeights
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from board_operations.checking_valid_placements import place_piece
-from heuristic import analyze_test, check_holes2, clearedLines, bumpiness, blockade_test, tetrisSlot, aggregate, iDependency, analyze
+from heuristic import check_holes2, clearedLines, bumpiness, blockade_test, tetrisSlot, aggregate, iDependency, analyze
 from utility.pieces_index import PIECES_index
 
 heuristic_test_board = [

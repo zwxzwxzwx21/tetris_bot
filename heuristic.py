@@ -1,6 +1,7 @@
 import random
-#from matplotlib.pylab import rand
 
+#from matplotlib.pylab import rand
+weights_editable = [1.7, 1, 2.5, 2.5, 1, 1, 10, 1, 3, 1, 1]
 
 def aggregate(board):
     #value to minimize
@@ -117,11 +118,11 @@ weights = [
 ]
 print("Weights used in this run:",weights)
 def analyze(board,cleared_lines):
-
-
+    from utility.print_board import printyellow
+    printyellow(f"Heuristic weights used in this run:{weights_editable}")
     #weights = [-0.8452081857581533, -2.166070991373233, -0.9969115616865911, -5.828298433516476, -7.643093990636554, -0.2550496908381308]
 
-    a, b, c, d, e, f,g = weights
+    #a, b, c, d, e, f,g = weights
 
     colHeights = []
     for i in range(10):
@@ -180,10 +181,10 @@ def analyze(board,cleared_lines):
     # - holes: we want this low
     PCbonus = 100 if all(colHeight == 0 for colHeight in colHeights) else 0
     from utility.print_board import printred
-    printred(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}, PCbonus {PCbonus} TOTAL: {-varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10 + PCbonus}")
+    printred(f"aggregate: {varA}, clearedLines: {varB}, bumpiness: {varC}, blockade: {varD}, tetrisSlot: {varE}, iDependency: {varF}, PCbonus {PCbonus} TOTAL: {-varA*weights_editable[0] + varB*weights_editable[1] - varC*weights_editable[2] - varD*weights_editable[3] + varE*weights_editable[4] - varF*weights_editable[5] - varG*weights_editable[6] + PCbonus*weights_editable[7] + cleared_lines*weights_editable[8]}")
     varB = 0
     #print(a*varA + b*varB + c*varC + d*varD + e*varE + f*varF)
-    return -varA*1.7 + varB - varC*2.5 - varD*2.5 + varE - varF - varG*10 + PCbonus + cleared_lines*3
+    return -(varA*weights_editable[0]) + varB*weights_editable[1] - varC*weights_editable[2] - varD*weights_editable[3] + varE*weights_editable[4] - varF*weights_editable[5] - varG*weights_editable[6] + PCbonus*weights_editable[7] + cleared_lines*weights_editable[8]
 
 def analyze_main(board,cleared_lines):
     # this one is for the board view printing
@@ -218,42 +219,3 @@ def analyze_main(board,cleared_lines):
     varG = check_holes2(board)
     return a*varA, b*varB, c*varC, d*varD, e*varE, f*varF,g*varG
 
-def analyze_test(board):
-    # this one is for the board view printing
-    weights = [
-    -2.030,   # aggregate
-    -0.760,   # increase tetris score after mvp
-    0.420,   # bumpiness
-    -6.474,  # blockade
-    1.942,   # tetris well
-    2.420    # i piece dependencies
-    ]
-
-    #weights = [-0.8452081857581533, -2.166070991373233, -0.9969115616865911, -5.828298433516476, -7.643093990636554, -0.2550496908381308]
-
-    a, b, c, d, e, f = weights
-
-    colHeights = []
-    for i in range(10):
-        for j in range(20): #go down from the top and break when tile is detected
-            if board[j][i] != " ":
-                colHeights.append(20-j)
-                break
-            elif j == 19:
-                if board[j][i] != " ":
-                    colHeights.append(1)
-                else:
-                    colHeights.append(0)
-
-    columns = []
-    for i in range(10):
-        columns.append([row[i] for row in board])
-
-    varA = aggregate(board)
-    varB = check_holes2(board)
-    varC = bumpiness(colHeights)
-    varD = blockade(columns)
-    varE = tetrisSlot(board, columns[0])
-    varF = iDependency(colHeights)
-    print(f"aggregate: {varA*a}, bumpiness: {varC*c}, blockade: {varD*d}, tetrisSlot: {varE*e}, iDependency: {varF*f}")
-    

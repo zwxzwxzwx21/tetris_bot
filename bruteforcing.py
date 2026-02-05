@@ -41,8 +41,8 @@ TIME_LIMIT = 999
 UNEVEN_THRESHOLD = 1.1  
 MAX_HEIGHT_DIFF = 6 
 BRUTEFORCE_MODE = False
-
 from heuristic import analyze
+
 def loss(board, cleared_lines) -> float:
     return analyze(board,cleared_lines)
 

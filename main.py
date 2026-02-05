@@ -12,6 +12,7 @@ import time
 import pandas as pd # type: ignore
 import os
 
+from heuristic_values_windowchanger import change_heuristic_values
 from utility.print_board import printgreen, printyellow,printred, print_board
 
 import pygame # type: ignore
@@ -112,6 +113,10 @@ class TetrisGame:
         self.control_mode = [False] 
         self.held_piece = None # should be string i guess
         self.no_calculation_mode = False # disables heuristic  - not done yet
+        self.weights_updated_event = threading.Event()
+
+    def request_weights_recalc(self):
+        self.weights_updated_event.set()
 
     def save_game_state(self,move_str,board):
         if config.PRINT_MODE:
@@ -246,6 +251,31 @@ class TetrisGame:
                     if viewer:
                         from utility.print_board import printred
                         #printred(best_move_str)
+
+                        if self.weights_updated_event.is_set():
+                            self.weights_updated_event.clear()
+                            move_history_ = find_best_placement(
+                                self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats, self.stats.held_piece
+                            )
+                            if move_history_:
+                                move_history, best_move_str, goal_y_pos = move_history_
+                                best_move_str_original = best_move_str
+                                if self.no_calculation_mode:
+                                    best_move_str = f"{self.queue[0]}_4_flat_0"
+                                    goal_y_pos = 1
+                                else:
+                                    best_move_str = best_move_str_original
+
+                                piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
+                                rotation  = rotation1 + "_" + rotation2
+                                try:
+                                    x = int(x_str[1:])
+                                except ValueError:
+                                    x = int(x_str)
+                                piece_type_placed = self.queue[0]
+                                piece_shape = PIECES[piece_type_placed][rotation]
+                                viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
+                                viewer.update_board(self.board)
                         
                         self.held_piece = None if self.held_piece is None else self.held_piece
                         change_held_piece_flag = False
@@ -665,7 +695,11 @@ if __name__ == "__main__":
         )
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
         t.start()
-        viewer.mainloop()
+        import heuristic
+        viewer_thread = threading.Thread(target=viewer.mainloop, daemon=True)
+        viewer_thread.start()
+        change_heuristic_values(heuristic.weights_editable, on_update=game.request_weights_recalc)
+        viewer.running = False
     else:
         game.start_signal[0] = True
         game.game_loop(None)
