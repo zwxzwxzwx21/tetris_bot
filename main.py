@@ -3,46 +3,35 @@
 # python .\main.py --rule control_mode
 # c:\Users\alexx\tewibot\.venv\Scripts\Activate.ps1
 
-import argparse  # testing it
+# stdlib
+import argparse
 import copy
 import logging
+import os
 import random
 import threading
 import time
-import pandas as pd # type: ignore
-import os
-
-from heuristic_values_windowchanger import change_heuristic_values
-from utility.print_board import printgreen, printyellow,printred, print_board
-
-import pygame # type: ignore
-
-from pyparsing import deque # type: ignore
-import config
-
-from config import PRINT_MODE
-
-from board_operations.board_operations import clear_lines, solidify_piece
-
-from heuristic import analyze
-
-from tetrio_parsing.calculate_attack import count_lines_clear
-
 from dataclasses import dataclass
 
-from utility.pieces_index import PIECES_index 
-from utility.pieces import PIECES
-from utility.print_board import print_board, debug_print
+# third party
+import pandas as pd  # type: ignore
+import pygame  # type: ignore
+from pyparsing import deque  # type: ignore
 
+# local
+import config
+from board_operations.board_operations import clear_lines, solidify_piece
 from BoardRealTimeView import TetrisBoardViewer
-
 from bruteforcing import find_best_placement
-
 from GenerateBag import add_piece_from_bag, create_bag
-
-from tests.combo_attack_test import (
-    custom_board,  # probably stupid way to do that, idk better yet
-)
+from heuristic import analyze
+from heuristic_values_windowchanger import change_heuristic_values
+from simulate_game_movement import simulate_move
+from tetrio_parsing.calculate_attack import count_lines_clear
+from tests.combo_attack_test import custom_board  # probably stupid way to do that, idk better yet
+from utility.pieces import PIECES
+from utility.pieces_index import PIECES_index
+from utility.print_board import printgreen, printyellow, printred, print_board, debug_print
 
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(
@@ -189,7 +178,7 @@ class TetrisGame:
                     if self.weights_updated_event.is_set():
                         self.weights_updated_event.clear()
                         move_history_ = find_best_placement(
-                            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats, self.stats.held_piece
+                            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
                         )
                         if move_history_:
                             move_history, best_move_str, goal_y_pos = move_history_
@@ -231,7 +220,6 @@ class TetrisGame:
                     key_pressed  = viewer.get_key_pressed()
                     key_held = viewer.get_key_held()
 
-                    from simulate_game_movement import simulate_move
                     
                     left_held = key_held == pygame.K_LEFT
                     right_held = key_held == pygame.K_RIGHT
@@ -310,7 +298,7 @@ class TetrisGame:
                         #printyellow(f'queue: {self.queue} current peice : {self.queue[0]}')
 
                         move_history_ = find_best_placement(
-                            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats, self.stats.held_piece
+                            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
                         )
                         
                         move_history, best_move_str,goal_y_pos = move_history_
@@ -338,7 +326,6 @@ class TetrisGame:
                     # heuristic checks
                     
                     from heuristic import aggregate,bumpiness,blockade,tetrisSlot,check_holes2,iDependency,analyze
-                    
 
                 else: 
                     break
@@ -393,11 +380,11 @@ class TetrisGame:
 
             board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
             debug_print(f"lines cleared: {lines_cleared_count}")
-            attack, self.combo = count_lines_clear(
+            attack, self.stats.combo = count_lines_clear(
                 lines_cleared_count, self.stats.combo, board_after_clear
             )
             self.stats.total_attack += attack
-            self.stats.combo = self.combo
+            self.stats.combo = self.stats.combo
 
             if lines_cleared_count == 1:
                 self.stats.single += 1
