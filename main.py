@@ -152,7 +152,7 @@ class TetrisGame:
             best_move_str_original = best_move_str
             if self.no_calculation_mode:
                 piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
-                best_move_str = f"{piece_type}_4_flat_0"
+                best_move_str = f"{piece_type}_x4_flat_0"
                 goal_y_pos = 1
 
             break_loop = False
@@ -336,10 +336,9 @@ class TetrisGame:
             debug_print(f"first move: {first_move}")
             piece_type, x_str, rotation1,rotation2 = first_move.split("_")
             rotation  = rotation1 + "_" + rotation2
-            try:
-                x = int(x_str[1:])
-            except ValueError:
-                x = int(x_str)
+            
+            x = int(x_str[1:])
+            
             piece_type_placed = self.queue[0]
             piece_shape = PIECES[piece_type_placed][rotation]
 
