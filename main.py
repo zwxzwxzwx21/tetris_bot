@@ -19,11 +19,9 @@ import pygame # type: ignore
 
 from pyparsing import deque # type: ignore
 import config
-import itertools
 
 from config import PRINT_MODE
 
-from board_operations.stack_checking import find_highest_y
 from board_operations.board_operations import clear_lines, solidify_piece
 
 from heuristic import analyze
@@ -232,7 +230,6 @@ class TetrisGame:
                     goal_y_pos = 1
 
                 break_loop = False
-                first_held_piece = True
                 
                 das_delay = 8  # 0.16s before repeat starts
                 arr_delay = 0   # 0s between moves after DAS activates
@@ -585,33 +582,6 @@ def save_game_results(uneven_loss, holes_punishment, height_diff_punishment,
         
         return len(updated_df)
     
-def run_bruteforce_games(params,num_games=3):
-    total_lines = 0
-
-    for game_index in range(num_games):
-        uneven_loss, holes_punishment, height_diff_punishment, attack_bonus, max_height_punishment = params["uneven_loss"], params["holes_punishment"], params["height_diff_punishment"], params["attack_bonus"], params["max_height_punishment"]
-        import bruteforcing
-        bruteforcing.uneven_loss = uneven_loss
-        bruteforcing.holes_punishment = holes_punishment
-        bruteforcing.height_diff_punishment = height_diff_punishment
-        bruteforcing.attack_bonus = attack_bonus
-        bruteforcing.max_height_punishment = max_height_punishment
-        
-        seed = time.time_ns() % (2**32 - 1)
-        game = TetrisGame(seed=seed)
-        game.stats.pieces_placed = 0
-        
-        game.start_signal[0] = True
-        pieces = game.game_loop(None)
-        if config.PRINT_MODE:
-            print(f"pieces: {pieces}")
-
-        lines_cleared= game.stats.single + game.stats.double*2 + game.stats.triple*3 + game.stats.tetris*4
-        total_lines += lines_cleared
-        if config.PRINT_MODE:
-            print(f"lines cleared: {lines_cleared}")
-    return total_lines/num_games
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument("--seed", type=int, help="override RNG seed")

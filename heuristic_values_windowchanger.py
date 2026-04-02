@@ -1,4 +1,6 @@
 import tkinter as tk
+import heuristic
+
 
 def change_heuristic_values(weights_editable, on_update=None):
     
@@ -42,15 +44,18 @@ def change_heuristic_values(weights_editable, on_update=None):
             if on_update is not None:
                 on_update()
 
-        tk.Button(buttons_frame, text="-", width=3, command=lambda idx=i, vl=value_label: update_and_refresh(idx, -0.1, vl)).grid(row=0, column=0, padx=2)
-        tk.Button(buttons_frame, text="+", width=3, command=lambda idx=i, vl=value_label: update_and_refresh(idx, 0.1, vl)).grid(row=0, column=1, padx=2)
+        tk.Button(buttons_frame, text="-", width=3, command=lambda idx=i, vl=value_label: 
+            update_and_refresh(idx, -0.1, vl)).grid(row=0, column=0, padx=2)
+        tk.Button(buttons_frame, text="+", width=3, command=lambda idx=i, vl=value_label: 
+            update_and_refresh(idx, 0.1, vl)).grid(row=0, column=1, padx=2)
 
-        tk.Button(buttons_frame, text="-", width=3, command=lambda idx=i, vl=value_label: update_and_refresh(idx, -1, vl)).grid(row=0, column=2, padx=6)
-        tk.Button(buttons_frame, text="+", width=3, command=lambda idx=i, vl=value_label: update_and_refresh(idx, 1, vl)).grid(row=0, column=3, padx=2)
+        tk.Button(buttons_frame, text="-", width=3, command=lambda idx=i, vl=value_label: 
+            update_and_refresh(idx, -1, vl)).grid(row=0, column=2, padx=6)
+        tk.Button(buttons_frame, text="+", width=3, command=lambda idx=i, vl=value_label: 
+            update_and_refresh(idx, 1, vl)).grid(row=0, column=3, padx=2)
 
     root.mainloop()
     return weights_editable
 
 if __name__ == "__main__":
-    import heuristic
     change_heuristic_values(heuristic.weights_editable)
