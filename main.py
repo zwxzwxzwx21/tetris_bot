@@ -54,9 +54,6 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-if not PIECES:
-    raise ImportError("PIECES dictionary could not be imported or is empty.")
-
 DESIRED_QUEUE_PREVIEW_LENGTH = 5
 
 @dataclass
@@ -71,19 +68,20 @@ class MoveHistory:
 
 class GameStats:
     def __init__(self):
+        #bot stats
         self.burst = []  # (PPS) stores 10 times piece was placed, then max-min
         self.pps = 0.0
         self.APM = 0.0
         self.APP = 0.0
         self.burst_attack = 0  # unused, stil; thinking about it
         self.total_attack = 0
-        
+        self.pieces_placed = 0 
+        #gamestats
         self.single = 0
         self.double = 0
         self.triple = 0
         self.tetris = 0
         self.combo = 0
-        self.pieces_placed = 0 
         self.held_piece = None # should be string i guess
 
 class TetrisGame:
@@ -91,25 +89,29 @@ class TetrisGame:
         self.board = [[" " for _ in range(10)] for _ in range(20)]
         self.queue = []
         self.bag = []
+        self.stats = GameStats()
+        
+        self.history = []
+        self.history_index = -1 # related to save/load 
+        self.pending_save = None # the clogger 
+        self.seed = seed
+        random.seed(self.seed) # needed for undo redo 
+        
+        self.held_piece = None # should be string i guess
+        self.weights_updated_event = threading.Event()
+        
+        # signals
+        self.control_mode = [False] 
+        self.no_calculation_mode = False # disables heuristic  - not done yet
         self.game_over_signal = [False]
         self.no_s_z_first_piece_signal = [False]
         self.custom_bag = [False]
-        self.stats = GameStats()
         self.slow_mode = [False]
         self.custom_board = [False]
         self.gui_mode = [False]
         self.delay_mode = [False,-1] # on/off , delay
         self.delay = -1
-        self.history = []
-        self.history_index = -1
-        self.pending_save = None # the clogger 
-        self.seed = seed
-        random.seed(self.seed) # needed for undo redo 
-        self.pieces_placed = 0
-        self.control_mode = [False] 
-        self.held_piece = None # should be string i guess
-        self.no_calculation_mode = False # disables heuristic  - not done yet
-        self.weights_updated_event = threading.Event()
+        
 
     def request_weights_recalc(self):
         self.weights_updated_event.set()
@@ -480,7 +482,7 @@ class TetrisGame:
                     + 3 * self.stats.triple
                     + 4 * self.stats.tetris
                 )
-                self.pieces_placed += 1
+                self.stats.pieces_placed += 1
                 if viewer:
                     viewer.clear_preview()
                     viewer.update_board(self.board)
@@ -488,7 +490,7 @@ class TetrisGame:
                         self.board, cleared_lines=total_lines_cleared
                     )
                     viewer.update_heuristics(agg, cl, bump, block, ts, idep,hol)
-                    viewer.update_pieces(self.pieces_placed)
+                    viewer.update_pieces(self.stats.pieces_placed)
                 if config.PRINT_MODE:
                     print_board(self.board)
 
@@ -509,7 +511,7 @@ class TetrisGame:
                     no_s_z_first_piece=self.no_s_z_first_piece_signal[0],
                 )
 
-                pieces_placed += 1
+                self.stats.pieces_placed += 1
                 # i think after removing board viewer it doesnt work, but i also dont print it at all so that is something i will do later
                 # im making those comments and changes cuz i wanna public code soon and then i will be so much more motivated to work on it lmao
                 elapsed = time.perf_counter() - actual_game_start_time
@@ -523,11 +525,11 @@ class TetrisGame:
                 if elapsed > 0:
                     self.stats.APM = (self.stats.total_attack / elapsed) * 60
                     self.stats.APP = (
-                        (self.stats.total_attack / pieces_placed)
-                        if pieces_placed > 0
+                        (self.stats.total_attack / self.stats.pieces_placed)
+                        if self.stats.pieces_placed > 0
                         else 0
                     )
-                    self.stats.pps = pieces_placed / elapsed
+                    self.stats.pps = self.stats.pieces_placed / elapsed
                     self.stats.burst_pps = (
                         (len(self.stats.burst) - 1)
                         / (max(self.stats.burst) - min(self.stats.burst))
@@ -544,7 +546,7 @@ class TetrisGame:
         #finally:
             logging.debug("game loop finished")
             self.game_over_signal[0] = True
-            return pieces_placed
+            return self.stats.pieces_placed
             
 def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
                       attack_bonus, game_stats, seed, game_number):
@@ -653,7 +655,7 @@ if __name__ == "__main__":
             game.slow_mode,
             game.seed,
             game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency, game.holes,
-            game.pieces_placed,
+            game.stats.pieces_placed,
             game.control_mode,
             game.held_piece,
         )
