@@ -70,19 +70,19 @@ class MoveHistory:
     rng: object
 
 class GameStats:
-    def __init__(self,seed):
+    def __init__(self):
         self.burst = []  # (PPS) stores 10 times piece was placed, then max-min
         self.pps = 0.0
+        self.APM = 0.0
+        self.APP = 0.0
+        self.burst_attack = 0  # unused, stil; thinking about it
+        self.total_attack = 0
+        
         self.single = 0
         self.double = 0
         self.triple = 0
         self.tetris = 0
         self.combo = 0
-        self.burst_attack = 0  # unused, stil; thinking about it
-        self.total_attack = 0
-        self.APM = 0.0
-        self.APP = 0.0
-        self.seed = seed
         self.pieces_placed = 0 
         self.held_piece = None # should be string i guess
 
@@ -94,7 +94,7 @@ class TetrisGame:
         self.game_over_signal = [False]
         self.no_s_z_first_piece_signal = [False]
         self.custom_bag = [False]
-        self.stats = GameStats(seed=seed)
+        self.stats = GameStats()
         self.slow_mode = [False]
         self.custom_board = [False]
         self.gui_mode = [False]
@@ -104,7 +104,7 @@ class TetrisGame:
         self.history_index = -1
         self.pending_save = None # the clogger 
         self.seed = seed
-        random.seed(self.seed)
+        random.seed(self.seed) # needed for undo redo 
         self.pieces_placed = 0
         self.control_mode = [False] 
         self.held_piece = None # should be string i guess
