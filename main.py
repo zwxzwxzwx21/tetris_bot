@@ -91,8 +91,6 @@ class TetrisGame:
         self.board = [[" " for _ in range(10)] for _ in range(20)]
         self.queue = []
         self.bag = []
-        self.combo = 0
-        self.start_signal = [False]
         self.game_over_signal = [False]
         self.no_s_z_first_piece_signal = [False]
         self.custom_bag = [False]
@@ -124,7 +122,7 @@ class TetrisGame:
             board = [row[:] for row in board],
             queue = list(self.queue),
             bag = list(self.bag),
-            combo = self.combo,
+            combo = self.stats.combo,
             stats = {
                 "total_attack": self.stats.total_attack,
                 "single": self.stats.single,
@@ -164,10 +162,7 @@ class TetrisGame:
     def game_loop(self, viewer):
         # todo: this has to go, left from boardvierer, was really usefull but now its annoying
         # i will change it i swear, just give me second
-            while not self.start_signal[0]:
-                time.sleep(0.1)
-                if self.game_over_signal[0]:
-                    return
+            
 
             pieces_placed = 0
             actual_game_start_time = time.perf_counter()
@@ -208,7 +203,7 @@ class TetrisGame:
                     logging.debug(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
                 move_history_ = find_best_placement(
-                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.combo, self.stats, self.stats.held_piece
+                    self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
                 )
 
                 
@@ -464,7 +459,7 @@ class TetrisGame:
                 if config.PRINT_MODE:
                     logging.debug(f"lines cleared: {lines_cleared_count}")
                 attack, self.combo = count_lines_clear(
-                    lines_cleared_count, self.combo, board_after_clear
+                    lines_cleared_count, self.stats.combo, board_after_clear
                 )
                 self.stats.total_attack += attack
                 self.stats.combo = self.combo
@@ -604,7 +599,8 @@ if __name__ == "__main__":
     if args.bruteforce:
         import bruteforcing
         bruteforcing.BRUTEFORCE_MODE = True
-        run_bruteforce_games(num_games=args.bruteforce, max_pieces=args.max_pieces)
+        import run_bruteforce_games
+        run_bruteforce_games.run_bruteforce_games(num_games=args.bruteforce, max_pieces=args.max_pieces)
         exit(0)
     
     if args.seed is not None:
@@ -613,8 +609,6 @@ if __name__ == "__main__":
         seed = time.time_ns() % (2**32 - 1)
     
     game = TetrisGame(seed=seed)
-
-    game.start_signal[0] = True
 
     game.no_s_z_first_piece_signal[0] = "nosz" in args.rules
 
