@@ -20,6 +20,7 @@ from pyparsing import deque  # type: ignore
 
 # local
 import config
+from board_save_load_functions import save_game_state, save_game_results, save_game_state
 from board_operations.board_operations import clear_lines, solidify_piece
 from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
@@ -43,7 +44,7 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-DESIRED_QUEUE_PREVIEW_LENGTH = 5
+DESIRED_QUEUE_PREVIEW_LENGTH = config.DESIRED_QUEUE_PREVIEW_LENGTH
 
 @dataclass
 class MoveHistory:
@@ -92,7 +93,6 @@ class TetrisGame:
         # signals
         self.control_mode = [False] 
         self.no_calculation_mode = False # disables heuristic  - not done yet
-        self.game_over_signal = [False]
         self.no_s_z_first_piece_signal = [False]
         self.custom_bag = [False]
         self.slow_mode = [False]
@@ -105,12 +105,10 @@ class TetrisGame:
     def request_weights_recalc(self):
         self.weights_updated_event.set()
 
-        
-
     def game_loop(self, viewer):           
         actual_game_start_time = time.perf_counter()
 
-    
+        # queue fill
         if not self.queue:
             debug_print("queue fill")
             num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(self.queue)
@@ -124,11 +122,11 @@ class TetrisGame:
             if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
                 debug_print("failed to fill queue")
                 return
-
+            
         if not self.history:
-            from board_save_load_functions import save_game_state
             save_game_state(self, move_str=None, board=self.board, MoveHistoryClass=MoveHistory)
 
+        # main game loop
         while True:
             if self.pending_save is not None:
                 save_game_state(self, self.pending_save, board=self.board, MoveHistoryClass=MoveHistory)
@@ -137,26 +135,26 @@ class TetrisGame:
             debug_print("\n=== Current Queue ===")
             debug_print(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
-            move_history_ = find_best_placement(
+            move_history_with_best_move_info = find_best_placement(
                 self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
             )
 
-            debug_print(f"move history from best placement: {move_history_}")
-            if not move_history_:
+            debug_print(f"move history from best placement: {move_history_with_best_move_info}")
+            
+            if not move_history_with_best_move_info:
                 debug_print("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
                 debug_print(f"piece that failed: {self.queue[0]}")
-                self.game_over_signal[0] = True 
                 break    
+            else:
+                move_history, best_move_str,goal_y_pos = move_history_with_best_move_info
+                best_move_str_original = best_move_str
             
-            move_history, best_move_str,goal_y_pos = move_history_
-            best_move_str_original = best_move_str
             if self.no_calculation_mode:
                 piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
                 best_move_str = f"{piece_type}_x4_flat_0"
                 goal_y_pos = 1
 
-            break_loop = False
-            
+            # needed for viewer which is created only with --rule gui 
             das_delay = 8  # 0.16s before repeat starts
             arr_delay = 0   # 0s between moves after DAS activates
             
@@ -166,171 +164,18 @@ class TetrisGame:
                 'right': {'held_frames': 0, 'arr_counter': 0, 'charged': False}
             }
             
-            
+            break_loop = False
 
             while self.control_mode[0] and break_loop == False:
                 # we dont really need bruteforcer to work in control_mode, only to display heuristic on given piece, so im not making it efficient
 
                 if viewer:
-                    from utility.print_board import printred
-                    #printred(best_move_str)
-
-                    if self.weights_updated_event.is_set():
-                        self.weights_updated_event.clear()
-                        move_history_ = find_best_placement(
-                            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
-                        )
-                        if move_history_:
-                            move_history, best_move_str, goal_y_pos = move_history_
-                            best_move_str_original = best_move_str
-                            if self.no_calculation_mode:
-                                best_move_str = f"{self.queue[0]}_4_flat_0"
-                                goal_y_pos = 1
-                            else:
-                                best_move_str = best_move_str_original
-
-                            piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
-                            rotation  = rotation1 + "_" + rotation2
-                            try:
-                                x = int(x_str[1:])
-                            except ValueError:
-                                x = int(x_str)
-                            piece_type_placed = self.queue[0]
-                            piece_shape = PIECES[piece_type_placed][rotation]
-                            viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
-                            viewer.update_board(self.board)
-                    
-                    self.held_piece = None if self.held_piece is None else self.held_piece
-                    change_held_piece_flag = False
-                    #printgreen(f"best move str: {best_move_str}")
-                    piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
-                    #printred(f"{piece_type}, {x_str}, {rotation1},{rotation2}")
-                    rotation  = rotation1 + "_" + rotation2
-                    #print(x_str)
-                    
-                    # REMOVE IT OR SOMETHIN A       AAA
-                    try:
-                        x = int(x_str[1:])
-                    except ValueError:
-                        x = int(x_str)
-                    piece_type_placed = self.queue[0]
-
-                    piece_shape = PIECES[piece_type_placed][rotation]
-                    #print(piece_type_placed, piece_shape, x,rotation)
-                    key_pressed  = viewer.get_key_pressed()
-                    key_held = viewer.get_key_held()
-
-                    
-                    left_held = key_held == pygame.K_LEFT
-                    right_held = key_held == pygame.K_RIGHT
-                    down_held = key_held == pygame.K_DOWN
-                    #region
-                    if left_held:
-                        das_state['left']['held_frames'] += 1
-                        
-                        if das_state['left']['held_frames'] >= das_delay:
-                            das_state['left']['charged'] = True
-                            
-                    else:
-                        das_state['left'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
-                    
-                    if down_held:
-                        das_state['down']['held_frames'] += 1
-                        
-                        if das_state['down']['held_frames'] >= das_delay:
-                            das_state['down']['charged'] = True
-                            
-                    else:
-                        das_state['down'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
-                    
-                    if right_held:
-                        das_state['right']['held_frames'] += 1
-                        if das_state['right']['held_frames'] >= das_delay:
-                            das_state['right']['charged'] = True
-                            
-                    else:
-                        das_state['right'] = {'held_frames': 0, 'arr_counter': 0, 'charged': False}
-                    
-                    das_move_left = False
-                    das_move_right = False
-                    das_move_down = False
-                    
-                    if das_state['left']['charged']:
-                        das_state['left']['arr_counter'] += 1
-                        if das_state['left']['arr_counter'] >= arr_delay:
-                            das_move_left = True
-                            das_state['left']['arr_counter'] = 0
-                            
-                    if das_state['right']['charged']:
-                        das_state['right']['arr_counter'] += 1
-                        if das_state['right']['arr_counter'] >= arr_delay:
-                            das_move_right = True
-                            das_state['right']['arr_counter'] = 0
-                            
-                    if down_held and das_state['down']['charged']:
-                        das_state['down']['arr_counter'] += 1
-                        if das_state['down']['arr_counter'] >= arr_delay:
-                            das_move_down = True
-                            das_state['down']['arr_counter'] = 0
-                            
-                    das_info = {'left': das_move_left, 'right': das_move_right, 'down': das_move_down}
-                    #endregion
-                    self.board, best_move_str, goal_y_pos, last_key, a, change_held_piece_flag, self.no_calculation_mode = simulate_move(self.board, best_move_str,goal_y_pos, key_pressed,self.held_piece, das_info, self.queue, self.no_calculation_mode, up_y_movement = True)
-                    
-                    if change_held_piece_flag:
-                        
-                        if self.held_piece is None:
-                            self.held_piece = self.queue[0]
-                            self.queue.pop(0)
-                            
-                        else:
-                            temp_hold_piece = self.held_piece
-                            self.held_piece = self.queue[0]
-                            self.queue[0] = temp_hold_piece
-                        change_held_piece_flag = False
-                    # piece_shape arg is not even used
-                    viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
-                    viewer.update_board(self.board)
-                    
-                    if last_key == pygame.K_SPACE:
-                        break_loop = True
-                    elif last_key == pygame.K_q:
-                        #printyellow(f'queue: {self.queue} current peice : {self.queue[0]}')
-
-                        move_history_ = find_best_placement(
-                            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
-                        )
-                        
-                        move_history, best_move_str,goal_y_pos = move_history_
-                        best_move_str_original = best_move_str
-                        #printyellow(f'new best move: {best_move_str} at y pos {goal_y_pos}')
-                        #best_move_str = f"{self.queue[0]}_4_flat_0"
-                        if self.no_calculation_mode:
-                            best_move_str = f"{self.queue[0]}_4_flat_0"
-                            goal_y_pos = 1
-
-                        else:
-                            best_move_str = best_move_str_original
-                        #goal_y_pos = 1 if self.no_calculation_mode else goal_y_pos
-                        
-                        try:
-                            x = int(x_str[1:])
-                        except ValueError:
-                            x = int(x_str)
-                        viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
-                        viewer.update_board(self.board)
-
-                        
-                    time.sleep(0.016)
-
-                    # heuristic checks
-                    
-                    from heuristic import aggregate,bumpiness,blockade,tetrisSlot,check_holes2,iDependency,analyze
-
+                    from main_viewer import main_viewer
+                    main_viewer(viewer, das_state, das_delay, arr_delay, self)
                 else: 
                     break
 
-            debug_print(f"move history str: {move_history}, full move history: {move_history_}, goal y pos: {goal_y_pos}")
+            debug_print(f"move history str: {move_history}, full move history: {move_history_with_best_move_info}, goal y pos: {goal_y_pos}")
             piece_type_placed = [0]
             first_move = best_move_str
             debug_print(f"first move: {first_move}")
@@ -453,39 +298,8 @@ class TetrisGame:
         
     
         logging.debug("game loop finished")
-        self.game_over_signal[0] = True
         return self.stats.pieces_placed
         
-def save_game_results(uneven_loss, holes_punishment, height_diff_punishment, 
-                      attack_bonus, game_stats, seed, game_number):
-        filepath = "bruteforcer_stats.xlsx"
-        
-        lines_cleared = game_stats.single + game_stats.double + game_stats.triple + game_stats.tetris
-        
-        new_data = {
-            "game_number": [game_number],
-            "uneven_loss": [uneven_loss],
-            "holes_punishment": [holes_punishment],
-            "height_diff_punishment": [height_diff_punishment],
-            "attack_bonus": [attack_bonus],
-            "lines_cleared": [lines_cleared],
-            "total_attack": [game_stats.total_attack],
-            "pieces_placed": [game_stats.pieces_placed if hasattr(game_stats, 'pieces_placed') else 0],
-            "seed": [seed],
-            "attack_per_line": [game_stats.total_attack / max(1, lines_cleared)]
-        }
-        
-        new_df = pd.DataFrame(new_data)
-        
-        if os.path.exists(filepath):
-            existing_df = pd.read_excel(filepath)
-            updated_df = pd.concat([existing_df, new_df], ignore_index=True)
-        else:
-            updated_df = new_df
-        
-        updated_df.to_excel(filepath, index=False)
-        
-        return len(updated_df)
     
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
