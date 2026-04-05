@@ -25,10 +25,10 @@ from board_operations.board_operations import clear_lines, solidify_piece
 from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
 from GenerateBag import add_piece_from_bag, create_bag
-from heuristic import analyze
+from heuristic import analyze, analyze_main
 from heuristic_values_windowchanger import change_heuristic_values
 from simulate_game_movement import simulate_move
-from tetrio_parsing.calculate_attack import count_lines_clear
+from tetrio_parsing.calculate_attack import calculate_attack_and_stats, count_lines_clear
 from tests.combo_attack_test import custom_board  # probably stupid way to do that, idk better yet
 from utility.pieces import PIECES
 from utility.pieces_index import PIECES_index
@@ -150,19 +150,15 @@ class TetrisGame:
                 best_move_str_original = best_move_str
             
             if self.no_calculation_mode:
+                # set positions for testing gamemode
                 piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
                 best_move_str = f"{piece_type}_x4_flat_0"
                 goal_y_pos = 1
 
             # needed for viewer which is created only with --rule gui 
-            das_delay = 8  # 0.16s before repeat starts
-            arr_delay = 0   # 0s between moves after DAS activates
-            
-            das_state = {
-                'left': {'held_frames': 0, 'arr_counter': 0, 'charged': False},
-                'down': {'held_frames': 0, 'arr_counter': 0, 'charged': False},
-                'right': {'held_frames': 0, 'arr_counter': 0, 'charged': False}
-            }
+            das_delay = config.das_delay  # 0.16s before repeat starts
+            arr_delay = config.arr_delay   # 0s between moves after DAS activates
+            das_state = config.das_state 
             
             break_loop = False
 
@@ -209,6 +205,7 @@ class TetrisGame:
                     else:
                         debug_print("no move to redo")
                     continue
+                
             elif self.delay_mode[0] == True:
                 self.delay = self.delay_mode[1]
 
@@ -227,26 +224,25 @@ class TetrisGame:
             attack, self.stats.combo = count_lines_clear(
                 lines_cleared_count, self.stats.combo, board_after_clear
             )
+            
+            attack, self.stats.combo, s, d, t, q = calculate_attack_and_stats(
+                lines_cleared_count, self.stats.combo, board_after_clear
+            )
             self.stats.total_attack += attack
-            self.stats.combo = self.stats.combo
-
-            if lines_cleared_count == 1:
-                self.stats.single += 1
-            elif lines_cleared_count == 2:
-                self.stats.double += 1
-            elif lines_cleared_count == 3:
-                self.stats.triple += 1
-            elif lines_cleared_count == 4:
-                self.stats.tetris += 1
-
-            self.board[:] = board_after_clear
+            self.stats.single += s
+            self.stats.double += d
+            self.stats.triple += t
+            self.stats.tetris += q
             total_lines_cleared = (
                 self.stats.single
                 + 2 * self.stats.double
                 + 3 * self.stats.triple
                 + 4 * self.stats.tetris
             )
-            self.stats.pieces_placed += 1
+            
+            self.board[:] = board_after_clear
+            self.stats.pieces_placed += 1 # there were two of these, i removed one so idk if things are not broken cuz of that
+            
             if viewer:
                 viewer.clear_preview()
                 viewer.update_board(self.board)
@@ -255,6 +251,7 @@ class TetrisGame:
                 )
                 viewer.update_heuristics(agg, cl, bump, block, ts, idep,hol)
                 viewer.update_pieces(self.stats.pieces_placed)
+            
             debug_print(self.board)
 
             if self.queue:
@@ -268,10 +265,10 @@ class TetrisGame:
                 no_s_z_first_piece=self.no_s_z_first_piece_signal[0],
             )
 
-            self.stats.pieces_placed += 1
             # i think after removing board viewer it doesnt work, but i also dont print it at all so that is something i will do later
             # im making those comments and changes cuz i wanna public code soon and then i will be so much more motivated to work on it lmao
             elapsed = time.perf_counter() - actual_game_start_time
+            
             if len(self.stats.burst) < 10:
                 self.stats.burst.append(elapsed)
             else:
@@ -279,6 +276,7 @@ class TetrisGame:
                 self.stats.burst.append(elapsed)
             debug_print(self.stats.burst)
             if elapsed > 0:
+                # thhat can go into calculate burst function and places in calculate attack
                 self.stats.APM = (self.stats.total_attack / elapsed) * 60
                 self.stats.APP = (
                     (self.stats.total_attack / self.stats.pieces_placed)
@@ -317,23 +315,20 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
-    args = parse_args()
-    
-    if args.bruteforce:
-        import bruteforcing
-        bruteforcing.BRUTEFORCE_MODE = True
-        import run_bruteforce_games
-        run_bruteforce_games.run_bruteforce_games(num_games=args.bruteforce, max_pieces=args.max_pieces)
-        exit(0)
-    
-    if args.seed is not None:
-        seed = args.seed
-    else:
-        seed = time.time_ns() % (2**32 - 1)
-    
-    game = TetrisGame(seed=seed)
+def run_bruteforce_mode(args):
+    import bruteforcing
+    bruteforcing.BRUTEFORCE_MODE = True
+    import run_bruteforce_games
+    run_bruteforce_games.run_bruteforce_games(num_games=args.bruteforce, max_pieces=args.max_pieces)
 
+
+def resolve_seed(args):
+    if args.seed is not None:
+        return args.seed
+    return time.time_ns() % (2**32 - 1)
+
+
+def apply_rules(game, args):
     game.no_s_z_first_piece_signal[0] = "nosz" in args.rules
 
     game.custom_bag[0] = "custom_bag" in args.rules
@@ -341,6 +336,7 @@ if __name__ == "__main__":
         game.bag = create_bag(custom_bag=True)
         debug_print(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
         time.sleep(1)
+
     game.custom_board[0] = "custom_board" in args.rules
     if game.custom_board[0]:
         game.board = custom_board
@@ -355,17 +351,30 @@ if __name__ == "__main__":
     game.gui_mode[0] = "gui" in args.rules
     use_gui = "gui" in args.rules
 
-    game.control_mode[0] = "control_mode" in args.rules                      ##################
-    
-    if game.control_mode[0] == True:
+    game.control_mode[0] = "control_mode" in args.rules
+    if game.control_mode[0]:
         print("control mode requires gui mode to be enabled, enabling gui mode")
         game.gui_mode[0] = True
         use_gui = True
-    
+
+    return use_gui
+
+
+def initialize_heuristics(game):
     from heuristic import analyze_main
-    
-    game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency,game.holes = analyze_main(game.board,cleared_lines=0)
-    
+
+    (
+        game.aggregate,
+        game.clearedLines,
+        game.bumpiness,
+        game.blockade,
+        game.tetrisSlot,
+        game.iDependency,
+        game.holes,
+    ) = analyze_main(game.board, cleared_lines=0)
+
+
+def run_game(game, use_gui):
     if use_gui:
         viewer = TetrisBoardViewer(
             game.board,
@@ -374,7 +383,13 @@ if __name__ == "__main__":
             game.no_s_z_first_piece_signal,
             game.slow_mode,
             game.seed,
-            game.aggregate, game.clearedLines, game.bumpiness, game.blockade, game.tetrisSlot, game.iDependency, game.holes,
+            game.aggregate,
+            game.clearedLines,
+            game.bumpiness,
+            game.blockade,
+            game.tetrisSlot,
+            game.iDependency,
+            game.holes,
             game.stats.pieces_placed,
             game.control_mode,
             game.held_piece,
@@ -389,6 +404,23 @@ if __name__ == "__main__":
     else:
         game.start_signal[0] = True
         game.game_loop(None)
+
+
+def main():
+    args = parse_args()
+
+    if args.bruteforce:
+        run_bruteforce_mode(args)
+        return
+
+    game = TetrisGame(seed=resolve_seed(args))
+    use_gui = apply_rules(game, args)
+    initialize_heuristics(game)
+    run_game(game, use_gui)
+
+
+if __name__ == "__main__":
+    main()
 
 # IMPORTANT:
 # - the game loop will stop if no valid placement is found
