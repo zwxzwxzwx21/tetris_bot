@@ -1,11 +1,7 @@
-import copy
 from logging import config
 from pprint import pp
-import time
-import random
 import pandas as pd
-import os
-import config 
+from heuristic import analyze
 
 from board_operations.board_operations import clear_lines
 from board_operations.stack_checking import (
@@ -34,22 +30,22 @@ rotations = {
     "T": ["flat", "180", "cw", "ccw"],
 }
 
-
 MOVES_DONE = 0
 MOVES_REMOVED = 0
 TIME_LIMIT = 999
 UNEVEN_THRESHOLD = 1.1  
 MAX_HEIGHT_DIFF = 6 
 BRUTEFORCE_MODE = False
-from heuristic import analyze
 
 def loss(board, cleared_lines) -> float:
     return analyze(board,cleared_lines)
 
+# MAKE SPINS RECOGNIZABLE
+# mark kicks as spins and whenever one is performed, set a flag that a spin was done, this will be used for btb
+
 def find_best_placement(board, queue, combo,stats,held_piece):
     move_history = []
     GAMEOVER = False
-    spin = False
     best_move = None
     total_lines = 0
      
@@ -57,67 +53,30 @@ def find_best_placement(board, queue, combo,stats,held_piece):
 
     arr_piece_info_array = []
     list_of_best_moves = []
-    current_piece = queue[0]
-    assert current_piece in PIECES_index
-    
-    for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
+    held_piece_checked_loop = 0 if held_piece is not None else 1 # if there is no held piece, we only check once
+    while held_piece_checked_loop < 2: # i dont know if bool works, we have to check twice and do while doesnt exist in python
+        # a bit unintuitive but we check held piece first there lol
+        current_piece = queue[0] if held_piece_checked_loop == 1 else held_piece
+        debug_print(f"CURRENT PIECE: {current_piece} held piece: {held_piece} loop: {held_piece_checked_loop}")
+        assert current_piece in PIECES_index
         
-        temp_array = []
-        
-        # o piece has no rotation so we just set values 
-        start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
-        finish_x_pos = 11-PIECES_xpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 9
-        for start_x in range(start_x_pos,finish_x_pos):
-            
-            lowest_y = find_lowest_y_for_piece(PIECES_index[current_piece][rotation_name], board, start_x,rotation_name,current_piece)
-
-            for y in range(lowest_y-0, 21):  
-                if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,rotation_name,current_piece,print_debug=False):
-
-                        arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
-                        temp_array.append([current_piece, rotation_name, start_x, y])
-    
-        
-    for position_info in arr_piece_info_array:
-        
-        new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
-        if not is_place_piece_successful:
-            debug_print(f"GAMEOVER, score (best loss) : {best_loss} ")
-            GAMEOVER = True
-            break
-        board_after_clear, cleared_lines = clear_lines(new_board)
-        debug_print("cleared lines:", cleared_lines)
-        # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
-        
-        print(loss(board_after_clear, cleared_lines),current_piece,position_info)
-        if (current_loss := loss(board_after_clear, cleared_lines)) > best_loss:
-            best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
-            best_move_y_pos = position_info[3]
-            move_history = [best_move]
-            best_loss = current_loss
-            total_lines += cleared_lines
-            debug_print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
-            list_of_best_moves.append((best_move, best_move_y_pos))
-    
-    if held_piece is not None: 
-        current_piece = held_piece
-        print("TRYING WITH HELD PIECE:", current_piece) # important kinda
         for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
-        
-            temp_array = []
+            
+            # o piece has no rotation so we just set values 
             start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
             finish_x_pos = 11-PIECES_xpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 9
+            #check all positions from the position we can place the piece on downwards,  if there is a place for a piece
+            # add it to arrayt and see what results it gives (it may be inaccesible)
             for start_x in range(start_x_pos,finish_x_pos):
                 
                 lowest_y = find_lowest_y_for_piece(PIECES_index[current_piece][rotation_name], board, start_x,rotation_name,current_piece)
 
-                for y in range(lowest_y+1, 21):  
+                for y in range(lowest_y-0, 21):  
                     if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,rotation_name,current_piece,print_debug=False):
 
                             arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
-                            temp_array.append([current_piece, rotation_name, start_x, y])
         
-        print(arr_piece_info_array)
+            
         for position_info in arr_piece_info_array:
             
             new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
@@ -126,19 +85,19 @@ def find_best_placement(board, queue, combo,stats,held_piece):
                 GAMEOVER = True
                 break
             board_after_clear, cleared_lines = clear_lines(new_board)
-            
             debug_print("cleared lines:", cleared_lines)
             # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
-            print(loss(board_after_clear, cleared_lines),current_piece,position_info) # this we dont debug either
+            
+            print(loss(board_after_clear, cleared_lines),current_piece,position_info)
             if (current_loss := loss(board_after_clear, cleared_lines)) > best_loss:
                 best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
                 best_move_y_pos = position_info[3]
                 move_history = [best_move]
                 best_loss = current_loss
                 total_lines += cleared_lines
-                
                 debug_print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
                 list_of_best_moves.append((best_move, best_move_y_pos))
+        held_piece_checked_loop += 1
 
     debug_print("\n")
     if GAMEOVER:

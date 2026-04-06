@@ -72,7 +72,6 @@ class GameStats:
         self.triple = 0
         self.tetris = 0
         self.combo = 0
-        self.held_piece = None # should be string i guess
 
 class TetrisGame:
     def __init__(self,seed):
@@ -136,7 +135,7 @@ class TetrisGame:
             debug_print(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
 
             move_history_with_best_move_info = find_best_placement(
-                self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
+                self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.held_piece
             )
 
             debug_print(f"move history from best placement: {move_history_with_best_move_info}")
