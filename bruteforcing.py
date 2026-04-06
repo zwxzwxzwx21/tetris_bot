@@ -5,7 +5,7 @@ import time
 import random
 import pandas as pd
 import os
-import config
+import config 
 
 from board_operations.board_operations import clear_lines
 from board_operations.stack_checking import (
@@ -14,7 +14,7 @@ from board_operations.stack_checking import (
     uneven_stack_est,
 )
 from tetrio_parsing.calculate_attack import count_lines_clear
-from utility.print_board import print_board
+from utility.print_board import print_board, debug_print
 from utility.pieces import PIECES, PIECES_soft_drop
 from utility.pieces_index import PIECES_index, PIECES_xpos_indexing_value, PIECES_startpos_indexing_value
 
@@ -46,7 +46,7 @@ from heuristic import analyze
 def loss(board, cleared_lines) -> float:
     return analyze(board,cleared_lines)
 
-def find_best_placement(board, queue, combo, stats,held_piece):
+def find_best_placement(board, queue, combo,stats,held_piece):
     move_history = []
     GAMEOVER = False
     spin = False
@@ -59,12 +59,12 @@ def find_best_placement(board, queue, combo, stats,held_piece):
     list_of_best_moves = []
     current_piece = queue[0]
     assert current_piece in PIECES_index
-    loop = 0
     
     for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
         
         temp_array = []
-        #print((PIECES_startpos_indexing_value[current_piece][rotation_name],11-PIECES_xpos_indexing_value[current_piece][rotation_name]))
+        
+        # o piece has no rotation so we just set values 
         start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
         finish_x_pos = 11-PIECES_xpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 9
         for start_x in range(start_x_pos,finish_x_pos):
@@ -82,16 +82,13 @@ def find_best_placement(board, queue, combo, stats,held_piece):
         
         new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
         if not is_place_piece_successful:
-            if config.PRINT_MODE:
-                print(f"GAMEOVER, score (best loss) : {best_loss} ")
+            debug_print(f"GAMEOVER, score (best loss) : {best_loss} ")
             GAMEOVER = True
             break
         board_after_clear, cleared_lines = clear_lines(new_board)
-        if config.PRINT_MODE:
-            print("cleared lines:", cleared_lines)
+        debug_print("cleared lines:", cleared_lines)
         # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
         
-        # FIXED: evaluate board_after_clear, not new_board!
         print(loss(board_after_clear, cleared_lines),current_piece,position_info)
         if (current_loss := loss(board_after_clear, cleared_lines)) > best_loss:
             best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
@@ -99,17 +96,15 @@ def find_best_placement(board, queue, combo, stats,held_piece):
             move_history = [best_move]
             best_loss = current_loss
             total_lines += cleared_lines
-            if config.PRINT_MODE:
-                print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
+            debug_print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
             list_of_best_moves.append((best_move, best_move_y_pos))
     
     if held_piece is not None: 
         current_piece = held_piece
-        print("TRYING WITH HELD PIECE:", current_piece)
+        print("TRYING WITH HELD PIECE:", current_piece) # important kinda
         for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
         
             temp_array = []
-            #print((PIECES_startpos_indexing_value[current_piece][rotation_name],11-PIECES_xpos_indexing_value[current_piece][rotation_name]))
             start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
             finish_x_pos = 11-PIECES_xpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 9
             for start_x in range(start_x_pos,finish_x_pos):
@@ -127,46 +122,40 @@ def find_best_placement(board, queue, combo, stats,held_piece):
             
             new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
             if not is_place_piece_successful:
-                if config.PRINT_MODE:
-                    print(f"GAMEOVER, score (best loss) : {best_loss} ")
+                debug_print(f"GAMEOVER, score (best loss) : {best_loss} ")
                 GAMEOVER = True
                 break
             board_after_clear, cleared_lines = clear_lines(new_board)
-            if config.PRINT_MODE:
-                print("cleared lines:", cleared_lines)
-            # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
             
-            # FIXED: evaluate board_after_clear, not new_board!
-            print(loss(board_after_clear, cleared_lines),current_piece,position_info)
+            debug_print("cleared lines:", cleared_lines)
+            # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
+            print(loss(board_after_clear, cleared_lines),current_piece,position_info) # this we dont debug either
             if (current_loss := loss(board_after_clear, cleared_lines)) > best_loss:
                 best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
                 best_move_y_pos = position_info[3]
                 move_history = [best_move]
                 best_loss = current_loss
                 total_lines += cleared_lines
-                if config.PRINT_MODE:
-                    print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
+                
+                debug_print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
                 list_of_best_moves.append((best_move, best_move_y_pos))
 
-    if config.PRINT_MODE:
-        print()
+    debug_print("\n")
     if GAMEOVER:
-        lines_cleared = (stats.single + stats.double + stats.triple + stats.tetris)
-         # ?
             
         return None
     assert move_history
-    if config.PRINT_MODE:
-        print(f"best move: {best_move} with loss: {best_loss}")
-        print(list_of_best_moves)
+    
+    debug_print(f"best move: {best_move} with loss: {best_loss}")
+    debug_print(list_of_best_moves)
+    # taking all the best moves and finding the sequence that leads to it, if it doesnt exist, we check the first one that does 
     for best_move_from_list, best_move_y_position in reversed(list_of_best_moves):
-        if config.PRINT_MODE:
-            print(f"attempting to find sequence for best move: {best_move_from_list} at y pos {best_move_y_position}")
+        debug_print(f"attempting to find sequence for best move: {best_move_from_list} at y pos {best_move_y_position}")
         
         if best_move_from_list is not None:
             goal_string = best_move_from_list
             sequence = search_for_best_move(goal_string, board, best_move_y_position)
-            print("this is the sequence for:",goal_string,sequence)
+            print("this is the sequence for:",goal_string,sequence) # this we dont debug print
             if sequence is not None:
                 return move_history, best_move_from_list,best_move_y_position
     return None
