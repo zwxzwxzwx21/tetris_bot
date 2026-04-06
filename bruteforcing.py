@@ -53,11 +53,13 @@ def find_best_placement(board, queue, combo,stats,held_piece):
 
     arr_piece_info_array = []
     list_of_best_moves = []
-    held_piece_checked_loop = 0 if held_piece is not None else 1 # if there is no held piece, we only check once
-    while held_piece_checked_loop < 2: # i dont know if bool works, we have to check twice and do while doesnt exist in python
-        # a bit unintuitive but we check held piece first there lol
-        current_piece = queue[0] if held_piece_checked_loop == 1 else held_piece
-        debug_print(f"CURRENT PIECE: {current_piece} held piece: {held_piece} loop: {held_piece_checked_loop}")
+    held_piece_checked_loop = 0 # if there is no held piece, we only check once
+    max_piece_loops = 1 if held_piece is None else 2
+    while held_piece_checked_loop < max_piece_loops: # i dont know if bool works, we have to check twice and do while doesnt exist in python
+        
+        current_piece = queue[0] if held_piece_checked_loop == 0 else held_piece
+        debug_print(f"CURRENT PIECE: {current_piece} held piece: {held_piece} loop: {held_piece_checked_loop}", "bruteforcing.py, function: find_best_placement")
+        print("current piece:", current_piece, "loop:", held_piece_checked_loop)
         assert current_piece in PIECES_index
         
         for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
@@ -75,29 +77,29 @@ def find_best_placement(board, queue, combo,stats,held_piece):
                     if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,rotation_name,current_piece,print_debug=False):
 
                             arr_piece_info_array.append([current_piece, rotation_name, start_x, y])
-        
-            
-        for position_info in arr_piece_info_array:
-            
-            new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
-            if not is_place_piece_successful:
-                debug_print(f"GAMEOVER, score (best loss) : {best_loss} ")
-                GAMEOVER = True
-                break
-            board_after_clear, cleared_lines = clear_lines(new_board)
-            debug_print("cleared lines:", cleared_lines)
-            # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
-            
-            print(loss(board_after_clear, cleared_lines),current_piece,position_info)
-            if (current_loss := loss(board_after_clear, cleared_lines)) > best_loss:
-                best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
-                best_move_y_pos = position_info[3]
-                move_history = [best_move]
-                best_loss = current_loss
-                total_lines += cleared_lines
-                debug_print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss)
-                list_of_best_moves.append((best_move, best_move_y_pos))
         held_piece_checked_loop += 1
+            
+    for position_info in arr_piece_info_array:
+        
+        new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
+        if not is_place_piece_successful:
+            debug_print(f"GAMEOVER, score (best loss) : {best_loss} ", "bruteforcing.py, function: find_best_placement")
+            GAMEOVER = True
+            break
+        board_after_clear, cleared_lines = clear_lines(new_board)
+        debug_print("cleared lines:", cleared_lines, "bruteforcing.py, function: find_best_placement")
+        # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
+        
+        print(loss(board_after_clear, cleared_lines),position_info)
+        if (current_loss := loss(board_after_clear, cleared_lines)) > best_loss:
+            best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
+            best_move_y_pos = position_info[3]
+            move_history = [best_move]
+            best_loss = current_loss
+            total_lines += cleared_lines
+            debug_print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss, "bruteforcing.py, function: find_best_placement")
+            list_of_best_moves.append((best_move, best_move_y_pos))
+        
 
     debug_print("\n")
     if GAMEOVER:
@@ -105,16 +107,17 @@ def find_best_placement(board, queue, combo,stats,held_piece):
         return None
     assert move_history
     
-    debug_print(f"best move: {best_move} with loss: {best_loss}")
-    debug_print(list_of_best_moves)
+    debug_print(f"best move: {best_move} with loss: {best_loss}", "bruteforcing.py, function: find_best_placement")
+    print(list_of_best_moves, "bruteforcing.py, function: find_best_placement")
     # taking all the best moves and finding the sequence that leads to it, if it doesnt exist, we check the first one that does 
     for best_move_from_list, best_move_y_position in reversed(list_of_best_moves):
-        debug_print(f"attempting to find sequence for best move: {best_move_from_list} at y pos {best_move_y_position}")
+        print(f"attempting to find sequence for best move: {best_move_from_list} at y pos {best_move_y_position}", "bruteforcing.py, function: find_best_placement")
         
         if best_move_from_list is not None:
             goal_string = best_move_from_list
             sequence = search_for_best_move(goal_string, board, best_move_y_position)
             print("this is the sequence for:",goal_string,sequence) # this we dont debug print
             if sequence is not None:
-                return move_history, best_move_from_list,best_move_y_position
+                used_hold = best_move_from_list[0] == held_piece
+                return move_history, best_move_from_list,best_move_y_position, used_hold
     return None

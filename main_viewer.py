@@ -11,10 +11,10 @@ def main_viewer(viewer, das_state, das_delay, arr_delay, self):
     if self.weights_updated_event.is_set():
         self.weights_updated_event.clear()
         move_history_with_best_move_info = find_best_placement(
-            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
+            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.held_piece
         )
         if move_history_with_best_move_info:
-            move_history, best_move_str, goal_y_pos = move_history_with_best_move_info
+            move_history, best_move_str, goal_y_pos, used_hold = move_history_with_best_move_info
             best_move_str_original = best_move_str
             if self.no_calculation_mode:
                 best_move_str = f"{self.queue[0]}_4_flat_0"
@@ -25,7 +25,7 @@ def main_viewer(viewer, das_state, das_delay, arr_delay, self):
             piece_type, x_str, rotation1,rotation2 = best_move_str.split("_")
             rotation  = rotation1 + "_" + rotation2
             x = int(x_str[1:])
-            piece_type_placed = self.queue[0]
+            piece_type_placed = piece_type
             piece_shape = PIECES[piece_type_placed][rotation]
             viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
             viewer.update_board(self.board)
@@ -124,10 +124,10 @@ def main_viewer(viewer, das_state, das_delay, arr_delay, self):
         #printyellow(f'queue: {self.queue} current peice : {self.queue[0]}')
 
         move_history_with_best_move_info = find_best_placement(
-            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.stats.held_piece
+            self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.held_piece
         )
         
-        move_history, best_move_str,goal_y_pos = move_history_with_best_move_info
+        move_history, best_move_str,goal_y_pos, used_hold = move_history_with_best_move_info
         best_move_str_original = best_move_str
         #printyellow(f'new best move: {best_move_str} at y pos {goal_y_pos}')
         #best_move_str = f"{self.queue[0]}_4_flat_0"

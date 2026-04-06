@@ -109,7 +109,7 @@ class TetrisGame:
 
         # queue fill
         if not self.queue:
-            debug_print("queue fill")
+            debug_print("queue fill","main.py 112")
             num_to_add = DESIRED_QUEUE_PREVIEW_LENGTH - len(self.queue)
             if num_to_add > 0:
                 self.queue, self.bag = add_piece_from_bag(
@@ -119,8 +119,15 @@ class TetrisGame:
                     no_s_z_first_piece=self.no_s_z_first_piece_signal[0],
                 )
             if len(self.queue) < DESIRED_QUEUE_PREVIEW_LENGTH:
-                debug_print("failed to fill queue")
+                debug_print("failed to fill queue","main.py 120")
                 return
+        # we force a piece to be in hold position so calculations can be run on it,
+        # and if better piece is found, that is accesible only after using hold, even if we havent used it in the game yet
+        # using hold to "replace" the piece givess the same result, for example
+        # imagine we have a queue S,L,J, with best placement being S, we firce L to be in held slot, we place S piece, calculate for both L and J, everything is good
+        # now if the best placement is L, we simply replace the held L with S and move with comparing J and S, at least thast how i imagine it lol 
+        self.held_piece = self.queue[1]
+        self.queue.pop(1) 
             
         if not self.history:
             save_game_state(self, move_str=None, board=self.board, MoveHistoryClass=MoveHistory)
@@ -131,21 +138,21 @@ class TetrisGame:
                 save_game_state(self, self.pending_save, board=self.board, MoveHistoryClass=MoveHistory)
                 self.pending_save = None
 
-            debug_print("\n=== Current Queue ===")
-            debug_print(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH])
+            debug_print("\n=== Current Queue ===", "main.py 137")
+            debug_print(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], "main.py 138")
 
             move_history_with_best_move_info = find_best_placement(
                 self.board, self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], self.stats.combo, self.stats, self.held_piece
             )
 
-            debug_print(f"move history from best placement: {move_history_with_best_move_info}")
+            debug_print(f"move history from best placement: {move_history_with_best_move_info}", "main.py 144")
             
             if not move_history_with_best_move_info:
-                debug_print("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi")
-                debug_print(f"piece that failed: {self.queue[0]}")
+                debug_print("game over, tewibot has run into a problem (laziness) and had to be put down, bye bye tewi", "main.py 147")
+                debug_print(f"piece that failed: {self.queue[0]}", "main.py 148")
                 break    
             else:
-                move_history, best_move_str,goal_y_pos = move_history_with_best_move_info
+                move_history, best_move_str,goal_y_pos, used_hold = move_history_with_best_move_info
                 best_move_str_original = best_move_str
             
             if self.no_calculation_mode:
@@ -170,16 +177,19 @@ class TetrisGame:
                 else: 
                     break
 
-            debug_print(f"move history str: {move_history}, full move history: {move_history_with_best_move_info}, goal y pos: {goal_y_pos}")
+            debug_print(f"move history str: {move_history}, full move history: {move_history_with_best_move_info}, goal y pos: {goal_y_pos}", "main.py 166")
             piece_type_placed = [0]
             first_move = best_move_str
-            debug_print(f"first move: {first_move}")
+            debug_print(f"first move: {first_move}", "main.py 168")
             piece_type, x_str, rotation1,rotation2 = first_move.split("_")
             rotation  = rotation1 + "_" + rotation2
+
+            if used_hold and self.held_piece is not None:
+                self.queue[0], self.held_piece = self.held_piece, self.queue[0]
             
             x = int(x_str[1:])
             
-            piece_type_placed = self.queue[0]
+            piece_type_placed = piece_type
             piece_shape = PIECES[piece_type_placed][rotation]
 
             if viewer:
@@ -188,7 +198,7 @@ class TetrisGame:
             board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
             
             if self.slow_mode[0]:
-                debug_print(board_after_drop)
+                debug_print(board_after_drop, "main.py 170")
                 decision = input(
                     f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...\n undo to move back, redo to redo if you have undone a move before "
                 )
@@ -196,13 +206,13 @@ class TetrisGame:
                     if self.history_index > 0:
                         self.load_game_state(self.history_index - 1, board=self.board)
                     else:
-                        debug_print("no move to undo")    
+                        debug_print("no move to undo", "main.py 177")    
                     continue
                 elif decision.lower() == "redo":
                     if self.history_index < len(self.history) - 1:
                         self.load_game_state(self.history_index + 1, board=self.board)
                     else:
-                        debug_print("no move to redo")
+                        debug_print("no move to redo", "main.py 183")
                     continue
                 
             elif self.delay_mode[0] == True:
@@ -215,11 +225,11 @@ class TetrisGame:
             # so when there isnt a single good move found, it returns none and fucks up entire program so heuristic can be edited
             # tho im not so sure, leaving it here just because of that
             if board_after_drop is None:
-                debug_print("cannot drop piece")
+                debug_print("cannot drop piece", "main.py 192")
                 break
 
             board_after_clear, lines_cleared_count = clear_lines(board_after_drop)
-            debug_print(f"lines cleared: {lines_cleared_count}")
+            debug_print(f"lines cleared: {lines_cleared_count}", "main.py 194")
             attack, self.stats.combo = count_lines_clear(
                 lines_cleared_count, self.stats.combo, board_after_clear
             )
@@ -251,7 +261,7 @@ class TetrisGame:
                 viewer.update_heuristics(agg, cl, bump, block, ts, idep,hol)
                 viewer.update_pieces(self.stats.pieces_placed)
             
-            debug_print(self.board)
+            debug_print(self.board, "main.py 200")
 
             if self.queue:
                 self.queue.pop(0)  # remove the used piece
@@ -273,7 +283,7 @@ class TetrisGame:
             else:
                 self.stats.burst.pop(0)
                 self.stats.burst.append(elapsed)
-            debug_print(self.stats.burst)
+            debug_print(self.stats.burst, "main.py 212")
             if elapsed > 0:
                 # thhat can go into calculate burst function and places in calculate attack
                 self.stats.APM = (self.stats.total_attack / elapsed) * 60
@@ -289,7 +299,7 @@ class TetrisGame:
                     if len(self.stats.burst) > 9
                     else 0
                 )
-                debug_print(f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps / 10}")
+                debug_print(f"PPS: {self.stats.pps:.2f} burst: {self.stats.burst_pps / 10}", "main.py 214")
             
             self.pending_save = best_move_str  
         
@@ -333,7 +343,7 @@ def apply_rules(game, args):
     game.custom_bag[0] = "custom_bag" in args.rules
     if game.custom_bag[0]:
         game.bag = create_bag(custom_bag=True)
-        debug_print(f"custom bag mode enabled, using custom bag \n bag={game.bag}")
+        debug_print(f"custom bag mode enabled, using custom bag \n bag={game.bag}", "main.py 256")
         time.sleep(1)
 
     game.custom_board[0] = "custom_board" in args.rules
@@ -345,7 +355,7 @@ def apply_rules(game, args):
         game.delay_mode[1] = float(input("enter delay in seconds"))
     elif "slow" in args.rules:
         game.slow_mode[0] = True
-        debug_print("slow mode enabled, press enter to place each piece")
+        debug_print("slow mode enabled, press enter to place each piece", "main.py 262")
 
     game.gui_mode[0] = "gui" in args.rules
     use_gui = "gui" in args.rules

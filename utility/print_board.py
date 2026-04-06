@@ -56,13 +56,13 @@ def printyellow(s):
     print("\033[93m" + s + "\033[0m")
     
 import config    
-def debug_print(*args, print_mode=config.PRINT_MODE, color=None, **kwargs):
+def debug_print(*args, print_mode=config.PRINT_MODE, color=None, filename_line: str = "", **kwargs):
     if print_mode:
         if color == 'red':
-            printred(*args, **kwargs)
+            printred(*args, filename_line=filename_line, **kwargs)
         elif color == 'green':
-            printgreen(*args, **kwargs)
+            printgreen(*args, filename_line=filename_line, **kwargs)
         elif color == 'yellow':
-            printyellow(*args, **kwargs)
+            printyellow(*args, filename_line=filename_line, **kwargs)
         else:
-            print(*args, **kwargs)
+            print(*args, filename_line=filename_line,**kwargs)
