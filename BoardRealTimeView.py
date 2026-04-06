@@ -53,7 +53,8 @@ class TetrisBoardViewer:
         self.pieces = pieces
         self.control_mode = control_mode
         self.last_key_pressed = None
-        self.held_piece = held_piece    
+        self.held_piece = held_piece  
+        self.seed = seed   
 
     def update_board(self, new_board):
         self.board = new_board
@@ -172,7 +173,7 @@ class TetrisBoardViewer:
         line(f"tetris: {self.stats.tetris}")
         y += 6
         line("seed:")
-        line(f"{self.stats.seed}")
+        line(f"{self.seed}")
         y += 6
         line("heuristic:")
         line(f"aggregate: {self.aggregate:.2f}")

@@ -11,7 +11,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #(x,y)
 
 PIECES_lowest_point_from_origin = {
-    # if there is or isnt any index to the left of origin
     'O': {
         'flat_0' : 0, 
         'spin_L' : 0,
@@ -337,18 +336,6 @@ PIECES_soft_drop_index = { # pieces without rotations, basically 0
         'flat_0': [(0,0),(-1,-1),(0,-1),(1,0)],
     }
 }
-
-'''from utility.print_board import print_board
-def testprint(piece,rotation):
-    board = [[' ' for _ in range(6)] for _ in range(6)]
-    for pos in PIECES_index[piece][rotation]:
-        print(pos)
-        board[pos[1]+2][2+pos[0]] = piece
-    print_board(board)
-testprint("T",'flat_0')
-testprint("T",'flat_2')
-testprint("T",'spin_R')
-testprint("T",'spin_L')'''
 
 highest_piece_y_position_gui = {
     'O': {

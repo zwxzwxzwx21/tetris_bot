@@ -17,6 +17,13 @@ ATTACK_TABLE_MAX_COMBO = { # for combo above 19
 
 PERFECT_CLEAR_BONUS = 5 # unsure if pc gives btb or no, idk if that matters even cuz api
 
+def calculate_attack_and_stats(lines_cleared_count, combo, board_after_clear):
+    attack, new_combo = count_lines_clear(lines_cleared_count, combo, board_after_clear)
+    single  = 1 if lines_cleared_count == 1 else 0
+    double  = 1 if lines_cleared_count == 2 else 0
+    triple  = 1 if lines_cleared_count == 3 else 0
+    tetris  = 1 if lines_cleared_count == 4 else 0
+    return attack, new_combo, single, double, triple, tetris
 
 def count_lines_clear(lines_cleared_count,combo,board):
     logs = False
