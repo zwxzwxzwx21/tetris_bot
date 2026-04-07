@@ -1,4 +1,5 @@
 import pygame  # type: ignore
+
 from utility.pieces_index import PIECES_index
 
 CELL_SIZE = 28
@@ -26,12 +27,31 @@ PIECE_COLORS = {
 
 
 class TetrisBoardViewer:
-    def __init__(self, board_, stats, queue, no_s_z_first_piece_signal, slow_mode, seed,aggregate, clearedLines, bumpiness, blockade, tetrisSlot,iDependency,holes, pieces, control_mode,held_piece):
+    def __init__(
+        self,
+        board_,
+        stats,
+        queue,
+        no_s_z_first_piece_signal,
+        slow_mode,
+        seed,
+        aggregate,
+        clearedLines,
+        bumpiness,
+        blockade,
+        tetrisSlot,
+        iDependency,
+        holes,
+        pieces,
+        control_mode,
+        held_piece,
+    ):
         pygame.init()
         self.surface = pygame.display.set_mode(
             (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
         )
         pygame.display.set_caption("tewi bot 🐰")
+        pygame.display.set_icon(pygame.image.load("OIP-3085101781.jpg"))
         self.font = pygame.font.SysFont("orbitron", 16)
         self.clock = pygame.time.Clock()
         self.board = board_
@@ -53,14 +73,23 @@ class TetrisBoardViewer:
         self.pieces = pieces
         self.control_mode = control_mode
         self.last_key_pressed = None
-        self.held_piece = held_piece  
-        self.seed = seed   
+        self.held_piece = held_piece
+        self.seed = seed
 
     def update_board(self, new_board):
         self.board = new_board
         self.draw = True
 
-    def update_heuristics(self, aggregate, clearedLines, bumpiness, blockade, tetrisSlot, iDependency,holes):
+    def update_heuristics(
+        self,
+        aggregate,
+        clearedLines,
+        bumpiness,
+        blockade,
+        tetrisSlot,
+        iDependency,
+        holes,
+    ):
         self.aggregate = aggregate
         self.clearedLines = clearedLines
         self.bumpiness = bumpiness
@@ -74,14 +103,25 @@ class TetrisBoardViewer:
         self.pieces = pieces_placed
         self.draw = True
 
-    def set_preview(self, piece, shape, xpos, board_array,rotation,held_piece,yvalue,control_mode):
+    def set_preview(
+        self,
+        piece,
+        shape,
+        xpos,
+        board_array,
+        rotation,
+        held_piece,
+        yvalue,
+        control_mode,
+    ):
         pieces_cords = PIECES_index[piece][rotation]
         self.held_piece = held_piece
+
         # ghost piece being drawn
         def collides(ypos):
-            for (dx, dy) in pieces_cords:
-                yyy = ypos + dy 
-                
+            for dx, dy in pieces_cords:
+                yyy = ypos + dy
+
                 if yvalue == 0:
                     yyy = yvalue + dy
                 xxx = xpos + dx
@@ -92,6 +132,7 @@ class TetrisBoardViewer:
                 if board_array[yyy][xxx] not in (" ", 0):
                     return True
             return False
+
         # this is just harddrop, doesnt reflect it that well due to that,
         y = 0
         if yvalue != 0:
@@ -118,20 +159,16 @@ class TetrisBoardViewer:
                 pygame.draw.rect(
                     self.surface, COLOR_GRID, (xx, yy, CELL_SIZE, CELL_SIZE), 1
                 )
- 
+
         if self.preview:
             piece, pieces_cords, xpos, ypos = self.preview
             base = PIECE_COLORS.get(piece, (180, 180, 180))
             duszek = tuple(wawa // 2 for wawa in base)
-            for (dx,dy) in pieces_cords:
+            for dx, dy in pieces_cords:
                 xx = (xpos + dx) * CELL_SIZE
                 yy = (ypos + dy) * CELL_SIZE
-                pygame.draw.rect(
-                    self.surface, duszek, (xx, yy, CELL_SIZE, CELL_SIZE)
-                )
-                pygame.draw.rect(
-                    self.surface, base, (xx, yy, CELL_SIZE, CELL_SIZE), 1
-                )
+                pygame.draw.rect(self.surface, duszek, (xx, yy, CELL_SIZE, CELL_SIZE))
+                pygame.draw.rect(self.surface, base, (xx, yy, CELL_SIZE, CELL_SIZE), 1)
 
     def _draw_panel(self):
         xpos = BOARD_WIDTH * CELL_SIZE
@@ -205,7 +242,7 @@ class TetrisBoardViewer:
                 self.draw = False
                 self._draw()
             self.clock.tick(FPS)
-            
+
         pygame.quit()
         # buttons dont appear anymore (somehow?) and also i wanna make so you have button that just acts as pressing enter in slow mode
 
@@ -214,16 +251,16 @@ class TetrisBoardViewer:
         key = self.last_key_pressed
         self.last_key_pressed = None
         return key
-    
+
     def get_key_held(self):
         """Returns the currently held movement key (prioritizes left/right for DAS)"""
         keys = pygame.key.get_pressed()
-        
+
         if keys[pygame.K_LEFT]:
             return pygame.K_LEFT
         if keys[pygame.K_RIGHT]:
             return pygame.K_RIGHT
-        
+
         if keys[pygame.K_DOWN]:
             return pygame.K_DOWN
         if keys[pygame.K_UP]:
@@ -240,6 +277,5 @@ class TetrisBoardViewer:
             return pygame.K_r
         if keys[pygame.K_RSHIFT]:
             return pygame.K_RSHIFT
-            
-        return None
 
+        return None
