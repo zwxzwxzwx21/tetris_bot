@@ -72,9 +72,9 @@ PIECES_startpos_indexing_value = {
 
     'I': {
         'flat_0' : 0,
-        'spin_L' : 0,
+        'spin_L' : -1,
         'flat_2' : 0,
-        'spin_R' : 0,
+        'spin_R' : -2,
         }, 
 
     'T': {
