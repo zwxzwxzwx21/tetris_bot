@@ -171,61 +171,6 @@ PIECES = {
         ]
     }
 }
-PIECES_soft_drop = { # pieces without rotations, basically 0
-    'O': {
-        'flat_0' :
-        [
-            ['O', 'O'],
-            ['O', 'O']
-        ]
-    },
-    'I': {
-        'flat_0' :
-        [
-            ['I', 'I', 'I', 'I']
-        ]
-        
-    },    
-    'T': {
-        'flat_0': 
-        [
-            [' ', 'T', ' '],
-            ['T', 'T', 'T']
-        ]
-    },
-    'L': {
-        'flat_0': 
-        [
-            [' ', ' ', 'L'],
-            ['L', 'L', 'L']
-        ]
-    },
-    'J': {
-        'flat_0': 
-        [
-            ['J', ' ', ' '],
-            ['J', 'J', 'J']
-        ]
-    },
-    'S': {
-        'flat_0': 
-        [
-            [' ', 'S', 'S'],
-            ['S', 'S', ' ']
-        ]
-    },
-    'Z': {
-        'flat_0': 
-        [
-            ['Z', 'Z', ' '],
-            [' ', 'Z', 'Z']
-        ]
-    }
-}
-
-
-
-
 
 # pieces - RGB : (amount of possible placementes)
 # j - (25, 131, 191) poss moves: 8+8+9+9 (34)
