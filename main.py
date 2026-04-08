@@ -30,7 +30,6 @@ from heuristic_values_windowchanger import change_heuristic_values
 from simulate_game_movement import simulate_move
 from tetrio_parsing.calculate_attack import calculate_attack_and_stats, count_lines_clear
 from tests.combo_attack_test import custom_board  # probably stupid way to do that, idk better yet
-from utility.pieces import PIECES
 from utility.pieces_index import PIECES_index
 from utility.print_board import printgreen, printyellow, printred, print_board, debug_print
 
@@ -190,17 +189,16 @@ class TetrisGame:
             x = int(x_str[1:])
             
             piece_type_placed = piece_type
-            piece_shape = PIECES[piece_type_placed][rotation]
-
+            
             if viewer:
-                viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
+                viewer.set_preview(piece_type_placed, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
 
-            board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_shape, rotation, x, goal_y_pos],)
+            board_after_drop = solidify_piece( copy.deepcopy(self.board), piece_type_placed,[piece_type_placed, rotation, x, goal_y_pos],)
             
             if self.slow_mode[0]:
                 debug_print(board_after_drop, "main.py 170")
                 decision = input(
-                    f"found move: {piece_shape} at x={x} rotation={rotation}, enter to continue...\n undo to move back, redo to redo if you have undone a move before "
+                    f"found move: {"placeholder"} at x={x} rotation={rotation}, enter to continue...\n undo to move back, redo to redo if you have undone a move before "
                 )
                 if decision.lower() == "undo":
                     if self.history_index > 0:

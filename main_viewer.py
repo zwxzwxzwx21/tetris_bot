@@ -41,7 +41,7 @@ def main_viewer(viewer, das_state, das_delay, arr_delay, self):
     x = int(x_str[1:])
     piece_type_placed = self.queue[0]
 
-    piece_shape = PIECES[piece_type_placed][rotation]
+    #piece_shape = PIECES[piece_type_placed][rotation]
     #print(piece_type_placed, piece_shape, x,rotation)
     key_pressed  = viewer.get_key_pressed()
     key_held = viewer.get_key_held()
@@ -115,7 +115,7 @@ def main_viewer(viewer, das_state, das_delay, arr_delay, self):
             self.queue[0] = temp_hold_piece
         change_held_piece_flag = False
     # piece_shape arg is not even used
-    viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
+    viewer.set_preview(piece_type_placed, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
     viewer.update_board(self.board)
 
     if last_key == pygame.K_SPACE:
@@ -139,11 +139,9 @@ def main_viewer(viewer, das_state, das_delay, arr_delay, self):
             best_move_str = best_move_str_original
         #goal_y_pos = 1 if self.no_calculation_mode else goal_y_pos
         
-        try:
-            x = int(x_str[1:])
-        except ValueError:
-            x = int(x_str)
-        viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
+        x = int(x_str[1:])
+        
+        viewer.set_preview(piece_type_placed, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
         viewer.update_board(self.board)
 
         

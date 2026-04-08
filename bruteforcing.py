@@ -11,7 +11,6 @@ from board_operations.stack_checking import (
 )
 from tetrio_parsing.calculate_attack import count_lines_clear
 from utility.print_board import print_board, debug_print
-from utility.pieces import PIECES
 from utility.pieces_index import PIECES_index, PIECES_xpos_indexing_value, PIECES_startpos_indexing_value
 
 from search_for_best_move import search_for_best_move

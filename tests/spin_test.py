@@ -12,7 +12,6 @@ from search_for_best_move import search_for_best_move
 from board_operations.stack_checking import find_highest_y
 from bruteforcing import find_best_placement
 from utility.pieces_index import PIECES_index
-from utility.pieces import PIECES
 from utility.print_board import print_board
 tspin_double_testcase = [
     [' ',' ',' ',' ',' ',' ',' ',' ',' ',' '],

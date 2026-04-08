@@ -106,7 +106,6 @@ class TetrisBoardViewer:
     def set_preview(
         self,
         piece,
-        shape,
         xpos,
         board_array,
         rotation,
