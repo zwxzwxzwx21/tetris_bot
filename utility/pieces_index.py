@@ -73,16 +73,16 @@ PIECES_xpos_indexing_value = {
 
     'I': {
         'flat_0' : 4,
-        'spin_L' : 2,
+        'spin_L' : 1,
         'flat_2' : 4,
-        'spin_R' : 3,
+        'spin_R' : 1,
         }, 
 
     'T': {
-        'flat_0': 2,
-        'flat_2': 2,
+        'flat_0': 3,
+        'flat_2': 3,
         'spin_R': 2,
-        'spin_L': 1
+        'spin_L': 2
         },
 
     'L': {
