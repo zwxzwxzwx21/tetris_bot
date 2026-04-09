@@ -1,7 +1,7 @@
 from board_operations.checking_valid_placements import find_lowest_y_for_piece, sideways_movement_simulation, place_piece, soft_drop_simulation_returning_ypos
 from spins import SRS_rest_pieces_kick_table, SRS_I_piece_kick_table
 from utility.print_board import print_board
-from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value, PIECES_xpos_indexing_value
+from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value
 from spins_funcions import try_place_piece_with_kick
 from config import PRINT_MODE
 import time
@@ -26,7 +26,7 @@ def search_for_best_move(goal, board, best_move_y_pos):
     for rot in rotations:
         if piece == "O" and rot in ["spin_R", "spin_L","flat_2"]:
             continue  # O piece has no spins
-        for dx in range(PIECES_startpos_indexing_value[piece][rot], 11 - PIECES_xpos_indexing_value[piece][rot]):
+        for dx in range(PIECES_startpos_indexing_value[piece][rot], 10-(max(dx for (dx, dy) in PIECES_index[piece][rot]) - min(dx for (dx, dy) in PIECES_index[piece][rot]))):
             lowest_Y = find_lowest_y_for_piece(PIECES_index[piece][rot], board, dx, rot, piece=piece)
             start_pos = [piece, rot, dx, lowest_Y]
             queue_of_positions.append(start_pos )  # apprends all the places available without tucking or spins/kicks

@@ -63,56 +63,6 @@ PIECES_startpos_indexing_value = {
         }
 }
 
-PIECES_xpos_indexing_value = {
-    'O': {
-        'flat_0' : 2, 
-        'spin_L' : 2,
-        'flat_2' : 2,
-        'spin_R' : 2,
-        },
-
-    'I': {
-        'flat_0' : 4,
-        'spin_L' : 1,
-        'flat_2' : 4,
-        'spin_R' : 1,
-        }, 
-
-    'T': {
-        'flat_0': 3,
-        'flat_2': 3,
-        'spin_R': 2,
-        'spin_L': 2
-        },
-
-    'L': {
-        'flat_0': 3,
-        'flat_2': 3,
-        'spin_R': 2,
-        'spin_L': 2,
-        },
-
-    'J': {
-        'flat_0': 3,
-        'flat_2': 3,
-        'spin_R': 2,
-        'spin_L': 2,
-        },
-
-    'S': {
-        'flat_0': 3,
-        'spin_R': 2,
-        'flat_2': 3,
-        'spin_L': 2,
-        },
-
-    'Z': {
-        'flat_0': 3,
-        'flat_2': 3,
-        'spin_L': 2,
-        'spin_R': 2,
-        }
-}
 PIECES_index = {
     'O': {  
         'flat_0' : [(0,0),(-1,0),(0,-1),(-1,-1)], 

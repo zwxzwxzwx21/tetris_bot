@@ -11,7 +11,7 @@ from board_operations.stack_checking import (
 )
 from tetrio_parsing.calculate_attack import count_lines_clear
 from utility.print_board import print_board, debug_print
-from utility.pieces_index import PIECES_index, PIECES_xpos_indexing_value, PIECES_startpos_indexing_value
+from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value
 
 from search_for_best_move import search_for_best_move
 
@@ -58,7 +58,6 @@ def find_best_placement(board, queue, combo,stats,held_piece):
         
         current_piece = queue[0] if held_piece_checked_loop == 0 else held_piece
         debug_print(f"CURRENT PIECE: {current_piece} held piece: {held_piece} loop: {held_piece_checked_loop}", "bruteforcing.py, function: find_best_placement")
-        print("current piece:", current_piece, "loop:", held_piece_checked_loop)
         assert current_piece in PIECES_index
         
         for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
@@ -66,7 +65,6 @@ def find_best_placement(board, queue, combo,stats,held_piece):
             start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
             
             finish_x_pos = 10-(max(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) - min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]))
-            print(finish_x_pos, "a")
             #check all positions from the position we can place the piece on downwards,  if there is a place for a piece
             # add it to arrayt and see what results it gives (it may be inaccesible)
             for start_x in range(start_x_pos,finish_x_pos):
@@ -90,7 +88,6 @@ def find_best_placement(board, queue, combo,stats,held_piece):
         debug_print("cleared lines:", cleared_lines, "bruteforcing.py, function: find_best_placement")
         # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
         
-        print(loss(board_after_clear, cleared_lines),position_info)
         if (current_loss := loss(board_after_clear, cleared_lines)) > best_loss:
             best_move = f"{position_info[0]}_x{position_info[2]}_{position_info[1]}"
             best_move_y_pos = position_info[3]
@@ -108,15 +105,12 @@ def find_best_placement(board, queue, combo,stats,held_piece):
     assert move_history
     
     debug_print(f"best move: {best_move} with loss: {best_loss}", "bruteforcing.py, function: find_best_placement")
-    print(list_of_best_moves, "bruteforcing.py, function: find_best_placement")
     # taking all the best moves and finding the sequence that leads to it, if it doesnt exist, we check the first one that does 
     for best_move_from_list, best_move_y_position in reversed(list_of_best_moves):
-        print(f"attempting to find sequence for best move: {best_move_from_list} at y pos {best_move_y_position}", "bruteforcing.py, function: find_best_placement")
         
         if best_move_from_list is not None:
             goal_string = best_move_from_list
             sequence = search_for_best_move(goal_string, board, best_move_y_position)
-            print("this is the sequence for:",goal_string,sequence) # this we dont debug print
             if sequence is not None:
                 used_hold = best_move_from_list[0] == held_piece
                 return move_history, best_move_from_list,best_move_y_position, used_hold
