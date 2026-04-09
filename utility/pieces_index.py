@@ -21,10 +21,10 @@ PIECES_startpos_indexing_value = {
         },
 
     'I': {
-        'flat_0' : 0,
-        'spin_L' : -1,
-        'flat_2' : 0,
-        'spin_R' : -2,
+        'flat_0' : 1,
+        'spin_L' : 0,
+        'flat_2' : 1,
+        'spin_R' : -1,
         }, 
 
     'T': {
@@ -62,6 +62,7 @@ PIECES_startpos_indexing_value = {
         'spin_R': 0,
         }
 }
+
 PIECES_xpos_indexing_value = {
     'O': {
         'flat_0' : 2, 
@@ -151,9 +152,9 @@ PIECES_index = {
 
     'S': {
         'flat_0': [(0,0),(0,-1),(1,-1),(-1,0)],
-        'spin_R': [(0,0),(0,-1),(1,0),(1,1)],
         'flat_2': [(0,0),(1,0),(-1,1),(0,1)],
         'spin_L': [(0,0),(-1,-1),(-1,0),(0,1)],
+        'spin_R': [(0,0),(0,-1),(1,0),(1,1)],
         },
 
     'Z': {

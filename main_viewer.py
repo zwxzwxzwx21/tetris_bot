@@ -1,5 +1,5 @@
+from utility.pieces_index import PIECES_index
 from utility.print_board import printred
-from utility.pieces import PIECES
 from config import DESIRED_QUEUE_PREVIEW_LENGTH
 from simulate_game_movement import simulate_move
 from bruteforcing import find_best_placement
@@ -26,7 +26,7 @@ def main_viewer(viewer, das_state, das_delay, arr_delay, self):
             rotation  = rotation1 + "_" + rotation2
             x = int(x_str[1:])
             piece_type_placed = piece_type
-            piece_shape = PIECES[piece_type_placed][rotation]
+            piece_shape = PIECES_index[piece_type_placed][rotation]
             viewer.set_preview(piece_type_placed, piece_shape, x, self.board,rotation,held_piece=self.held_piece,yvalue=goal_y_pos,control_mode=self.control_mode)
             viewer.update_board(self.board)
 
