@@ -63,9 +63,10 @@ def find_best_placement(board, queue, combo,stats,held_piece):
         
         for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
             
-            # o piece has no rotation so we just set values 
             start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
-            finish_x_pos = 12-PIECES_xpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 9
+            
+            finish_x_pos = 10-(max(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) - min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]))
+            print(finish_x_pos, "a")
             #check all positions from the position we can place the piece on downwards,  if there is a place for a piece
             # add it to arrayt and see what results it gives (it may be inaccesible)
             for start_x in range(start_x_pos,finish_x_pos):
