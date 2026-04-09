@@ -55,7 +55,6 @@ def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
         return 0
     return row
 
-from utility.pieces_index import  PIECES_startpos_indexing_value
 def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=False,where_called_from=""):
 
     """
@@ -64,7 +63,7 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=Fals
     returns true or false if succeded or failed
     """
     
-    if PIECES_startpos_indexing_value[piece][rotation] > x or x > len(board[0])-1-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation]):
+    if min(dx for (dx, dy) in PIECES_index[piece][rotation])*-1 > x or x > len(board[0])-1-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation]):
         return board,False
     if 0 > y or y > len(board) - max([dy for (dx, dy) in PIECES_index[piece][rotation]]):
         return board,False

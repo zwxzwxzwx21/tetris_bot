@@ -11,57 +11,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #[0,1][1,1] <-- rotation index
 #(x,y)
 
-PIECES_startpos_indexing_value = {
-    # if there is or isnt any index to the left of origin
-    'O': {
-        'flat_0' : 1, 
-        'spin_L' : 1,
-        'flat_2' : 1,
-        'spin_R' : 1,
-        },
-
-    'I': {
-        'flat_0' : 1,
-        'spin_L' : 0,
-        'flat_2' : 1,
-        'spin_R' : -1,
-        }, 
-
-    'T': {
-        'flat_0': 1,
-        'flat_2': 1,
-        'spin_R': 0,
-        'spin_L': 1
-        },
-
-    'L': {
-        'flat_0': 1,
-        'flat_2': 1,
-        'spin_R': 0,
-        'spin_L': 1,
-        },
-
-    'J': {
-        'flat_0': 1,
-        'flat_2': 1,
-        'spin_R': 1,
-        'spin_L': 0,
-        },
-
-    'S': {
-        'flat_0': 1,
-        'spin_R': 0,
-        'flat_2': 1,
-        'spin_L': 0,
-        },
-
-    'Z': {
-        'flat_0': 1,
-        'flat_2': 1,
-        'spin_L': 0,
-        'spin_R': 0,
-        }
-}
 
 PIECES_index = {
     'O': {  

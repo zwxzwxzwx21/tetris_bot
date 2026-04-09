@@ -11,7 +11,7 @@ from board_operations.stack_checking import (
 )
 from tetrio_parsing.calculate_attack import count_lines_clear
 from utility.print_board import print_board, debug_print
-from utility.pieces_index import PIECES_index, PIECES_startpos_indexing_value
+from utility.pieces_index import PIECES_index
 
 from search_for_best_move import search_for_best_move
 
@@ -62,8 +62,8 @@ def find_best_placement(board, queue, combo,stats,held_piece):
         
         for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
             
-            start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
-            
+            #start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
+            start_x_pos = min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) * -1
             finish_x_pos = 10-(max(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) - min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]))
             #check all positions from the position we can place the piece on downwards,  if there is a place for a piece
             # add it to arrayt and see what results it gives (it may be inaccesible)
