@@ -6,12 +6,13 @@ import sys
 import os
 from time import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# rotation index is a 1,1 point in matrix around which calculations are made, its the same no matter the size of matrix
 #[0,0][1,0]
 #[0,1][1,1] <-- rotation index
 #(x,y)
 
 PIECES_lowest_point_from_origin = {
-    'O': {
+    'O': { # max(tuple) would work as everything is -1 or 0
         'flat_0' : 0, 
         'spin_L' : 0,
         'flat_2' : 0,
@@ -19,10 +20,10 @@ PIECES_lowest_point_from_origin = {
         },
 
     'I': {
-        'flat_0' : 1,
-        'spin_L' : 3,
-        'flat_2' : 2,
-        'spin_R' : 3,
+        'flat_0' : 0,
+        'spin_L' : 2,
+        'flat_2' : 1,
+        'spin_R' : 2,
         }, 
 
     'T': {
@@ -163,18 +164,19 @@ PIECES_xpos_indexing_value = {
         }
 }
 PIECES_index = {
-    'O': {
+    'O': {  
         'flat_0' : [(0,0),(-1,0),(0,-1),(-1,-1)], 
         'spin_L' : [(0,0),(-1,0),(0,-1),(-1,-1)], 
         'flat_2' : [(0,0),(-1,0),(0,-1),(-1,-1)], 
         'spin_R' : [(0,0),(-1,0),(0,-1),(-1,-1)], 
         },
 
+    
     'I': {
-        'flat_0' : [(0,1),(1,1),(2,1),(3,1)],
-        'spin_L' : [(1,0),(1,1),(1,2),(1,3)],
-        'flat_2' : [(0,2),(1,2),(2,2),(3,2)],
-        'spin_R' : [(2,0),(2,1),(2,2),(2,3)],
+        'flat_0' : [(-1,0),(0,0),(1,0),(2,0)],
+        'spin_L' : [(0,-1),(0,0),(0,1),(0,2)],
+        'flat_2' : [(-1,1),(0,1),(1,1),(2,1)],
+        'spin_R' : [(1,-1),(1,0),(1,1),(1,2)],
         }, 
 
     'T': {

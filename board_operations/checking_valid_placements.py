@@ -47,7 +47,6 @@ def find_lowest_y_for_piece(piece_index_array,board,col,rotation,piece ):
     board_copy = [row.copy() for row in board]
     row = 0
     
-    #print(can_place(piece_index_array, board_copy, row + 1, col,rotation,piece,print_debug=False))
     while can_place(piece_index_array, board_copy, row + 1, col,rotation,piece,print_debug=False):
         row += 1
         if can_place(piece_index_array, board_copy, row + 1, col,rotation,piece,print_debug=False) == False:
@@ -66,13 +65,8 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=Fals
     """
     
     if PIECES_startpos_indexing_value[piece][rotation] > x or x > len(board[0])-1-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation]):
-        #print(f"x out of bounds {x} max available:{len(board[0])-get_piece_rightmost_index_from_origin(PIECES_index[piece][rotation])}")
-        #print("if1 args causing error: ",piece_index_array, piece, x, y,rotation, where_called_from)
-        
         return board,False
     if 0 > y or y > len(board) - PIECES_lowest_point_from_origin[piece][rotation]:
-        #print(f"y out of bounds {y} max available:{len(board)-get_piece_height(piece_index_array)+1}")
-        #print("if2 args causing error: ",piece_index_array, piece, board, x, y,rotation)
         return board,False
     new_board = [row.copy() for row in board]
     old_board = [row.copy() for row in board]
@@ -82,7 +76,6 @@ def place_piece(piece_index_array, piece, board, x, y,rotation, print_debug=Fals
         if print_debug:
             print(x + dx, y + dy, "place piece", piece, "<-")
 
-        #print(f"y= {y} + {dy} = {y + dy} x= {x} + {dx} = {x + dx}")
         if 0 <= x + dx < 10 and 0 <= y + dy < 20:   
             if new_board[y + dy][x + dx] == ' ':
                 new_board[y + dy][x + dx] = piece
@@ -117,7 +110,6 @@ def can_place2(piece, board, xpos, ypos,side):
     return True
 from utility.pieces_index import PIECES_index
 from utility.print_board import print_board
-from utility.pieces import *
 def sideways_movement_simulation(board, piece, rotation, x_pos, y_pos, piece_info_array):
     '''returns array'''
     #this shit broken as hell wuuh
