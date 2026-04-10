@@ -26,7 +26,6 @@ from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
 from GenerateBag import add_piece_from_bag, create_bag
 from heuristic import analyze, analyze_main
-from heuristic_values_windowchanger import change_heuristic_values
 from simulate_game_movement import simulate_move
 from tetrio_parsing.calculate_attack import (
     calculate_attack_and_stats,
@@ -469,13 +468,8 @@ def run_game(game, use_gui):
         )
         t = threading.Thread(target=game.game_loop, args=(viewer,), daemon=True)
         t.start()
-        import heuristic
 
-        viewer_thread = threading.Thread(target=viewer.mainloop, daemon=True)
-        viewer_thread.start()
-        change_heuristic_values(
-            heuristic.weights_editable, on_update=game.request_weights_recalc
-        )
+        viewer.mainloop()
         viewer.running = False
     else:
         game.start_signal[0] = True

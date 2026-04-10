@@ -1,7 +1,6 @@
 import tkinter as tk
 import heuristic
 
-
 def change_heuristic_values(weights_editable, on_update=None):
     
     weight_names = [
