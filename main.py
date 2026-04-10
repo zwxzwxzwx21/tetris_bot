@@ -355,10 +355,7 @@ class TetrisGame:
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument("--seed", type=int, help="override RNG seed")
-    parser.add_argument(
-        "--bruteforce",
-        type=int,
-    )
+    
     parser.add_argument("--max-pieces", type=int, default=99999999)
 
     parser.add_argument(
@@ -378,17 +375,6 @@ def parse_args():
         help="unsure what it does i guess its like, when you just ask for help, well there is none, youre left alone in the dark world",
     )
     return parser.parse_args()
-
-
-def run_bruteforce_mode(args):
-    import bruteforcing
-
-    bruteforcing.BRUTEFORCE_MODE = True
-    import run_bruteforce_games
-
-    run_bruteforce_games.run_bruteforce_games(
-        num_games=args.bruteforce, max_pieces=args.max_pieces
-    )
 
 
 def resolve_seed(args):
@@ -478,10 +464,6 @@ def run_game(game, use_gui):
 
 def main():
     args = parse_args()
-
-    if args.bruteforce:
-        run_bruteforce_mode(args)
-        return
 
     game = TetrisGame(seed=resolve_seed(args))
     use_gui = apply_rules(game, args)
