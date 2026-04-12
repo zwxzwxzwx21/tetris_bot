@@ -25,7 +25,7 @@ from board_save_load_functions import save_game_results, save_game_state
 from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
 from GenerateBag import add_piece_from_bag, create_bag
-from heuristic import analyze, analyze_main
+from heuristic import analyze
 from simulate_game_movement import simulate_move
 from tetrio_parsing.calculate_attack import (
     calculate_attack_and_stats,
@@ -416,7 +416,6 @@ def apply_rules(game, args):
 
 
 def initialize_heuristics(game):
-    from heuristic import analyze_main
 
     (
         game.aggregate,
@@ -426,7 +425,7 @@ def initialize_heuristics(game):
         game.tetrisSlot,
         game.iDependency,
         game.holes,
-    ) = analyze_main(game.board, cleared_lines=0)
+    ) = analyze(game.board, cleared_lines=0, print_values_to_viewer=True)
 
 
 def run_game(game, use_gui):
