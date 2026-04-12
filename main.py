@@ -297,10 +297,7 @@ class TetrisGame:
             if viewer:
                 viewer.clear_preview()
                 viewer.update_board(self.board)
-                agg, cl, bump, block, ts, idep, hol = analyze_main(
-                    self.board, cleared_lines=total_lines_cleared
-                )
-                viewer.update_heuristics(agg, cl, bump, block, ts, idep, hol)
+                
                 viewer.update_pieces(self.stats.pieces_placed)
 
             debug_print(self.board, "main.py 200")
@@ -397,7 +394,7 @@ def apply_rules(game, args):
 
     game.custom_board[0] = "custom_board" in args.rules
     if game.custom_board[0]:
-        game.board = custom_board
+        game.board = config.custom_board
 
     if "delay" in args.rules:
         game.delay_mode[0] = True

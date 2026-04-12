@@ -8,3 +8,5 @@ das_state = {
     'down': {'held_frames': 0, 'arr_counter': 0, 'charged': False},
     'right': {'held_frames': 0, 'arr_counter': 0, 'charged': False}
 }
+
+custom_board = [[' ' for _ in range(10)] for _ in range(20)]
