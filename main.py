@@ -31,6 +31,7 @@ from tetrio_parsing.calculate_attack import (
     calculate_attack_and_stats,
     count_lines_clear,
 )
+from utility.main_calc_time_place_piece import time_to_place_piece
 from utility.pieces_index import PIECES_index
 from utility.print_board import (
     debug_print,
@@ -74,6 +75,8 @@ class GameStats:
         self.burst_attack = 0  # unused, stil; thinking about it
         self.total_attack = 0
         self.pieces_placed = 0
+        self.calc_piece_time = [0,0,0,0,0,0,0] # how much time it takes to calculate one piece place,ment on averrage, [O,I,J,L,S,Z,T]
+        self.calc_piece_time_piecenumber = [0,0,0,0,0,0,0] # how much a piece got placed
         # gamestats
         self.single = 0
         self.double = 0
@@ -156,6 +159,8 @@ class TetrisGame:
             debug_print("\n=== Current Queue ===", "main.py 137")
             debug_print(self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH], "main.py 138")
 
+            time_start = time.perf_counter()
+
             move_history_with_best_move_info = find_best_placement(
                 self.board,
                 self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],
@@ -163,7 +168,26 @@ class TetrisGame:
                 self.stats,
                 self.held_piece,
             )
-
+            
+            time_to_calc_piece = time.perf_counter() - time_start
+            
+            self.stats.calc_piece_time, self.stats.calc_piece_time_piecenumber = time_to_place_piece(
+                move_history_with_best_move_info[0][0][0], # a piece like "T", "I" etc
+                self.stats.calc_piece_time,
+                time_to_calc_piece,
+                self.stats.calc_piece_time_piecenumber
+            )
+            #print(self.stats.calc_piece_time, self.stats.calc_piece_time_piecenumber)
+            
+            print(
+                f"O piece time: {(self.stats.calc_piece_time[0]/(self.stats.calc_piece_time_piecenumber[0] if self.stats.calc_piece_time_piecenumber[0] != 0 else 1)):.5f}\
+                    I piece time: {(self.stats.calc_piece_time[1]/(self.stats.calc_piece_time_piecenumber[1] if self.stats.calc_piece_time_piecenumber[1] != 0 else 1)):.5f}\
+                    J piece time: {(self.stats.calc_piece_time[2]/(self.stats.calc_piece_time_piecenumber[2] if self.stats.calc_piece_time_piecenumber[2] != 0 else 1)):.5f}\
+                    L piece time: {(self.stats.calc_piece_time[3]/(self.stats.calc_piece_time_piecenumber[3] if self.stats.calc_piece_time_piecenumber[3] != 0 else 1)):.5f}\
+                    S piece time: {(self.stats.calc_piece_time[4]/(self.stats.calc_piece_time_piecenumber[4] if self.stats.calc_piece_time_piecenumber[4] != 0 else 1)):.5f}\
+                    Z piece time: {(self.stats.calc_piece_time[5]/(self.stats.calc_piece_time_piecenumber[5] if self.stats.calc_piece_time_piecenumber[5] != 0 else 1)):.5f}\
+                    T piece time: {(self.stats.calc_piece_time[6]/(self.stats.calc_piece_time_piecenumber[6] if self.stats.calc_piece_time_piecenumber[6] != 0 else 1)):.5f}")
+            
             debug_print(
                 f"move history from best placement: {move_history_with_best_move_info}",
                 "main.py 144",
