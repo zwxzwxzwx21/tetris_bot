@@ -185,7 +185,7 @@ def analyze(board,cleared_lines,print_values_to_viewer=False):
     varB = 0
     if print_values_to_viewer:
         a, b, c, d, e, f, g = weights
-        return a*varA, b*varB, c*varC, d*varD, e*varE, f*varF,g*varG
+        return a, b, c, d, e, f, g
     
     #print(a*varA + b*varB + c*varC + d*varD + e*varE + f*varF)
     return -(varA*weights_editable[0]) + varB*weights_editable[1] - varC*weights_editable[2] - varD*weights_editable[3] + varE*weights_editable[4] - varF*weights_editable[5] - varG*weights_editable[6] + PCbonus*weights_editable[7] + cleared_lines*weights_editable[8]

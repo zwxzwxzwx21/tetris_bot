@@ -197,7 +197,6 @@ class TetrisGame:
 
             while self.control_mode[0] and break_loop == False:
                 # we dont really need bruteforcer to work in control_mode, only to display heuristic on given piece, so im not making it efficient
-
                 if viewer:
                     from main_viewer import main_viewer
 
@@ -297,7 +296,6 @@ class TetrisGame:
             if viewer:
                 viewer.clear_preview()
                 viewer.update_board(self.board)
-                
                 viewer.update_pieces(self.stats.pieces_placed)
 
             debug_print(self.board, "main.py 200")
