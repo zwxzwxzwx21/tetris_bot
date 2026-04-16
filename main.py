@@ -75,8 +75,24 @@ class GameStats:
         self.burst_attack = 0  # unused, stil; thinking about it
         self.total_attack = 0
         self.pieces_placed = 0
-        self.calc_piece_time = [0,0,0,0,0,0,0] # how much time it takes to calculate one piece place,ment on averrage, [O,I,J,L,S,Z,T]
-        self.calc_piece_time_piecenumber = [0,0,0,0,0,0,0] # how much a piece got placed
+        self.calc_piece_time = [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]  # how much time it takes to calculate one piece place,ment on averrage, [O,I,J,L,S,Z,T]
+        self.calc_piece_time_piecenumber = [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+        ]  # how much a piece got placed
         # gamestats
         self.single = 0
         self.double = 0
@@ -115,7 +131,7 @@ class TetrisGame:
     def request_weights_recalc(self):
         self.weights_updated_event.set()
 
-    def game_loop(self, viewer):
+    def game_loop(self, viewer: TetrisBoardViewer):
         actual_game_start_time = time.perf_counter()
 
         # queue fill
@@ -168,26 +184,31 @@ class TetrisGame:
                 self.stats,
                 self.held_piece,
             )
-            
+
             time_to_calc_piece = time.perf_counter() - time_start
-            
-            self.stats.calc_piece_time, self.stats.calc_piece_time_piecenumber = time_to_place_piece(
-                move_history_with_best_move_info[0][0][0], # a piece like "T", "I" etc
-                self.stats.calc_piece_time,
-                time_to_calc_piece,
-                self.stats.calc_piece_time_piecenumber
+
+            self.stats.calc_piece_time, self.stats.calc_piece_time_piecenumber = (
+                time_to_place_piece(
+                    move_history_with_best_move_info[0][0][
+                        0
+                    ],  # a piece like "T", "I" etc
+                    self.stats.calc_piece_time,
+                    time_to_calc_piece,
+                    self.stats.calc_piece_time_piecenumber,
+                )
             )
-            #print(self.stats.calc_piece_time, self.stats.calc_piece_time_piecenumber)
-            
+            # print(self.stats.calc_piece_time, self.stats.calc_piece_time_piecenumber)
+
             print(
-                f"O piece time: {(self.stats.calc_piece_time[0]/(self.stats.calc_piece_time_piecenumber[0] if self.stats.calc_piece_time_piecenumber[0] != 0 else 1)):.5f}\
-                    I piece time: {(self.stats.calc_piece_time[1]/(self.stats.calc_piece_time_piecenumber[1] if self.stats.calc_piece_time_piecenumber[1] != 0 else 1)):.5f}\
-                    J piece time: {(self.stats.calc_piece_time[2]/(self.stats.calc_piece_time_piecenumber[2] if self.stats.calc_piece_time_piecenumber[2] != 0 else 1)):.5f}\
-                    L piece time: {(self.stats.calc_piece_time[3]/(self.stats.calc_piece_time_piecenumber[3] if self.stats.calc_piece_time_piecenumber[3] != 0 else 1)):.5f}\
-                    S piece time: {(self.stats.calc_piece_time[4]/(self.stats.calc_piece_time_piecenumber[4] if self.stats.calc_piece_time_piecenumber[4] != 0 else 1)):.5f}\
-                    Z piece time: {(self.stats.calc_piece_time[5]/(self.stats.calc_piece_time_piecenumber[5] if self.stats.calc_piece_time_piecenumber[5] != 0 else 1)):.5f}\
-                    T piece time: {(self.stats.calc_piece_time[6]/(self.stats.calc_piece_time_piecenumber[6] if self.stats.calc_piece_time_piecenumber[6] != 0 else 1)):.5f}")
-            
+                f"O piece time: {(self.stats.calc_piece_time[0] / (self.stats.calc_piece_time_piecenumber[0] if self.stats.calc_piece_time_piecenumber[0] != 0 else 1)):.5f}\
+                    I piece time: {(self.stats.calc_piece_time[1] / (self.stats.calc_piece_time_piecenumber[1] if self.stats.calc_piece_time_piecenumber[1] != 0 else 1)):.5f}\
+                    J piece time: {(self.stats.calc_piece_time[2] / (self.stats.calc_piece_time_piecenumber[2] if self.stats.calc_piece_time_piecenumber[2] != 0 else 1)):.5f}\
+                    L piece time: {(self.stats.calc_piece_time[3] / (self.stats.calc_piece_time_piecenumber[3] if self.stats.calc_piece_time_piecenumber[3] != 0 else 1)):.5f}\
+                    S piece time: {(self.stats.calc_piece_time[4] / (self.stats.calc_piece_time_piecenumber[4] if self.stats.calc_piece_time_piecenumber[4] != 0 else 1)):.5f}\
+                    Z piece time: {(self.stats.calc_piece_time[5] / (self.stats.calc_piece_time_piecenumber[5] if self.stats.calc_piece_time_piecenumber[5] != 0 else 1)):.5f}\
+                    T piece time: {(self.stats.calc_piece_time[6] / (self.stats.calc_piece_time_piecenumber[6] if self.stats.calc_piece_time_piecenumber[6] != 0 else 1)):.5f}"
+            )
+
             debug_print(
                 f"move history from best placement: {move_history_with_best_move_info}",
                 "main.py 144",
@@ -321,6 +342,11 @@ class TetrisGame:
                 viewer.clear_preview()
                 viewer.update_board(self.board)
                 viewer.update_pieces(self.stats.pieces_placed)
+                viewer.update_heuristics(
+                    *analyze(
+                        self.board, lines_cleared_count, print_values_to_viewer=True
+                    )
+                )
 
             debug_print(self.board, "main.py 200")
 
@@ -374,7 +400,7 @@ class TetrisGame:
 def parse_args():
     parser = argparse.ArgumentParser(description="Test arguments/rules")
     parser.add_argument("--seed", type=int, help="override RNG seed")
-    
+
     parser.add_argument("--max-pieces", type=int, default=99999999)
 
     parser.add_argument(
