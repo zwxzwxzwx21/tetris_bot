@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
  # python.exe -m pytest -q
 from BnB import run_reference_comparison, all_valid_positions
-pieces = ["I", "O", "T", "S", "Z", "J", "L"]
+pieces = ["I", "T", "S", "Z", "J", "L"]
 board = [[" " for _ in range(10)] for _ in range(20)]
 from board_operations.checking_valid_placements import can_place, find_lowest_y_for_piece 
     
@@ -133,7 +133,7 @@ expected_position_J = [
 ('J', 'spin_L', 9, 18),
 ]
 
-expected_position_O = [
+expected_position_O_optimal = [ # flat only as o doesnt have any rotations
     ('O', 'flat_0', 1, 19),
     ('O', 'flat_0', 2, 19),
     ('O', 'flat_0', 3, 19),
@@ -142,41 +142,7 @@ expected_position_O = [
     ('O', 'flat_0', 6, 19),
     ('O', 'flat_0', 7, 19),
     ('O', 'flat_0', 8, 19),
-    ('O', 'spin_L', 1, 19),
-    ('O', 'spin_L', 2, 19),
-    ('O', 'spin_L', 3, 19),
-    ('O', 'spin_L', 4, 19),
-    ('O', 'spin_L', 5, 19),
-    ('O', 'spin_L', 6, 19),
-    ('O', 'spin_L', 7, 19),
-    ('O', 'spin_L', 8, 19),
-    ('O', 'flat_2', 1, 19),
-    ('O', 'flat_2', 2, 19),
-    ('O', 'flat_2', 3, 19),
-    ('O', 'flat_2', 4, 19),
-    ('O', 'flat_2', 5, 19),
-    ('O', 'flat_2', 6, 19),
-    ('O', 'flat_2', 7, 19),
-    ('O', 'flat_2', 8, 19),
-    ('O', 'spin_R', 1, 19),
-    ('O', 'spin_R', 2, 19),
-    ('O', 'spin_R', 3, 19),
-    ('O', 'spin_R', 4, 19),
-    ('O', 'spin_R', 5, 19),
-    ('O', 'spin_R', 6, 19),
-    ('O', 'spin_R', 7, 19),
-    ('O', 'spin_R', 8, 19),
-]
-
-expected_position_O_optimal = [
-    ('O', 'flat_0', 1, 19),
-    ('O', 'flat_0', 2, 19),
-    ('O', 'flat_0', 3, 19),
-    ('O', 'flat_0', 4, 19),
-    ('O', 'flat_0', 5, 19),
-    ('O', 'flat_0', 6, 19),
-    ('O', 'flat_0', 7, 19),
-    ('O', 'flat_0', 8, 19)
+    ('O', 'flat_0', 9, 19)
 ]
 
 expected_position_Z = [
@@ -301,7 +267,6 @@ expected_position_S = [
 
 EXPECTED_BY_PIECE = {
     'I': expected_positions_I,
-    'O': expected_position_O,
     'T': expected_position_T,
     'S': expected_position_S,
     'Z': expected_position_Z,
@@ -310,10 +275,10 @@ EXPECTED_BY_PIECE = {
     'O_optimal': expected_position_O_optimal
 }
 
-@pytest.mark.parametrize("piece", ["I", "O", "T", "S", "Z", "J", "L"])
+@pytest.mark.parametrize("piece", ["I", "T", "S", "Z", "J", "L"])
 def test_all_valid_positions_match_expected(piece):
     board = [[" " for _ in range(10)] for _ in range(20)]
-    actual = set(all_valid_positions(piece, board, held_piece=None, queue=piece))
+    actual = set(all_valid_positions(piece, board, held_piece=None, queue=[piece]))
     expected = set(EXPECTED_BY_PIECE[piece])
 
     missing = sorted(expected - actual)
@@ -325,7 +290,7 @@ def test_all_valid_positions_match_expected(piece):
     )
 def test_O_optimal_positions():
     board = [[" " for _ in range(10)] for _ in range(20)]
-    actual = set(all_valid_positions('O', board, held_piece=None, queue='O'))
+    actual = set(all_valid_positions('O', board, held_piece=None, queue=['O']))
     expected = set(EXPECTED_BY_PIECE['O_optimal'])
 
     missing = sorted(expected - actual)

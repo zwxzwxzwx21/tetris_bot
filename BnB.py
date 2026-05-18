@@ -245,13 +245,14 @@ def all_valid_positions(piece, board, held_piece, queue):
         assert current_piece in PIECES_index
         
         for rotation_name, piece_pos_array  in PIECES_index[current_piece].items():
-            
+            if current_piece == "O" and rotation_name in ["spin_R", "spin_L","flat_2"]:    
+                continue  # O piece has no spins
             #start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
             start_x_pos = min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) * -1
-            finish_x_pos = BOARD_WIDTH-(max(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) - min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]))
+            finish_x_pos = BOARD_WIDTH - 1 - max(dx for (dx, _dy) in PIECES_index[current_piece][rotation_name])
             #check all positions from the position we can place the piece on downwards,  if there is a place for a piece
             # add it to arrayt and see what results it gives (it may be inaccesible)
-            for start_x in range(start_x_pos,finish_x_pos):
+            for start_x in range(start_x_pos, finish_x_pos + 1):
                 
                 lowest_y = find_lowest_y_for_piece(PIECES_index[current_piece][rotation_name], board, start_x,rotation_name,current_piece)
 
