@@ -45,9 +45,9 @@ def find_best_placement(board, queue, combo,stats,held_piece):
     total_lines = 0
      
     best_loss = -999999
-
-    arr_piece_info_array = []
     list_of_best_moves = []
+    
+    arr_piece_info_array = []
     held_piece_checked_loop = 0 # if there is no held piece, we only check once
     max_piece_loops = 1 if held_piece is None else 2
     while held_piece_checked_loop < max_piece_loops: # i dont know if bool works, we have to check twice and do while doesnt exist in python
@@ -77,9 +77,8 @@ def find_best_placement(board, queue, combo,stats,held_piece):
         
         new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
         if not is_place_piece_successful:
-            debug_print(f"GAMEOVER, score (best loss) : {best_loss} ", "bruteforcing.py, function: find_best_placement")
-            GAMEOVER = True
-            break
+            continue
+        
         board_after_clear, cleared_lines = clear_lines(new_board)
         debug_print("cleared lines:", cleared_lines, "bruteforcing.py, function: find_best_placement")
         # piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
@@ -92,7 +91,8 @@ def find_best_placement(board, queue, combo,stats,held_piece):
             total_lines += cleared_lines
             debug_print("UPDATED BEST MOVE TO:", best_move, " with loss: ", best_loss, "bruteforcing.py, function: find_best_placement")
             list_of_best_moves.append((best_move, best_move_y_pos))
-        
+    if len(list_of_best_moves) == 0:
+        GAMEOVER = True    
 
     debug_print("\n")
     if GAMEOVER:
