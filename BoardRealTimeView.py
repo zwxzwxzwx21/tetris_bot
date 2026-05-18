@@ -1,3 +1,7 @@
+import ctypes
+import os
+import sys
+
 import pygame  # type: ignore
 
 from utility.pieces_index import PIECES_index
@@ -13,6 +17,8 @@ COLOR_PANEL = (28, 28, 36)
 COLOR_GRID = (42, 42, 54)
 COLOR_TEXT = (220, 220, 230)
 COLOR_BUTTON = (30, 140, 40)
+ICON_FILENAME = "OIP-3085101781.jpg"
+WINDOWS_APP_ID = "tewibot.viewer"
 
 PIECE_COLORS = {
     "I": (0, 255, 255),
@@ -24,6 +30,25 @@ PIECE_COLORS = {
     "T": (160, 0, 160),
     " ": (224, 224, 232),
 }
+
+
+def _set_windows_taskbar_app_id():
+    if sys.platform != "win32":
+        return
+
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(WINDOWS_APP_ID)
+    except Exception:
+        # If this fails, pygame still runs, windows will use the default process icon.
+        pass
+
+
+def _load_window_icon_surface():
+    icon_path = os.path.join(os.path.dirname(__file__), ICON_FILENAME)
+    try:
+        return pygame.image.load(icon_path)
+    except pygame.error:
+        return None
 
 
 class TetrisBoardViewer:
@@ -46,12 +71,16 @@ class TetrisBoardViewer:
         control_mode,
         held_piece,
     ):
+        _set_windows_taskbar_app_id()
         pygame.init()
+        icon_surface = _load_window_icon_surface()
+        if icon_surface is not None:
+            pygame.display.set_icon(icon_surface)
+
         self.surface = pygame.display.set_mode(
             (BOARD_WIDTH * CELL_SIZE + SIDE_WIDTH, BOARD_HEIGHT * CELL_SIZE)
         )
         pygame.display.set_caption("tewi bot 🐰")
-        pygame.display.set_icon(pygame.image.load("OIP-3085101781.jpg"))
         self.font = pygame.font.SysFont("orbitron", 16)
         self.clock = pygame.time.Clock()
         self.board = board_
