@@ -29,19 +29,15 @@ rotations = {
     "T": ["flat", "180", "cw", "ccw"],
 }
 
-MOVES_DONE = 0
-MOVES_REMOVED = 0
-TIME_LIMIT = 999
-UNEVEN_THRESHOLD = 1.1  
-MAX_HEIGHT_DIFF = 6 
-BRUTEFORCE_MODE = False
+
 
 def loss(board, cleared_lines) -> float:
     return analyze(board,cleared_lines)
 
 # MAKE SPINS RECOGNIZABLE
 # mark kicks as spins and whenever one is performed, set a flag that a spin was done, this will be used for btb
-
+BOARD_HEIGHT = 20 # TODO move it to config
+BOARD_WIDTH = 10 
 def find_best_placement(board, queue, combo,stats,held_piece):
     move_history = []
     GAMEOVER = False
@@ -64,14 +60,14 @@ def find_best_placement(board, queue, combo,stats,held_piece):
             
             #start_x_pos = PIECES_startpos_indexing_value[current_piece][rotation_name] if current_piece != 'O' else 1
             start_x_pos = min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) * -1
-            finish_x_pos = 10-(max(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) - min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]))
+            finish_x_pos = BOARD_WIDTH-(max(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]) - min(dx for (dx, dy) in PIECES_index[current_piece][rotation_name]))
             #check all positions from the position we can place the piece on downwards,  if there is a place for a piece
             # add it to arrayt and see what results it gives (it may be inaccesible)
             for start_x in range(start_x_pos,finish_x_pos):
                 
                 lowest_y = find_lowest_y_for_piece(PIECES_index[current_piece][rotation_name], board, start_x,rotation_name,current_piece)
 
-                for y in range(lowest_y-0, 21):  
+                for y in range(lowest_y-0, BOARD_HEIGHT+1):  
                     if can_place(PIECES_index[current_piece][rotation_name], board, y, start_x,rotation_name,current_piece,print_debug=False):
 
                             arr_piece_info_array.append([current_piece, rotation_name, start_x, y])

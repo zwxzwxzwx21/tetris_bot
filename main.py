@@ -1,6 +1,6 @@
 # to test the argparse better, try running it in console using:
 # python .\main.py --rule, rules will be listed lower, as they are wip
-# python .\main.py --rule control_mode
+# python .\main.py --rule gui
 # c:\Users\alexx\tewibot\.venv\Scripts\Activate.ps1
 
 # stdlib
@@ -196,17 +196,6 @@ class TetrisGame:
                     time_to_calc_piece,
                     self.stats.calc_piece_time_piecenumber,
                 )
-            )
-            # print(self.stats.calc_piece_time, self.stats.calc_piece_time_piecenumber)
-
-            print(
-                f"O piece time: {(self.stats.calc_piece_time[0] / (self.stats.calc_piece_time_piecenumber[0] if self.stats.calc_piece_time_piecenumber[0] != 0 else 1)):.5f}\
-                    I piece time: {(self.stats.calc_piece_time[1] / (self.stats.calc_piece_time_piecenumber[1] if self.stats.calc_piece_time_piecenumber[1] != 0 else 1)):.5f}\
-                    J piece time: {(self.stats.calc_piece_time[2] / (self.stats.calc_piece_time_piecenumber[2] if self.stats.calc_piece_time_piecenumber[2] != 0 else 1)):.5f}\
-                    L piece time: {(self.stats.calc_piece_time[3] / (self.stats.calc_piece_time_piecenumber[3] if self.stats.calc_piece_time_piecenumber[3] != 0 else 1)):.5f}\
-                    S piece time: {(self.stats.calc_piece_time[4] / (self.stats.calc_piece_time_piecenumber[4] if self.stats.calc_piece_time_piecenumber[4] != 0 else 1)):.5f}\
-                    Z piece time: {(self.stats.calc_piece_time[5] / (self.stats.calc_piece_time_piecenumber[5] if self.stats.calc_piece_time_piecenumber[5] != 0 else 1)):.5f}\
-                    T piece time: {(self.stats.calc_piece_time[6] / (self.stats.calc_piece_time_piecenumber[6] if self.stats.calc_piece_time_piecenumber[6] != 0 else 1)):.5f}"
             )
 
             debug_print(
