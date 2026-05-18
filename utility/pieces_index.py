@@ -65,7 +65,7 @@ PIECES_index = {
 }
 
 PIECES_index_sim_game_left = {
-    'O': {
+    'O': { 
         'flat_0' : 1, 
         'flat_2': 1,
         'spin_L': 1,
@@ -73,9 +73,9 @@ PIECES_index_sim_game_left = {
         },
 
     'I': {
-        'flat_0' : 0,
+        'flat_0' : 0, # off by one
         'spin_L' : -1,
-        'flat_2' : 0,
+        'flat_2' : 0, # off by one
         'spin_R' : -2,
         }, 
 
@@ -87,10 +87,10 @@ PIECES_index_sim_game_left = {
         },
 
     'L': {
-        'flat_0': 1,
-        'flat_2': 1,
+        'flat_0': 1, # off by one 
+        'flat_2': 1, # off by one 
         'spin_R': 0,
-        'spin_L': 1,
+        'spin_L': 1, # off by one 
         },
 
     'J': {
