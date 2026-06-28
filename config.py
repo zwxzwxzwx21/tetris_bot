@@ -1,6 +1,6 @@
 PRINT_MODE = False
 DESIRED_QUEUE_PREVIEW_LENGTH = 5
-SEARCH_DEPTH = 5
+#SEARCH_DEPTH = 5
 BOARD_WIDTH, BOARD_HEIGHT = 10, 20
 das_delay = 8  # 0.16s before repeat starts
 arr_delay = 0   # 0s between moves after DAS activates
@@ -12,3 +12,6 @@ das_state = {
 }
 
 custom_board = [[' ' for _ in range(10)] for _ in range(20)]
+
+USE_BNB_SEARCH = False
+BNB_SEARCH_DEPTH = 2 

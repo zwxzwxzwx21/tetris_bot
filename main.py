@@ -24,6 +24,7 @@ from board_operations.board_operations import clear_lines, solidify_piece
 from board_save_load_functions import save_game_results, save_game_state
 from BoardRealTimeView import TetrisBoardViewer
 from bruteforcing import find_best_placement
+from BnB import find_best_placement_bnb
 from GenerateBag import add_piece_from_bag, create_bag
 from heuristic import analyze
 from simulate_game_movement import simulate_move
@@ -177,12 +178,11 @@ class TetrisGame:
 
             time_start = time.perf_counter()
 
-            move_history_with_best_move_info = find_best_placement(
+            move_history_with_best_move_info = find_best_placement_bnb(
                 self.board,
                 self.queue[:DESIRED_QUEUE_PREVIEW_LENGTH],
-                self.stats.combo,
-                self.stats,
                 self.held_piece,
+                depth=config.BNB_SEARCH_DEPTH,
             )
 
             time_to_calc_piece = time.perf_counter() - time_start

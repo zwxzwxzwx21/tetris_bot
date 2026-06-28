@@ -5,7 +5,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
  # python.exe -m pytest -q
-from BnB import run_reference_comparison, all_valid_positions
+from BnB import all_valid_positions
 pieces = ["I", "T", "S", "Z", "J", "L"]
 board = [[" " for _ in range(10)] for _ in range(20)]
 from board_operations.checking_valid_placements import can_place, find_lowest_y_for_piece 

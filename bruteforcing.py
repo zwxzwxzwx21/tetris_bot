@@ -1,4 +1,4 @@
-from logging import config
+import config
 from pprint import pp
 import pandas as pd
 from heuristic import analyze
@@ -12,6 +12,7 @@ from board_operations.stack_checking import (
 from tetrio_parsing.calculate_attack import count_lines_clear
 from utility.print_board import print_board, debug_print
 from utility.pieces_index import PIECES_index
+
 
 from search_for_best_move import search_for_best_move
 
@@ -39,13 +40,15 @@ def loss(board, cleared_lines) -> float:
 BOARD_HEIGHT = 20 # TODO move it to config
 BOARD_WIDTH = 10 
 def find_best_placement(board, queue, combo,stats,held_piece):
+
+
     move_history = []
     GAMEOVER = False
     best_move = None
     total_lines = 0
      
     best_loss = -999999
-    list_of_best_moves = []
+    list_of_best_moves = [] # inaccurate naming, its mostly list of all moves that were better than current  loss and can be unachieveable
     
     arr_piece_info_array = []
     held_piece_checked_loop = 0 # if there is no held piece, we only check once
@@ -76,8 +79,6 @@ def find_best_placement(board, queue, combo,stats,held_piece):
     for position_info in arr_piece_info_array:
         
         new_board, is_place_piece_successful = place_piece(PIECES_index[position_info[0]][position_info[1]],position_info[0], board, position_info[2], position_info[3], position_info[1],print_debug=False,where_called_from="bruteforcing, fuycntion: try best placement")
-        if not is_place_piece_successful:
-            continue
         
         board_after_clear, cleared_lines = clear_lines(new_board)
         debug_print("cleared lines:", cleared_lines, "bruteforcing.py, function: find_best_placement")

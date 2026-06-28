@@ -1,10 +1,18 @@
 python .\main.py --rule 
 
 
+# piece info array example ("T",'flat_0',x(fore xample 4),y(for example 15))
 
 
 
-
+"""alexx@zwx MINGW64 ~/tewibot (master)
+$ ./.venv/Scripts/python -m pytest -vv --durations=0
+============================= test session starts =============================
+platform win32 -- Python 3.14.2, pytest-9.0.3, pluggy-1.6.0 -- C:\Users\alexx\tewibot\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\alexx\tewibot
+collected 10 items
+"""
 
 
 with new window that shows how algorythm work i would like to add some things that may improve the clarity of how things work:
