@@ -1,5 +1,7 @@
 import logging
 
+from config import BOARD_WIDTH
+
 logging.basicConfig(
     format="%(levelname)s: %(filename)s: %(lineno)d: %(message)s", level=logging.DEBUG
 )
@@ -83,3 +85,42 @@ def find_highest_y(board):
         if any(cell != ' ' for cell in board[y]):
             return y
     return len(board)
+
+def is_tetris_well(board):
+    BOARD_HEIGHT = len(board)
+    BOARD_WIDTH = len(board[0])
+    empty_cells_array = [0] * BOARD_WIDTH
+    
+    for height, row in enumerate(board):
+        empty_cols = [col for col in range(BOARD_WIDTH) if row[col] == " "]
+        
+        if len(empty_cols) == 1:
+            col = empty_cols[0]
+            for i in range(BOARD_WIDTH):
+                if i == col:
+                    empty_cells_array[i] += 1
+                else:
+                    empty_cells_array[i] = 0
+        else:
+            empty_cells_array = [0] * BOARD_WIDTH
+            continue
+        
+        for col, count in enumerate(empty_cells_array):
+            if count >= 4:
+                well_top = height - count + 1
+                
+                left_ok = (col > 0) and any(board[y][col-1] != " " for y in range(BOARD_HEIGHT))
+                right_ok = (col < BOARD_WIDTH-1) and any(board[y][col+1] != " " for y in range(BOARD_HEIGHT))
+                
+                if not (left_ok or right_ok):
+                    continue
+                
+                minos_above = well_top  
+                for y_above in range(well_top):
+                    if board[y_above][col] != " ":
+                        minos_above = well_top - y_above
+                        break
+                
+                return True, col, well_top, minos_above
+    
+    return False, None, None, None
