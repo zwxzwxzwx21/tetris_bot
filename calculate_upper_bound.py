@@ -25,11 +25,13 @@ class CalculateUpperBound():
         #self.calculate_upper_bound()
         
     def is_pc_possible(self):
+        
         higest_y_with_parity = find_highest_y(self.board) # highestY returns height from 0 index on Y axis so board height of 4 yields 16, to fix it just do 20-result
         higest_y_with_parity = 20 - higest_y_with_parity
         if higest_y_with_parity % 2 == 1: # board does not have even height 
             higest_y_with_parity += 1 # we add one to make it even, this is because pc requires even height to be possible
-        
+        if (higest_y_with_parity*BOARD_WIDTH - count_minos(self.board)) % 4 != 0:
+            return False
         if (higest_y_with_parity*BOARD_WIDTH - count_minos(self.board))/4 <= self.depth: 
             return True
         return False

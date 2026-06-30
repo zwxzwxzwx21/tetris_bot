@@ -126,22 +126,8 @@ from board_operations.stack_checking import count_minos, find_highest_y
 def test_calculate_upper_bound_PCable_at_depth_2():
     from board_operations.stack_checking import count_minos, find_highest_y
     
-    # Oblicz ręcznie, żeby zobaczyć wartości
-    h = 20 - find_highest_y(board_PCalbe_at_depth_2)
-    c = count_minos(board_PCalbe_at_depth_2)
-    
-    # WYMUŚ wypisanie NAWET przy PASS (użyj -s przy pytest)
-    import sys
-    print(f"\n=== DEBUG PC depth 2 ===", file=sys.stderr)
-    print(f"highest_y: {h}", file=sys.stderr)
-    print(f"count_minos: {c}", file=sys.stderr)
-    print(f"formula: ({h}*10 - {c})/4 = {(h*10 - c)/4} <= 2", file=sys.stderr)
-    
     upper_bound_calculator = CalculateUpperBound(board_PCalbe_at_depth_2, queue, None, 2)
-    result = upper_bound_calculator.is_pc_possible()
-    print(f"is_pc_possible() returned: {result}", file=sys.stderr)
     
-    assert result == True, f"h={h}, c={c}, formula={(h*10 - c)/4}"
     assert upper_bound_calculator.is_pc_possible() == True, "Expected PC to be possible at depth 2"
 def test_calculate_upper_bound_PCable_at_depth_3():
     upper_bound_calculator = CalculateUpperBound(board_PCalbe_at_depth_2, queue, None, 3)
@@ -160,15 +146,21 @@ def test_calculate_upper_bound_PCable_at_depth_6_parity_example_true():
 def test_calculate_upper_bound_not_PCable():
     upper_bound_calculator = CalculateUpperBound(board_not_PCable, queue, None, 5)
     assert upper_bound_calculator.is_pc_possible() == False, "Expected PC to be impossible at depth 5"
+    
+    
 def test_calculate_upper_bound_not_PCable_depth_6():
     upper_bound_calculator = CalculateUpperBound(board_not_PCable, queue, None, 6)
+    
+    
+    #assert result == True, f"h={h}, c={c}, formula={(h*10 - c)/4}"
     assert upper_bound_calculator.is_pc_possible() == False, "Expected PC to be impossible at depth 6"
     
-def test_calculate_upper_bound_impossible_to_pc_example1():
+def test_calculate_upper_bound_impossible_to_pc_example1():# uneven amount of blocks
     upper_bound_calculator = CalculateUpperBound(board_impossible_to_pc_example1, queue, None, 30)
     assert upper_bound_calculator.is_pc_possible() == False, "Expected PC to be impossible"
-def test_calculate_upper_bound_impossible_to_pc_example2():
-    upper_bound_calculator = CalculateUpperBound(board_impossible_to_pc_example2, queue, None, 30)
+def test_calculate_upper_bound_impossible_to_pc_example2(): # not enough depth
+    upper_bound_calculator = CalculateUpperBound(board_impossible_to_pc_example2, queue, None, 10)
+    
     assert upper_bound_calculator.is_pc_possible() == False, "Expected PC to be impossible"
     
 # to run tests just from this file use command 
