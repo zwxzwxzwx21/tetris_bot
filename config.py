@@ -12,6 +12,6 @@ das_state = {
 }
 
 custom_board = [[' ' for _ in range(10)] for _ in range(20)]
-
+_OPTIMISTIC_FUTURE_STEP = 50
 USE_BNB_SEARCH = False
-BNB_SEARCH_DEPTH = 2 
+BNB_SEARCH_DEPTH = 2

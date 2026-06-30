@@ -5,7 +5,7 @@ from time import time
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # called by bruteforcer
-
+# TODO arent find drop height and soft drop simulation returning ypos the same? 
 def find_drop_height(board, xpos):
     """
     Finds the height at which a piece would land if dropped in the given column.

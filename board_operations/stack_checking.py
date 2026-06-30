@@ -3,7 +3,11 @@ import logging
 logging.basicConfig(
     format="%(levelname)s: %(filename)s: %(lineno)d: %(message)s", level=logging.DEBUG
 )
-
+def count_minos(board):
+    """
+    Counts the number of minos (non-empty cells) on the board.
+    """
+    return sum(cell != " " for row in board for cell in row)
 
 def hole_exists(board, x, y):
     assert 0 <= x <= 9

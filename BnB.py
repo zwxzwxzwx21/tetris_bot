@@ -15,8 +15,10 @@ from utility.pieces_index import PIECES_index
 
 Move = tuple[str, str, int, int, bool]
 BonusFn = Callable[[list[str], str | None, int, list[list[str]]], float]
+from calculate_upper_bound import CalculateUpperBound
 
-_OPTIMISTIC_FUTURE_STEP = 1000.0
+# _OPTIMISTIC_FUTURE_STEP = CalculateUpperBound.upper_bound
+
 
 def _get_moves_from_all_valid(board, queue, held_piece):
     """Converts the result of all_valid_positions to BnB format (with used_hold).
@@ -286,8 +288,6 @@ def find_best_placement_bnb(
     bonus_fn: BonusFn = calculate_bonus,
 ):
     """
-    Compatibility wrapper matching `bruteforcing.find_best_placement` return shape.
-
     Args:
         board (list[list[str]]): The current board state.
         queue (list[str]): The current piece queue.
