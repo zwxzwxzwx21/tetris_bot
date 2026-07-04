@@ -13,7 +13,7 @@ the idea here is that looking ahead in X moves we can tell if:
 
 from config import BOARD_WIDTH
 from config import _OPTIMISTIC_FUTURE_STEP
-from board_operations.stack_checking import find_highest_y, count_minos
+from board_operations.stack_checking import find_highest_y, count_minos, is_tetris_well
 import math 
 # small problem i have with this function that i dont know how to fix yet is that it kinda works when bot puts itself in positions that could leave to good outcomes
 # for example, if it would skim all the time, it would not look for pcs or tetrises (tho tspins could save something here) so we kinda pray that it puts itself in one of those situations to go for better moves
@@ -48,9 +48,11 @@ class CalculateUpperBound():
         """
         now that one is tricky because what even is a tspin, we need unevenbboard check, heighdifference and possibility to judge how possible
         it would be to fill up the height diff with other blocks for tspins (donations) and things like t spin minis, and hamburger setups
+        
+        should have a check "is tspin in queue i guess but that isnt needed"
         """
         return False
-    def is_tetris_well_possible(self):
+    def is_tetris_well_possible(self, board):
         # TODO implement tetris well check, maybe just check if there is a tetris well on the board and if the next piece is I
         """ 
         here the idea would be to simply check if we can do a quad or a combo to quad with current pieces
@@ -61,7 +63,20 @@ class CalculateUpperBound():
         so for example we have spiky board that has holes like, depth 2, depth 4, and depth 5, we will focus on depth 5 hole and try filling up everything else, unless we dont have enough depth to fill up the blocks
         """
         
-        # case 1 #
+        # case 1 # example of  return: True(was succesful?), col, well_top(index in which highest I piece mino would be while tkaing quad), minos_above
+        
+        tetris_wall_esists, col ,index_of_top_well , spaces_above_the_well= is_tetris_well(board)
+        
+        """ 
+        case 1 has a big issue that it only gives us where the well is, if there is one, 
+        but we need to tell if the well is even accesible in x amount of pieces, that could be done in same wayas checking PC, 
+        additionaly we can add some more points if the well is accesible in a combo, like make move 1 and see if the combo increases,
+        if no, move is over, then do it with entire queue, assuming that the weill is still accesible in that amount of peisces
+        
+        # i take back things that are below but i keep it for clarity, if heuristic is good, it will take quads over normal clears, and it should be able to find a quad, doing another check here is useless
+        another important thing is that quad can be accesible with a spin, when the well is technically covered, easy check woudl be to just run the check we do for bruteforce,
+        if we can make the I piece go into that spot, taking a quad, so simulate game movement etc etc
+        """
         
         
         return False

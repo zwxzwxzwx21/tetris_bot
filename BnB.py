@@ -9,7 +9,7 @@ from board_operations.checking_valid_placements import (
     find_lowest_y_for_piece,
     place_piece,
 )
-from config import BOARD_WIDTH, BOARD_HEIGHT, BNB_SEARCH_DEPTH
+from config import BOARD_WIDTH, BOARD_HEIGHT, BNB_SEARCH_DEPTH,_OPTIMISTIC_FUTURE_STEP
 from heuristic import analyze
 from utility.pieces_index import PIECES_index
 

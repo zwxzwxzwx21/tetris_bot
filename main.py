@@ -23,7 +23,7 @@ import config
 from board_operations.board_operations import clear_lines, solidify_piece
 from board_save_load_functions import save_game_results, save_game_state
 from BoardRealTimeView import TetrisBoardViewer
-from bruteforcing import find_best_placement
+#from bruteforcing import find_best_placement
 from BnB import find_best_placement_bnb
 from GenerateBag import add_piece_from_bag, create_bag
 from heuristic import analyze

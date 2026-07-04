@@ -5,11 +5,50 @@ from config import BOARD_WIDTH
 logging.basicConfig(
     format="%(levelname)s: %(filename)s: %(lineno)d: %(message)s", level=logging.DEBUG
 )
-def count_minos(board):
+
+def calculate_board_messiness(board, y1=0, y2=None):
+    """the idea is that we have X holes in a line, and if there are no shifts in holes, so we can have line with hole on X 5
+    for Y = 10, and hole on X 5 for Y = 11, then we have no shifts, so we dont need as many pieces as we would need
+    if we hav a hole on x 4, which we need at least one more piece to clear, basically try to guess amount of pieces needed to get to the well
+    """
+    #board_garbage_array = [0] * BOARD_WIDTH
+    shift_number = 0 
+    if y2 is None:
+        y2 = len(board)
+    first_row = True
+    for y in range(y1, y2):
+        for x in range(BOARD_WIDTH):
+            if board[y][x] == " ":
+                if 0 < x < BOARD_WIDTH+1:
+                    #TODO  fix the condition above as it skips sides
+                    if not first_row:
+                        if board[y+1][x] == " ": 
+                            if board[y+1][x+1] == " ":
+                                shift_number += 0.5
+                            elif board[y+1][x-1] == " ":
+                                shift_number += 0.5
+                            # im aware it can count multiple shifts for one hole
+                        else:
+                            if board[y+1][x] != " ":
+                                shift_number += 1
+                                if board[y+1][x+1] == " ":
+                                    shift_number += 1
+                                elif board[y+1][x-1] == " ":
+                                    shift_number += 1
+                
+                first_row = False
+    
+    return shift_number+2 # estimated number of pieces to fill up mboaard to get to the well
+    # +2 because testcases show that its better to be a bit pesimistic 
+def count_minos(board, y1=0, y2=None):
     """
     Counts the number of minos (non-empty cells) on the board.
+    Only counts rows from y1 (inclusive) to y2 (exclusive).
+    y=0 is top, y=20 is bottom.
     """
-    return sum(cell != " " for row in board for cell in row)
+    if y2 is None:
+        y2 = len(board)
+    return sum(cell != " " for row in board[y1:y2] for cell in row)
 
 def hole_exists(board, x, y):
     assert 0 <= x <= 9
